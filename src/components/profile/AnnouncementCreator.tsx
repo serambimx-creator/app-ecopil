@@ -31,7 +31,7 @@ export default function AnnouncementCreator({ open, onOpenChange }: Announcement
         if (data) {
             const uniqueNodes = Array.from(new Set(data.map(p => p.node).filter(Boolean))) as string[];
             setNodes(uniqueNodes);
-            setStaff(data);
+            setStaff(data as any);
         }
     }
 
