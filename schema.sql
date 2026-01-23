@@ -1,0 +1,130 @@
+-- Enable UUID extension
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
+-- 1. ENUMS
+CREATE TYPE status_enum AS ENUM ('red', 'yellow', 'green');
+CREATE TYPE role_enum AS ENUM ('admin', 'coordinator', 'volunteer');
+CREATE TYPE finance_type_enum AS ENUM ('income', 'expense');
+CREATE TYPE evidence_type_enum AS ENUM ('image', 'video', 'audio', 'document');
+
+-- 2. TABLES
+
+-- Profiles
+CREATE TABLE profiles (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    email TEXT NOT NULL UNIQUE,
+    full_name TEXT NOT NULL,
+    node TEXT, -- e.g. 'Hidalgo', 'Morelos'
+    role role_enum NOT NULL DEFAULT 'volunteer',
+    avatar_url TEXT,
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Projects (Gestión Anual)
+CREATE TABLE projects (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    title TEXT NOT NULL,
+    description TEXT,
+    year INTEGER NOT NULL,
+    status status_enum NOT NULL DEFAULT 'yellow',
+    cover_image TEXT,
+    latitude FLOAT,
+    longitude FLOAT,
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Agenda Activities (Encuentro)
+CREATE TABLE agenda_activities (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    project_id UUID REFERENCES projects(id) ON DELETE CASCADE,
+    title TEXT NOT NULL,
+    description TEXT,
+    status status_enum NOT NULL DEFAULT 'yellow',
+    date TIMESTAMPTZ NOT NULL, -- Includes time
+    location TEXT,
+    latitude FLOAT,
+    longitude FLOAT,
+    agreements TEXT,
+    report_details TEXT,
+    logistics_instructions TEXT,
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Sub Blocks (Logistics)
+CREATE TABLE sub_blocks (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    activity_id UUID REFERENCES agenda_activities(id) ON DELETE CASCADE,
+    title TEXT NOT NULL,
+    description TEXT,
+    time_start TEXT, -- Format "HH:MM"
+    time_end TEXT    -- Format "HH:MM"
+);
+
+-- Finances
+CREATE TABLE finances (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    project_id UUID REFERENCES projects(id) ON DELETE CASCADE,
+    type finance_type_enum NOT NULL,
+    amount NUMERIC(12, 2) NOT NULL,
+    description TEXT NOT NULL,
+    date TIMESTAMPTZ NOT NULL,
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Activity Assignments (Responsabilidades)
+CREATE TABLE activity_assignments (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    activity_id UUID REFERENCES agenda_activities(id) ON DELETE CASCADE,
+    user_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
+    role_in_activity TEXT, -- e.g. 'Moderator', 'Hydration'
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Personal Tasks (Notas Privadas)
+CREATE TABLE personal_tasks (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    user_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
+    title TEXT NOT NULL,
+    is_completed BOOLEAN DEFAULT FALSE,
+    due_date TIMESTAMPTZ,
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Announcements (Avisos)
+CREATE TABLE announcements (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    title TEXT NOT NULL,
+    content TEXT NOT NULL,
+    target_audience TEXT, -- 'all', 'volunteers', etc.
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Evidence (Multimedia)
+CREATE TABLE evidence (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    activity_id UUID REFERENCES agenda_activities(id) ON DELETE CASCADE,
+    file_url TEXT NOT NULL,
+    file_type evidence_type_enum NOT NULL,
+    uploaded_by UUID REFERENCES profiles(id) ON DELETE SET NULL,
+    description TEXT,
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Audit Logs (Historial)
+CREATE TABLE audit_logs (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    table_name TEXT NOT NULL,
+    record_id UUID NOT NULL,
+    action TEXT CHECK (action IN ('INSERT', 'UPDATE', 'DELETE')),
+    old_data JSONB,
+    new_data JSONB,
+    performed_by UUID REFERENCES profiles(id) ON DELETE SET NULL,
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- 3. INDEXES (Optional for performance)
+CREATE INDEX idx_agenda_activities_project_id ON agenda_activities(project_id);
+CREATE INDEX idx_agenda_activities_date ON agenda_activities(date);
+CREATE INDEX idx_audit_logs_created_at ON audit_logs(created_at);
+CREATE INDEX idx_profiles_email ON profiles(email);
+

@@ -1,0 +1,59 @@
+@import "tailwindcss";
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+
+  /* Brand Colors */
+  --color-brand-green: #00DF81;
+  --color-status-red: #FF4B4B;
+  --color-status-yellow: #FFD233;
+  --color-dark-surface: #121212;
+
+  /* Border Radius */
+  --radius-3xl: 1.5rem;
+  --radius-DEFAULT: 1.5rem;
+  /* Setting 3xl as default standard if desired, or just ensuring it's available */
+}
+
+/* Base Styles */
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #121212;
+    /* Using dark-surface as main background */
+    --foreground: #ededed;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Utilities */
+.glass-card {
+  @apply backdrop-blur-xl bg-white/5 border border-white/10;
+}
+
+/* Animations */
+@keyframes scroll-infinite {
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-scroll-infinite {
+  animation: scroll-infinite 20s linear infinite;
+}
