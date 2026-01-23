@@ -99,7 +99,7 @@ export default function WarRoom({ role = 'admin' }: WarRoomProps) {
     }
 
     return (
-        <div className="space-y-6 animate-in fade-in zoom-in duration-500">
+        <div className="space-y-6 animate-in fade-in zoom-in duration-500 pb-24">
 
             <header className="mb-6">
                 <h1 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-500">

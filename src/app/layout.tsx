@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import BottomNav from "@/components/layout/BottomNav";
 import AssistantFab from "@/components/ai/AssistantFab";
@@ -11,6 +11,13 @@ export const metadata: Metadata = {
   description: "Plataforma de gestión App-Ecopil",
 };
 
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -19,12 +26,12 @@ export default function RootLayout({
   return (
     <html lang="es" suppressHydrationWarning>
       <body
-        className={`bg-dark-surface text-foreground antialiased min-h-screen pb-24`}
+        className={`bg-dark-surface text-foreground antialiased min-h-screen pb-32 max-w-md mx-auto overflow-x-hidden shadow-2xl border-x border-white/5`}
         suppressHydrationWarning
       >
         <AuthProvider>
           <Header />
-          <main className="p-4 md:p-8">
+          <main className="p-4">
             {children}
           </main>
           <BottomNav />

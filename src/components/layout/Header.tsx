@@ -28,7 +28,7 @@ export default function Header() {
 
     return (
         <header className="sticky top-0 z-30 w-full border-b border-white/5 bg-gradient-to-r from-dark-surface/90 to-white/95 backdrop-blur-md transition-all duration-300">
-            <div className="flex items-center justify-between px-6 py-4">
+            <div className="flex items-center justify-between px-6 py-2">
                 {/* Left: Dynamic Title */}
                 <h1 className="text-xl font-black text-white tracking-wide drop-shadow-sm">
                     {getTitle()}
