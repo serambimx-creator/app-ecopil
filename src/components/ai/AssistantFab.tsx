@@ -99,7 +99,7 @@ export default function AssistantFab() {
             <button
                 onClick={() => setIsOpen(!isOpen)}
                 className={clsx(
-                    "fixed bottom-6 right-6 z-50 p-4 rounded-full shadow-2xl transition-all duration-300 transform hover:scale-110 active:scale-95",
+                    "fixed bottom-24 right-6 z-50 p-4 rounded-full shadow-2xl transition-all duration-300 transform hover:scale-110 active:scale-95",
                     isOpen ? "bg-status-red text-white rotate-90" : "bg-brand-green text-dark-surface"
                 )}
                 aria-label="Abrir Asistente"

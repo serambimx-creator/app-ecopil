@@ -104,49 +104,66 @@ export default function TeamChat() {
     };
 
     return (
-        <div className="flex flex-col h-[calc(100vh-140px)]">
-            {/* Messages Area */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-4 no-scrollbar">
+        <div className="flex flex-col h-[calc(100vh-140px)] bg-black/20 rounded-3xl overflow-hidden border border-white/5 relative">
+
+            {/* 1. Header (Telegram Style) */}
+            <div className="flex items-center gap-3 px-4 py-3 bg-white/5 border-b border-white/10 backdrop-blur-md z-10">
+                <div className="w-10 h-10 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400 font-bold border border-blue-500/30">
+                    #
+                </div>
+                <div>
+                    <h2 className="font-bold text-white text-sm">Equipo Nacional</h2>
+                    <p className="text-[10px] text-brand-green flex items-center gap-1">
+                        <span className="w-1.5 h-1.5 rounded-full bg-brand-green animate-pulse" />
+                        En línea
+                    </p>
+                </div>
+            </div>
+
+            {/* 2. Messages Area (WhatsApp Style) */}
+            <div className="flex-1 overflow-y-auto p-4 space-y-3 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
                 {messages.length === 0 && (
-                    <div className="text-center text-gray-500 mt-10">
-                        <p>No hay mensajes aún.</p>
-                        <p className="text-xs">¡Sé el primero en escribir al equipo!</p>
+                    <div className="text-center text-gray-500 mt-10 p-6 glass-card rounded-2xl mx-auto max-w-[200px]">
+                        <p className="text-sm">💬</p>
+                        <p className="text-xs mt-2">Inicia la conversación con tu equipo.</p>
                     </div>
                 )}
 
                 {messages.map((msg) => {
                     const isMe = msg.user_id === user?.id;
                     return (
-                        <div key={msg.id} className={`flex gap-3 ${isMe ? 'flex-row-reverse' : ''}`}>
-                            <div className="flex-shrink-0">
-                                {msg.profiles?.avatar_url ? (
-                                    <div className="w-8 h-8 rounded-full overflow-hidden border border-white/10">
-                                        <img src={msg.profiles.avatar_url} alt="Av" className="w-full h-full object-cover" />
-                                    </div>
-                                ) : (
-                                    <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center">
-                                        <User size={14} className="text-gray-400" />
-                                    </div>
+                        <div key={msg.id} className={`flex gap-2 ${isMe ? 'flex-row-reverse' : 'flex-row'} items-end`}>
+                            {/* Avatar */}
+                            <div className="flex-shrink-0 mb-1">
+                                {!isMe && (
+                                    msg.profiles?.avatar_url ? (
+                                        <div className="w-6 h-6 rounded-full overflow-hidden border border-white/10">
+                                            <img src={msg.profiles.avatar_url} alt="Av" className="w-full h-full object-cover" />
+                                        </div>
+                                    ) : (
+                                        <div className="w-6 h-6 rounded-full bg-purple-500/20 flex items-center justify-center text-purple-400 text-[10px] font-bold">
+                                            {msg.profiles?.full_name?.charAt(0) || 'U'}
+                                        </div>
+                                    )
                                 )}
                             </div>
 
-                            <div className={`max-w-[80%] space-y-1 ${isMe ? 'items-end flex flex-col' : ''}`}>
+                            {/* Bubble */}
+                            <div className={`max-w-[75%] flex flex-col ${isMe ? 'items-end' : 'items-start'}`}>
                                 {!isMe && (
-                                    <div className="flex items-center gap-2">
-                                        <span className="text-xs font-bold text-gray-300">{msg.profiles?.full_name || 'Usuario'}</span>
-                                        <span className="text-[10px] bg-white/10 px-1.5 rounded text-gray-400 uppercase">{msg.profiles?.role || 'Staff'}</span>
-                                    </div>
+                                    <span className="text-[10px] text-gray-400 ml-1 mb-0.5">
+                                        {msg.profiles?.full_name?.split(' ')[0]}
+                                    </span>
                                 )}
-
-                                <div className={`px-4 py-2 rounded-2xl text-sm leading-relaxed ${isMe
-                                        ? 'bg-brand-green text-black rounded-tr-sm'
-                                        : 'bg-white/10 text-white rounded-tl-sm border border-white/5'
+                                <div className={`px-4 py-2 rounded-2xl text-sm leading-relaxed relative shadow-md ${isMe
+                                        ? 'bg-brand-green text-black rounded-br-none'
+                                        : 'bg-white/10 text-white rounded-bl-none border border-white/5'
                                     }`}>
                                     {msg.content}
+                                    <span className={`text-[9px] block text-right mt-1 opacity-60 ${isMe ? 'text-black' : 'text-gray-400'}`}>
+                                        {new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                    </span>
                                 </div>
-                                <span className="text-[10px] text-gray-600 block">
-                                    {new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                </span>
                             </div>
                         </div>
                     );
@@ -154,26 +171,28 @@ export default function TeamChat() {
                 <div ref={messagesEndRef} />
             </div>
 
-            {/* Input Area */}
-            <form onSubmit={handleSendMessage} className="p-4 pt-2">
-                <div className="glass-card p-1.5 rounded-full flex items-center gap-2 border border-white/10 bg-black/40 backdrop-blur-xl">
-                    <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center flex-shrink-0 cursor-pointer hover:bg-white/10 transition-colors">
+            {/* 3. Input Area (Sticky Bottom) */}
+            <form onSubmit={handleSendMessage} className="p-3 bg-white/5 border-t border-white/10 backdrop-blur-md sticky bottom-0 z-20">
+                <div className="flex items-center gap-2">
+                    <button type="button" className="p-2 text-gray-400 hover:text-white transition-colors">
                         <span className="text-xl">📎</span>
-                    </div>
+                    </button>
 
-                    <input
-                        type="text"
-                        value={newMessage}
-                        onChange={(e) => setNewMessage(e.target.value)}
-                        placeholder="Escribe un mensaje al equipo..."
-                        className="flex-1 bg-transparent text-white placeholder-gray-500 text-sm focus:outline-none px-2"
-                        disabled={!user}
-                    />
+                    <div className="flex-1 bg-black/40 rounded-full border border-white/10 flex items-center px-4 py-2 focus-within:border-brand-green/50 transition-colors">
+                        <input
+                            type="text"
+                            value={newMessage}
+                            onChange={(e) => setNewMessage(e.target.value)}
+                            placeholder="Escribe un mensaje..."
+                            className="flex-1 bg-transparent text-white placeholder-gray-500 text-sm focus:outline-none"
+                            disabled={!user}
+                        />
+                    </div>
 
                     <button
                         type="submit"
                         disabled={sending || !newMessage.trim()}
-                        className="w-10 h-10 rounded-full bg-brand-green text-black flex items-center justify-center hover:scale-105 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="w-10 h-10 rounded-full bg-brand-green text-black flex items-center justify-center shadow-lg hover:scale-105 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         {sending ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} className="ml-0.5" />}
                     </button>

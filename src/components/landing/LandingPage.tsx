@@ -81,15 +81,15 @@ export default function LandingPage() {
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-black/30" />
 
-                <div className="relative z-10 w-full space-y-6 animate-in slide-in-from-bottom-8 fade-in duration-700 delay-200">
+                <div className="relative z-10 w-full space-y-6 animate-in slide-in-from-bottom-8 fade-in duration-700 delay-200 px-4 break-words">
                     <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-brand-green/20 border border-brand-green/50 text-brand-green text-[10px] font-bold uppercase tracking-[0.2em] mb-2 backdrop-blur-md shadow-[0_0_20px_rgba(0,223,129,0.2)]">
                         <Star size={10} fill="currentColor" /> Pachuca 2026
                     </div>
 
-                    <h1 className="flex flex-col items-center font-black leading-none tracking-tighter drop-shadow-2xl uppercase select-none">
-                        <span className="text-3xl md:text-5xl text-gray-300 font-bold mb-2">7mo Encuentro</span>
-                        <span className="text-5xl md:text-7xl text-transparent bg-clip-text bg-gradient-to-b from-white to-gray-400">Nacional</span>
-                        <span className="text-xl md:text-3xl text-brand-green mt-2 tracking-widest">de Nodos Ecopil</span>
+                    <h1 className="flex flex-col items-center text-3xl font-black leading-tight tracking-tighter md:text-6xl uppercase select-none">
+                        <span className="text-gray-300 font-bold mb-2">7mo Encuentro</span>
+                        <span className="text-transparent bg-clip-text bg-gradient-to-b from-white to-gray-400">Nacional</span>
+                        <span className="text-brand-green mt-2 tracking-widest text-xl md:text-3xl">de Nodos Ecopil</span>
                     </h1>
 
                     <p className="text-lg md:text-xl text-gray-200 font-light max-w-xs mx-auto leading-relaxed drop-shadow-sm px-4">
@@ -122,11 +122,11 @@ export default function LandingPage() {
                     </div>
 
                     {/* Horizontal Scroll Snap for Mobile */}
-                    <div className="flex md:grid md:grid-cols-3 gap-4 overflow-x-auto snap-x snap-mandatory -mx-4 px-4 pb-4 md:overflow-visible md:pb-0 scrollbar-hide">
+                    <div className="flex overflow-x-auto space-x-4 snap-x snap-mandatory hide-scrollbar pb-4 md:grid md:grid-cols-3 md:space-x-0 md:gap-4 md:overflow-visible md:pb-0">
                         {GALLERY_IMAGES.map((img, idx) => (
                             <div
                                 key={idx}
-                                className="snap-center shrink-0 w-[85%] group relative h-72 rounded-3xl overflow-hidden shadow-sm border border-white/5 active:scale-95 transition-transform"
+                                className="min-w-[85%] snap-center group relative h-72 rounded-2xl overflow-hidden shadow-sm border border-white/5 active:scale-95 transition-transform"
                             >
                                 <div
                                     className="absolute inset-0 bg-cover bg-center"

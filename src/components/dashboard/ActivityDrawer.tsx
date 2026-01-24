@@ -263,9 +263,10 @@ export default function ActivityDrawer({ trigger, activityId, onClose, open, onO
                 {trigger || <button className="px-4 py-2 bg-brand-green text-black rounded-full font-bold">Nueva Actividad</button>}
             </Drawer.Trigger>
             <Drawer.Portal>
-                <Drawer.Overlay className="fixed inset-0 bg-black/60 z-50" />
+                <Drawer.Overlay className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[60]" />
                 <Drawer.Content className={cn(
-                    "border-status-yellow/50 shadow-[0_0_50px_rgba(255,210,51,0.1)]" // yellow default
+                    "fixed bottom-0 left-0 right-0 z-[60] max-h-[85vh] flex flex-col rounded-t-[10px] md:rounded-t-[24px] outline-none",
+                    "border-t border-status-yellow/50 shadow-[0_0_50px_rgba(255,210,51,0.1)] bg-dark-surface"
                 )}>
 
                     {/* Drawer Handle / Header */}
