@@ -122,9 +122,34 @@ CREATE TABLE audit_logs (
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- Messages (Chat Team)
+CREATE TABLE messages (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    user_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+    content TEXT NOT NULL,
+    type TEXT NOT NULL CHECK (type IN ('text', 'image')) DEFAULT 'text',
+    image_url TEXT,
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
 -- 3. INDEXES (Optional for performance)
 CREATE INDEX idx_agenda_activities_project_id ON agenda_activities(project_id);
 CREATE INDEX idx_agenda_activities_date ON agenda_activities(date);
 CREATE INDEX idx_audit_logs_created_at ON audit_logs(created_at);
 CREATE INDEX idx_profiles_email ON profiles(email);
+CREATE INDEX idx_messages_user_id ON messages(user_id);
+CREATE INDEX idx_messages_created_at ON messages(created_at);
+
+-- 4. ROW LEVEL SECURITY (RLS)
+ALTER TABLE messages ENABLE ROW LEVEL SECURITY;
+
+-- Policy: Authenticated users can view all messages
+CREATE POLICY "Authenticated users can view all messages"
+ON messages FOR SELECT
+USING (auth.role() = 'authenticated');
+
+-- Policy: Authenticated users can insert their own messages
+CREATE POLICY "Authenticated users can insert their own messages"
+ON messages FOR INSERT
+WITH CHECK (auth.role() = 'authenticated' AND auth.uid() = user_id);
 

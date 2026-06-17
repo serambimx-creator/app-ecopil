@@ -2,20 +2,19 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
-import { Project, AgendaActivity, Finance, ActivityAssignment, PersonalTask } from '@/types/database';
+import { Project, AgendaActivity, Finance, PersonalTask } from '@/types/database';
 import DashboardWidgets from '@/components/dashboard/DashboardWidgets';
 import PersonalBunker from '@/components/dashboard/PersonalBunker';
 import ReportPreview from '@/components/dashboard/ReportPreview';
 import TeamChat from '@/components/chat/TeamChat';
-
-// Mock User ID (Replace with real Auth later - passed as prop ideally, or context)
-const USER_ID = 'CURRENT_USER_ID_PLACEHOLDER';
+import { useAuth } from '@/context/AuthContext';
 
 interface WarRoomProps {
     role?: 'admin' | 'coordinator';
 }
 
 export default function WarRoom({ role = 'admin' }: WarRoomProps) {
+    const { userId } = useAuth();
     const [projects, setProjects] = useState<Project[]>([]);
     const [activities, setActivities] = useState<AgendaActivity[]>([]);
     const [finances, setFinances] = useState<Finance[]>([]);
@@ -36,25 +35,26 @@ export default function WarRoom({ role = 'admin' }: WarRoomProps) {
             if (fin) setFinances(fin);
 
             // 2. Fetch User Specific Data
-            const { data: tasks } = await supabase
-                .from('personal_tasks')
-                .select('*')
-                .eq('user_id', USER_ID)
-                .order('created_at', { ascending: false });
-            if (tasks) setPersonalTasks(tasks);
+            if (userId) {
+                const { data: tasks } = await supabase
+                    .from('personal_tasks')
+                    .select('*')
+                    .eq('user_id', userId)
+                    .order('created_at', { ascending: false });
+                if (tasks) setPersonalTasks(tasks);
 
-            const { data: assigns } = await supabase
-                .from('activity_assignments')
-                .select('*, agenda_activities(title)')
-                .eq('user_id', USER_ID);
+                const { data: assigns } = await supabase
+                    .from('activity_assignments')
+                    .select('*, agenda_activities(title)')
+                    .eq('user_id', userId);
 
-            if (assigns) {
-                // Flatten structure for easier consumption
-                const formatted = assigns.map((a: any) => ({
-                    ...a,
-                    activity_title: a.agenda_activities?.title
-                }));
-                setAssignments(formatted);
+                if (assigns) {
+                    const formatted = assigns.map((a: any) => ({
+                        ...a,
+                        activity_title: a.agenda_activities?.title
+                    }));
+                    setAssignments(formatted);
+                }
             }
 
         } catch (error) {
@@ -65,14 +65,15 @@ export default function WarRoom({ role = 'admin' }: WarRoomProps) {
     }
 
     useEffect(() => {
-        fetchData();
-    }, []);
+        if (userId) fetchData();
+    }, [userId]);
 
     // Handlers for Bunker
     const handleAddPrivateTask = async (title: string) => {
+        if (!userId) return;
         const newTask = {
             id: crypto.randomUUID(),
-            user_id: USER_ID,
+            user_id: userId,
             title,
             is_completed: false,
             created_at: new Date().toISOString()
@@ -82,16 +83,19 @@ export default function WarRoom({ role = 'admin' }: WarRoomProps) {
         setPersonalTasks([newTask, ...personalTasks]);
 
         // DB Call
-        // await supabase.from('personal_tasks').insert(newTask); 
+        await supabase.from('personal_tasks').insert(newTask);
     };
 
     const handleTogglePrivateTask = async (taskId: string) => {
+        const task = personalTasks.find(t => t.id === taskId);
+        if (!task) return;
+
         setPersonalTasks(prev => prev.map(t =>
             t.id === taskId ? { ...t, is_completed: !t.is_completed } : t
         ));
 
         // DB Call
-        // await supabase.from('personal_tasks').update({ is_completed: ... }).eq('id', taskId);
+        await supabase.from('personal_tasks').update({ is_completed: !task.is_completed }).eq('id', taskId);
     };
 
     if (loading) {

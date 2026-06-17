@@ -10,21 +10,17 @@ export default function Header() {
     const pathname = usePathname();
     const { isAuthenticated, signOut } = useAuth();
 
-    // Determine Title based on path
+    // Display Ecopil MX on landing page instead of Panel Principal
     const getTitle = () => {
+        if (!isAuthenticated && pathname === '/') return 'Ecopil MX';
         switch (pathname) {
             case '/': return 'Panel Principal';
-            case '/agenda': return 'Agenda 2024';
-            case '/map': return 'Mapa Operativo';
+            case '/agenda': return 'Agenda 2026';
+            case '/mapa': return 'Mapa Operativo';
             case '/perfil': return 'Mi Perfil';
             default: return 'Ecopil Org';
         }
     };
-
-    // Hide Header on Landing Page (Unauthenticated Home)
-    if (pathname === '/' && !isAuthenticated) {
-        return null;
-    }
 
     return (
         <header className="sticky top-0 z-30 w-full border-b border-white/5 bg-gradient-to-r from-dark-surface/90 to-white/95 backdrop-blur-md transition-all duration-300">
@@ -36,7 +32,7 @@ export default function Header() {
 
                 {/* Right: Logos & Access */}
                 <div className="flex items-center gap-4">
-                    <div className="flex items-center gap-4 hidden md:flex">
+                    <div className="hidden md:flex items-center gap-4">
                         <div className="relative h-14 w-40">
                             <Image
                                 src="/logos/ecopil.png"
@@ -71,9 +67,9 @@ export default function Header() {
                     ) : (
                         <Link
                             href="/login"
-                            className="bg-black/90 hover:bg-black text-white px-5 py-2 rounded-full text-[10px] font-bold uppercase tracking-wider transition-all shadow-lg hover:scale-105 flex items-center gap-2"
+                            className="bg-brand-green hover:bg-brand-green/80 text-black px-5 py-2 rounded-full text-[10px] font-bold uppercase tracking-wider transition-all shadow-lg hover:scale-105 flex items-center gap-2"
                         >
-                            <User size={14} /> ACCESO ORGANIZADOR
+                            <User size={14} /> INICIAR SESIÓN
                         </Link>
                     )}
                 </div>

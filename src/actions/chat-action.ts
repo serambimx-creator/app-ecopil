@@ -13,9 +13,6 @@ const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 // Note: In a real app, use Service Role Key for Admin actions, but here we simulate User actions so Anon is safer unless we bypass RLS.
 const supabase = createClient(supabaseUrl, supabaseKey);
 
-console.log('[DEBUG DB] URL:', supabaseUrl);
-console.log('[DEBUG DB] Key provided:', !!supabaseKey, supabaseKey?.substring(0, 5) + '...');
-
 if (!supabaseUrl || !supabaseKey) {
     console.error("❌ CRITICAL: Supabase Vars missing in Server Action");
 }
@@ -25,9 +22,6 @@ const ALLOWED_ORIGINS = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:30
 export async function processChatMessage(userMessage: string, userId: string) {
     console.log("--- Server Action: Processing Chat ---");
 
-    // DEBUG: Print what the server sees for DB Config
-    console.log('[DEBUG DB] URL Configured:', process.env.NEXT_PUBLIC_SUPABASE_URL);
-    console.log('[DEBUG DB] Key Configured:', !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.substring(0, 10) + '...');
 
     // 0. Developer Override for Testing DB (Bypasses AI)
     if (userMessage.startsWith('/test-agenda')) {
@@ -61,12 +55,11 @@ export async function processChatMessage(userMessage: string, userId: string) {
 
     try {
         const genAI = new GoogleGenerativeAI(API_KEY);
-        // Using 'gemini-flash-latest' to auto-resolve to the best available tier
-        const model = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
+        const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
         // 2. Fetch Context (Server Side - Fast & Secure)
         const [projectsRes, financesRes, activitiesRes] = await Promise.all([
-            supabase.from('projects').select('id, name').limit(5),
+            supabase.from('projects').select('id, title').limit(5),
             supabase.from('finances').select('amount, description').limit(5),
             supabase.from('agenda_activities').select('title, date, location').limit(5)
         ]);
@@ -143,7 +136,6 @@ export async function processChatMessage(userMessage: string, userId: string) {
                 const finalAmount = Number(amount) || 0;
 
                 const payload = {
-                    department: 'General',
                     amount: finalAmount,
                     description: finalDesc,
                     type: 'expense',

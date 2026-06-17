@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { ArrowRight, Leaf, Map, Users, Calendar, Star, Heart, Camera, Loader2, MapPin, Clock } from 'lucide-react';
 import { clsx } from 'clsx';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
 import { AgendaActivity } from '@/types/database';
 import { format } from 'date-fns';
@@ -56,20 +57,6 @@ export default function LandingPage() {
 
     return (
         <div className="min-h-screen bg-black text-white selection:bg-brand-green selection:text-black font-sans pb-24">
-
-            {/* Header / Nav */}
-            <nav className="fixed top-0 w-full z-50 px-4 py-3 flex justify-between items-center bg-black/80 backdrop-blur-md border-b border-white/5 transition-all">
-                <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 bg-brand-green rounded-full flex items-center justify-center font-black text-black text-xs shadow-[0_0_15px_rgba(0,223,129,0.5)]">E</div>
-                    <span className="font-bold tracking-widest text-xs text-white">ECOPIL MX</span>
-                </div>
-                <button
-                    onClick={handleLogin}
-                    className="bg-white/10 hover:bg-white text-white hover:text-black border border-white/20 px-4 py-2 rounded-full text-[10px] font-bold uppercase tracking-wider transition-all active:scale-95"
-                >
-                    Entrar
-                </button>
-            </nav>
 
             {/* Hero Section */}
             {/* Hero Section */}

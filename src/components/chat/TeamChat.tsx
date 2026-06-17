@@ -4,15 +4,18 @@ import { useState, useEffect, useRef } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/context/AuthContext';
 import { Message } from '@/types/chat';
-import { Send, User, Loader2 } from 'lucide-react';
+import { Send, User, Loader2, Image as ImageIcon } from 'lucide-react';
 import Image from 'next/image';
+import { uploadToSupabaseStorage } from '@/lib/supabaseStorage';
 
 export default function TeamChat() {
     const { user, isAuthenticated } = useAuth();
     const [messages, setMessages] = useState<Message[]>([]);
     const [newMessage, setNewMessage] = useState('');
     const [sending, setSending] = useState(false);
+    const [uploadingImage, setUploadingImage] = useState(false);
     const messagesEndRef = useRef<HTMLDivElement>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
     // Initial Fetch
     useEffect(() => {
@@ -103,6 +106,62 @@ export default function TeamChat() {
         }
     };
 
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            handleSendMessage(e as any);
+        }
+    };
+
+    const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file || !user) return;
+
+        setUploadingImage(true);
+        try {
+            const publicUrl = await uploadToSupabaseStorage(file, 'evidencias');
+
+            // Format as a markdown image so we can identify it easily without schema changes
+            const imageMarkdown = `![image](${publicUrl})`;
+
+            const { error } = await supabase
+                .from('messages')
+                .insert({
+                    user_id: user.id,
+                    content: imageMarkdown
+                });
+
+            if (error) {
+                console.error("Error sending image message:", error);
+            }
+        } catch (error) {
+            console.error("Error uploading image:", error);
+            // Optionally could add a toast here
+        } finally {
+            setUploadingImage(false);
+            if (fileInputRef.current) {
+                fileInputRef.current.value = ''; // Reset
+            }
+        }
+    };
+
+    const renderMessageContent = (content: string) => {
+        const imageMatch = content.match(/!\[image\]\((.*?)\)/);
+        if (imageMatch && imageMatch[1]) {
+            return (
+                <div className="mt-1 relative rounded-xl overflow-hidden min-w-[200px] min-h-[150px] bg-black/20">
+                    <img
+                        src={imageMatch[1]}
+                        alt="Shared image"
+                        className="max-w-full max-h-[300px] object-contain rounded-xl"
+                        onLoad={scrollToBottom}
+                    />
+                </div>
+            );
+        }
+        return <p className="whitespace-pre-wrap">{content}</p>;
+    };
+
     return (
         <div className="flex flex-col h-[calc(100vh-140px)] bg-black/20 rounded-3xl overflow-hidden border border-white/5 relative">
 
@@ -155,11 +214,11 @@ export default function TeamChat() {
                                         {msg.profiles?.full_name?.split(' ')[0]}
                                     </span>
                                 )}
-                                <div className={`px-4 py-2 rounded-2xl text-sm leading-relaxed relative shadow-md ${isMe
-                                        ? 'bg-brand-green text-black rounded-br-none'
-                                        : 'bg-white/10 text-white rounded-bl-none border border-white/5'
+                                <div className={`px-4 py-2 text-sm leading-relaxed relative shadow-md ${isMe
+                                    ? 'bg-brand-green text-black rounded-2xl rounded-br-none'
+                                    : 'bg-white/10 text-white rounded-2xl rounded-bl-none border border-white/5'
                                     }`}>
-                                    {msg.content}
+                                    {renderMessageContent(msg.content)}
                                     <span className={`text-[9px] block text-right mt-1 opacity-60 ${isMe ? 'text-black' : 'text-gray-400'}`}>
                                         {new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                     </span>
@@ -173,26 +232,42 @@ export default function TeamChat() {
 
             {/* 3. Input Area (Sticky Bottom) */}
             <form onSubmit={handleSendMessage} className="p-3 bg-white/5 border-t border-white/10 backdrop-blur-md sticky bottom-0 z-20">
-                <div className="flex items-center gap-2">
-                    <button type="button" className="p-2 text-gray-400 hover:text-white transition-colors">
-                        <span className="text-xl">📎</span>
+                <div className="flex items-end gap-2">
+                    <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        ref={fileInputRef}
+                        onChange={handleImageUpload}
+                    />
+                    <button
+                        type="button"
+                        onClick={() => fileInputRef.current?.click()}
+                        disabled={uploadingImage}
+                        className="p-2 text-gray-400 hover:text-white transition-colors mb-1"
+                    >
+                        {uploadingImage ? <Loader2 size={24} className="animate-spin text-brand-green" /> : <ImageIcon size={24} />}
                     </button>
 
-                    <div className="flex-1 bg-black/40 rounded-full border border-white/10 flex items-center px-4 py-2 focus-within:border-brand-green/50 transition-colors">
-                        <input
-                            type="text"
+                    <div className="flex-1 bg-black/40 rounded-2xl border border-white/10 flex items-center px-4 py-2 focus-within:border-brand-green/50 transition-colors">
+                        <textarea
                             value={newMessage}
-                            onChange={(e) => setNewMessage(e.target.value)}
+                            onChange={(e) => {
+                                setNewMessage(e.target.value);
+                                // Auto-resize logic could go here
+                            }}
+                            onKeyDown={handleKeyDown}
                             placeholder="Escribe un mensaje..."
-                            className="flex-1 bg-transparent text-white placeholder-gray-500 text-sm focus:outline-none"
-                            disabled={!user}
+                            className="flex-1 bg-transparent text-white placeholder-gray-500 text-sm focus:outline-none resize-none min-h-[40px] max-h-[120px] py-2 scrollbar-thin scrollbar-thumb-white/10"
+                            disabled={!user || uploadingImage}
+                            rows={1}
                         />
                     </div>
 
                     <button
                         type="submit"
-                        disabled={sending || !newMessage.trim()}
-                        className="w-10 h-10 rounded-full bg-brand-green text-black flex items-center justify-center shadow-lg hover:scale-105 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                        disabled={sending || (!newMessage.trim() && !uploadingImage)}
+                        className="w-10 h-10 rounded-full bg-brand-green text-black flex items-center justify-center shadow-lg hover:scale-105 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed mb-1 shrink-0"
                     >
                         {sending ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} className="ml-0.5" />}
                     </button>

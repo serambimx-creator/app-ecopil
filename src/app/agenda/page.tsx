@@ -7,7 +7,9 @@ import { Plus, MapPin, ChevronRight, Loader2 } from 'lucide-react';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import ActivityDrawer from '@/components/dashboard/ActivityDrawer';
+import AgendaCalendar from '@/components/dashboard/AgendaCalendar';
 import { clsx } from 'clsx';
+import { List, Calendar as CalendarIcon } from 'lucide-react';
 
 export default function AgendaPage() {
     const [activities, setActivities] = useState<AgendaActivity[]>([]);
@@ -15,6 +17,7 @@ export default function AgendaPage() {
     const [selectedActivityId, setSelectedActivityId] = useState<string | undefined>(undefined);
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
     const [role, setRole] = useState<'admin' | 'coordinator' | 'guest'>('coordinator');
+    const [viewMode, setViewMode] = useState<'list' | 'calendar'>('list');
 
     useEffect(() => {
         fetchActivities();
@@ -73,15 +76,46 @@ export default function AgendaPage() {
 
     return (
         <div className="pb-24 animate-in fade-in duration-500">
-            <header className="mb-8 px-4 pt-4">
-                <h1 className="text-3xl font-black text-white mb-1">Agenda Operativa</h1>
-                <p className="text-gray-400 text-sm">Cronograma oficial Pachuca 2026</p>
+            <header className="mb-8 px-4 pt-4 flex items-end justify-between">
+                <div>
+                    <h1 className="text-3xl font-black text-white mb-1">Agenda Operativa</h1>
+                    <p className="text-gray-400 text-sm">Cronograma oficial Pachuca 2026</p>
+                </div>
+                {/* Toggle View */}
+                <div className="flex bg-black/40 border border-white/10 rounded-full p-1 shadow-inner">
+                    <button
+                        onClick={() => setViewMode('list')}
+                        className={clsx(
+                            "p-2 rounded-full transition-all text-xs",
+                            viewMode === 'list' ? "bg-white/10 text-brand-green shadow-sm" : "text-gray-500 hover:text-white"
+                        )}
+                        aria-label="Vista de Lista"
+                    >
+                        <List size={18} />
+                    </button>
+                    <button
+                        onClick={() => setViewMode('calendar')}
+                        className={clsx(
+                            "p-2 rounded-full transition-all text-xs",
+                            viewMode === 'calendar' ? "bg-white/10 text-brand-green shadow-sm" : "text-gray-500 hover:text-white"
+                        )}
+                        aria-label="Vista de Calendario"
+                    >
+                        <CalendarIcon size={18} />
+                    </button>
+                </div>
             </header>
 
             {loading ? (
                 <div className="flex justify-center py-20">
                     <Loader2 className="animate-spin text-brand-green" />
                 </div>
+            ) : viewMode === 'calendar' ? (
+                <AgendaCalendar
+                    activities={activities}
+                    onActivityClick={handleActivityClick}
+                    role={role}
+                />
             ) : (
                 <div className="space-y-4 px-4">
                     {activities.length === 0 && (

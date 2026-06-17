@@ -10,9 +10,10 @@ import { supabase } from '@/lib/supabase';
 import type { AgendaActivity, Profile, Finance, PersonalTask, Status, Evidence, EvidenceType } from '@/types/database';
 import SemaphoreSelector from './SemaphoreSelector';
 import MediaGrid from './MediaGrid';
-import { uploadToGoogleDrive } from '@/lib/googleDrive';
+import { uploadToSupabaseStorage } from '@/lib/supabaseStorage';
 import dynamic from 'next/dynamic';
 import SubBlocksEditor from './SubBlocksEditor';
+import { useAuth } from '@/context/AuthContext';
 
 // Dynamic import for Map Component (Client-side only)
 const LocationPicker = dynamic(() => import('../maps/LocationPicker'), {
@@ -33,14 +34,13 @@ interface ActivityDrawerProps {
 }
 
 export default function ActivityDrawer({ trigger, activityId, onClose, open, onOpenChange }: ActivityDrawerProps) {
+    const { userId } = useAuth();
     const [internalOpen, setInternalOpen] = useState(false);
 
     // Controlled vs Uncontrolled logic
     const isControlled = open !== undefined;
     const isOpen = isControlled ? open : internalOpen;
-    const setIsOpen = isControlled ? onOpenChange : setInternalOpen;
-
-    if (!setIsOpen) throw new Error("ActivityDrawer: onOpenChange required if controlled");
+    const setIsOpen = isControlled ? onOpenChange! : setInternalOpen;
 
     const [activeTab, setActiveTab] = useState<'general' | 'personal' | 'evidence'>('general');
     const [profiles, setProfiles] = useState<Profile[]>([]);
@@ -57,6 +57,8 @@ export default function ActivityDrawer({ trigger, activityId, onClose, open, onO
     const [agreements, setAgreements] = useState('');
     const [reportDetails, setReportDetails] = useState('');
     const [assignedUserIds, setAssignedUserIds] = useState<Set<string>>(new Set());
+    const [userRole, setUserRole] = useState<'admin' | 'coordinator' | 'guest'>('guest');
+    const [isEditing, setIsEditing] = useState(false);
 
     // Personal Tasks State
     const [personalTasks, setPersonalTasks] = useState<PersonalTask[]>([]);
@@ -78,17 +80,24 @@ export default function ActivityDrawer({ trigger, activityId, onClose, open, onO
             const { data: profilesData } = await supabase.from('profiles').select('*');
             if (profilesData) setProfiles(profilesData);
 
-            // Fetch Personal Tasks (simulated user for now, in real app use auth.getUser())
-            const userId = 'CURRENT_USER_ID_PLACEHOLDER'; // TODO: Replace with real auth user
+            // Fetch Profile Role (to handle Guest mode)
+            if (userId) {
+                const { data: profile } = await supabase.from('profiles').select('*').eq('id', userId).single();
+                if (profile) {
+                    if (profile.node === 'Nacional') setUserRole('guest');
+                    else setUserRole(profile.role as 'admin' | 'coordinator' | 'guest');
+                }
 
-            const { data: tasks } = await supabase
-                .from('personal_tasks')
-                .select('*')
-                .eq('user_id', userId)
-                .order('created_at', { ascending: false });
-            if (tasks) setPersonalTasks(tasks);
+                const { data: tasks } = await supabase
+                    .from('personal_tasks')
+                    .select('*')
+                    .eq('user_id', userId)
+                    .order('created_at', { ascending: false });
+                if (tasks) setPersonalTasks(tasks);
+            }
 
             if (activityId) {
+                setIsEditing(false); // Start in view mode for existing
                 // Fetch Activity
                 const { data: act } = await supabase
                     .from('agenda_activities')
@@ -125,11 +134,16 @@ export default function ActivityDrawer({ trigger, activityId, onClose, open, onO
                     .eq('activity_id', activityId)
                     .order('created_at', { ascending: false });
                 if (ev) setEvidence(ev);
+            } else {
+                setIsEditing(true); // New activity starts editing
+                setTitle(''); setStatus('yellow'); setDate(''); setLocation('');
+                setLatitude(undefined); setLongitude(undefined); setLogistics('');
+                setAgreements(''); setReportDetails('');
             }
         }
 
         if (isOpen) loadData();
-    }, [activityId, isOpen]);
+    }, [activityId, isOpen, userId]);
 
     // Reactive Autosave (Debounced)
     useEffect(() => {
@@ -180,12 +194,12 @@ export default function ActivityDrawer({ trigger, activityId, onClose, open, onO
     };
 
     const handleAddPersonalTask = async () => {
-        if (!newPersonalTask.trim()) return;
+        if (!newPersonalTask.trim() || !userId) return;
 
         // Optimistic Update
         const newTask: PersonalTask = {
             id: crypto.randomUUID(),
-            user_id: 'CURRENT_USER_ID_PLACEHOLDER',
+            user_id: userId,
             title: newPersonalTask,
             is_completed: false,
             created_at: new Date().toISOString()
@@ -194,8 +208,8 @@ export default function ActivityDrawer({ trigger, activityId, onClose, open, onO
         setPersonalTasks([newTask, ...personalTasks]);
         setNewPersonalTask('');
 
-        // In real app: save to DB
-        // await supabase.from('personal_tasks').insert({ ... })
+        // Save to DB
+        await supabase.from('personal_tasks').insert(newTask);
     };
 
     const toggleTaskCompletion = (taskId: string) => {
@@ -221,8 +235,8 @@ export default function ActivityDrawer({ trigger, activityId, onClose, open, onO
         const file = e.target.files[0];
 
         try {
-            // 1. Upload to Drive (Mock)
-            const url = await uploadToGoogleDrive(file);
+            // 1. Upload to Supabase Storage
+            const url = await uploadToSupabaseStorage(file);
 
             // Determine type
             let type: EvidenceType = 'document';
@@ -236,13 +250,14 @@ export default function ActivityDrawer({ trigger, activityId, onClose, open, onO
                 activity_id: activityId,
                 file_url: url,
                 file_type: type,
-                uploaded_by: 'CURRENT_USER_ID_PLACEHOLDER',
+                uploaded_by: userId || '',
                 description: file.name,
                 created_at: new Date().toISOString()
             };
 
             setEvidence([newEvidence, ...evidence]);
-            // await supabase.from('evidence').insert(newEvidence);
+            // Save to DB immediately
+            await supabase.from('evidence').insert(newEvidence);
 
         } catch (error) {
             console.error('Upload failed', error);
@@ -318,62 +333,96 @@ export default function ActivityDrawer({ trigger, activityId, onClose, open, onO
                             <div className="max-w-md mx-auto space-y-8 pb-10">
                                 {/* Header Module */}
                                 <div className="space-y-4">
-                                    <input
-                                        type="text"
-                                        value={title}
-                                        onChange={e => setTitle(e.target.value)}
-                                        placeholder="Nombre de la actividad"
-                                        className="w-full bg-transparent text-3xl font-bold text-white placeholder:text-white/20 focus:outline-none"
-                                    />
+                                    <div className="flex justify-between items-start">
+                                        {isEditing ? (
+                                            <input
+                                                type="text"
+                                                value={title}
+                                                onChange={e => setTitle(e.target.value)}
+                                                placeholder="Nombre de la actividad"
+                                                className="w-full bg-transparent text-3xl font-bold text-white placeholder:text-white/20 focus:outline-none"
+                                            />
+                                        ) : (
+                                            <h2 className="text-3xl font-bold text-white leading-tight">{title || 'Actividad sin nombre'}</h2>
+                                        )}
+
+                                        {!isEditing && (userRole === 'admin' || userRole === 'coordinator') && (
+                                            <button onClick={() => setIsEditing(true)} className="ml-4 px-3 py-1 bg-white/10 text-white rounded-full text-xs font-bold shrink-0">
+                                                Editar
+                                            </button>
+                                        )}
+                                        {isEditing && (userRole === 'admin' || userRole === 'coordinator') && (
+                                            <button onClick={() => setIsEditing(false)} className="ml-4 px-3 py-1 bg-brand-green/20 text-brand-green rounded-full text-xs font-bold shrink-0">
+                                                Hecho
+                                            </button>
+                                        )}
+                                    </div>
 
                                     <div className="flex items-center gap-4">
                                         <span className="text-xs uppercase text-gray-500 font-bold tracking-wider">Estado:</span>
-                                        <SemaphoreSelector
-                                            currentStatus={status}
-                                            onStatusChange={setStatus}
-                                        />
+                                        {isEditing ? (
+                                            <SemaphoreSelector currentStatus={status} onStatusChange={setStatus} />
+                                        ) : (
+                                            <SemaphoreSelector currentStatus={status} onStatusChange={() => { }} className="pointer-events-none" />
+                                        )}
                                     </div>
 
-                                    <div className="flex gap-4">
-                                        <div className="flex items-center gap-2 bg-white/5 px-3 py-2 rounded-xl border border-white/10 flex-1">
-                                            <Calendar size={18} className="text-brand-green" />
+                                    <div className="flex items-center gap-2 bg-white/5 px-3 py-2 rounded-xl border border-white/10 w-fit text-sm">
+                                        <Calendar size={18} className="text-brand-green" />
+                                        {isEditing ? (
                                             <input
                                                 type="date"
                                                 value={date}
                                                 onChange={e => setDate(e.target.value)}
-                                                className="bg-transparent text-sm w-full focus:outline-none dark:[color-scheme:dark]"
+                                                className="bg-transparent focus:outline-none dark:[color-scheme:dark]"
                                             />
-                                        </div>
+                                        ) : (
+                                            <span className="text-gray-200">{date || 'Sin fecha asignada'}</span>
+                                        )}
                                     </div>
 
                                     {/* Location Module */}
                                     <div className="space-y-2">
-                                        <div className="flex items-center gap-2 bg-white/5 px-3 py-2 rounded-xl border border-white/10">
+                                        <div className="flex items-center gap-2 bg-white/5 px-3 py-2 rounded-xl border border-white/10 text-sm">
                                             <MapPin size={18} className="text-brand-green" />
-                                            <input
-                                                type="text"
-                                                value={location}
-                                                onChange={e => setLocation(e.target.value)}
-                                                placeholder="Dirección o nombre del lugar"
-                                                className="bg-transparent text-sm w-full focus:outline-none placeholder:text-white/30"
-                                            />
+                                            {isEditing ? (
+                                                <input
+                                                    type="text"
+                                                    value={location}
+                                                    onChange={e => setLocation(e.target.value)}
+                                                    placeholder="Dirección o nombre del lugar"
+                                                    className="bg-transparent w-full focus:outline-none placeholder:text-white/30"
+                                                />
+                                            ) : (
+                                                <span className="text-gray-200">{location || 'Ubicación por definir'}</span>
+                                            )}
                                         </div>
 
                                         {/* Map Location Picker */}
-                                        <div className="mt-2">
-                                            <LocationPicker
-                                                latitude={latitude}
-                                                longitude={longitude}
-                                                onLocationChange={handleLocationChange}
-                                            />
-                                            {latitude && longitude && (
-                                                <div className="text-[10px] text-gray-500 text-right mt-1 font-mono">
-                                                    Lat: {latitude.toFixed(5)}, Lng: {longitude.toFixed(5)}
+                                        {isEditing ? (
+                                            <div className="mt-2 text-left">
+                                                <p className="text-xs text-gray-400 mb-2 ml-1">Pin del Mapa (Opcional):</p>
+                                                <LocationPicker
+                                                    latitude={latitude}
+                                                    longitude={longitude}
+                                                    onLocationChange={handleLocationChange}
+                                                />
+                                                {latitude && longitude && (
+                                                    <div className="text-[10px] text-gray-500 text-right mt-1 font-mono">
+                                                        Lat: {latitude.toFixed(5)}, Lng: {longitude.toFixed(5)}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        ) : (
+                                            latitude && longitude && (
+                                                <div className="mt-2 rounded-xl overflow-hidden opacity-80 h-32 relative text-center">
+                                                    {/* Ideally a static map image or read-only map here */}
+                                                    <LocationPicker latitude={latitude} longitude={longitude} onLocationChange={() => { }} />
+                                                    <div className="absolute inset-0 bg-transparent z-10" /> {/* Prevent map interactions in View mode */}
                                                 </div>
-                                            )}
-                                        </div>
+                                            )
+                                        )}
                                     </div>
-
                                 </div>
 
                                 <div className="h-px bg-white/10" />
@@ -389,12 +438,18 @@ export default function ActivityDrawer({ trigger, activityId, onClose, open, onO
                                         <FileText size={20} />
                                         <h3>Logística & Instrucciones</h3>
                                     </div>
-                                    <textarea
-                                        value={logistics}
-                                        onChange={e => setLogistics(e.target.value)}
-                                        className="w-full h-32 bg-black/20 rounded-2xl p-4 text-sm text-gray-300 resize-none focus:outline-none focus:ring-1 focus:ring-brand-green/50 placeholder:text-white/10"
-                                        placeholder="Escribe aquí las instrucciones de preparación, materiales necesarios y pasos logísticos..."
-                                    />
+                                    {isEditing ? (
+                                        <textarea
+                                            value={logistics}
+                                            onChange={e => setLogistics(e.target.value)}
+                                            className="w-full h-32 bg-black/20 rounded-2xl p-4 text-sm text-gray-300 resize-none focus:outline-none focus:ring-1 focus:ring-brand-green/50 placeholder:text-white/10 border border-white/5"
+                                            placeholder="Escribe aquí las instrucciones de preparación..."
+                                        />
+                                    ) : (
+                                        <div className="bg-white/5 rounded-2xl p-4 text-sm text-gray-300 min-h-[80px] border border-white/5">
+                                            {logistics || <span className="opacity-40 italic">Sin instrucciones de logística.</span>}
+                                        </div>
+                                    )}
                                 </div>
 
                                 {/* Mentions Module */}
