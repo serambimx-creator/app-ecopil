@@ -58,6 +58,57 @@ const CONTACTS = [
     { initials: 'LB', name: 'Luis Balderas', role: 'SERAMBI · Ecopil Hidalgo', tel: '7713300261', email: 'jorgeluis55245@gmail.com' },
 ];
 
+function CountdownTimer() {
+    const [timeLeft, setTimeLeft] = useState<{ days: number; hours: number; minutes: number; started: boolean } | null>(null);
+
+    useEffect(() => {
+        const calculateTimeLeft = () => {
+            const targetDate = new Date(2026, 11, 18, 9, 0, 0);
+            targetDate.setHours(targetDate.getHours() - 6);
+            const now = new Date();
+            const diff = targetDate.getTime() - now.getTime();
+
+            if (diff <= 0) {
+                setTimeLeft({ days: 0, hours: 0, minutes: 0, started: true });
+            } else {
+                const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                setTimeLeft({ days, hours, minutes, started: false });
+            }
+        };
+
+        calculateTimeLeft();
+        const interval = setInterval(calculateTimeLeft, 60000);
+        return () => clearInterval(interval);
+    }, []);
+
+    if (!timeLeft) return null;
+
+    if (timeLeft.started) {
+        return <div className="text-lg font-bold text-brand-green">¡En curso!</div>;
+    }
+
+    return (
+        <div className="flex items-center justify-center gap-2">
+            <div className="bg-[#1a2a1a] border border-[#2a3a2a] rounded-xl px-4 py-2">
+                <p className="text-xl font-bold text-brand-green">{timeLeft.days}</p>
+                <p className="text-xs text-gray-500 uppercase">días</p>
+            </div>
+            <span className="text-brand-green font-bold">:</span>
+            <div className="bg-[#1a2a1a] border border-[#2a3a2a] rounded-xl px-4 py-2">
+                <p className="text-xl font-bold text-brand-green">{String(timeLeft.hours).padStart(2, '0')}</p>
+                <p className="text-xs text-gray-500 uppercase">horas</p>
+            </div>
+            <span className="text-brand-green font-bold">:</span>
+            <div className="bg-[#1a2a1a] border border-[#2a3a2a] rounded-xl px-4 py-2">
+                <p className="text-xl font-bold text-brand-green">{String(timeLeft.minutes).padStart(2, '0')}</p>
+                <p className="text-xs text-gray-500 uppercase">minutos</p>
+            </div>
+        </div>
+    );
+}
+
 const TIERS = [
     {
         name: 'PLATINO',
@@ -201,6 +252,8 @@ export default function LandingPage() {
                         <Star size={10} fill="currentColor" /> 7mo Encuentro Nacional &middot; Hidalgo 2026
                     </div>
 
+                    <CountdownTimer />
+
                     <h1 className="text-2xl font-black leading-tight tracking-tight">
                         Innovación Social <span className="text-brand-green">&</span> Gestión Ambiental
                     </h1>
@@ -316,10 +369,11 @@ export default function LandingPage() {
                             </button>
 
                             <button
-                                className="bg-[#1a1a1a] border border-[#252525] rounded-2xl p-4 flex flex-col items-center gap-2 opacity-50 cursor-default"
+                                onClick={() => router.push('/guia')}
+                                className="bg-[#1a1a1a] border border-[#252525] rounded-2xl p-4 flex flex-col items-center gap-2 transition-colors hover:bg-white/5 active:scale-95"
                             >
                                 <FileText size={20} className="text-gray-400" />
-                                <span className="text-xs font-bold text-gray-300">Documentos</span>
+                                <span className="text-xs font-bold text-gray-300">Ver guía</span>
                             </button>
                         </div>
                     </section>

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Home, Calendar, Map, User, MessageCircle } from 'lucide-react';
+import { Home, Calendar, BookOpen, Map, User, MessageCircle } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 
 export default function BottomNav() {
@@ -16,7 +16,7 @@ export default function BottomNav() {
     const navItems = [
         { name: 'Inicio', href: '/', icon: Home },
         { name: 'Agenda', href: '/agenda', icon: Calendar },
-        { name: 'Chat', href: '/chat', icon: MessageCircle },
+        { name: 'Guía', href: '/guia', icon: BookOpen },
         { name: 'Mapa', href: '/mapa', icon: Map },
         { name: 'Perfil', href: '/perfil', icon: User },
     ];
