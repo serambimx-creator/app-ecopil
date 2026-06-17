@@ -4,7 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
-import { LogOut, User } from 'lucide-react';
+import { LogOut, Lock } from 'lucide-react';
 
 export default function Header() {
     const pathname = usePathname();
@@ -25,38 +25,36 @@ export default function Header() {
     return (
         <header className="sticky top-0 z-30 w-full border-b border-white/5 bg-gradient-to-r from-dark-surface/90 to-white/95 backdrop-blur-md transition-all duration-300">
             <div className="flex items-center justify-between px-6 py-2">
-                {/* Left: Dynamic Title */}
-                <h1 className="text-xl font-black text-white tracking-wide drop-shadow-sm">
-                    {getTitle()}
-                </h1>
-
-                {/* Right: Logos & Access */}
-                <div className="flex items-center gap-4">
-                    <div className="hidden md:flex items-center gap-4">
-                        <div className="relative h-14 w-40">
-                            <Image
-                                src="/logos/ecopil.png"
-                                alt="Ecopil Logo"
-                                fill
-                                className="object-contain object-left"
-                                sizes="160px"
-                                priority
-                            />
-                        </div>
-
-                        <div className="w-px h-8 bg-black/10"></div>
-
-                        <div className="relative h-10 w-32 opacity-80 hover:opacity-100 transition-opacity">
-                            <Image
-                                src="/logos/serambi.png"
-                                alt="Serambi Logo"
-                                fill
-                                className="object-contain"
-                                sizes="120px"
-                            />
-                        </div>
+                {/* Left: Logos + Title */}
+                <div className="flex items-center gap-3">
+                    <div className="relative h-8 w-20">
+                        <Image
+                            src="/logos/ecopil.png"
+                            alt="Ecopil Logo"
+                            fill
+                            className="object-contain"
+                            sizes="80px"
+                            priority
+                        />
                     </div>
 
+                    <div className="relative h-6 w-16">
+                        <Image
+                            src="/logos/serambi.png"
+                            alt="Serambi Logo"
+                            fill
+                            className="object-contain opacity-80 hover:opacity-100 transition-opacity"
+                            sizes="64px"
+                        />
+                    </div>
+
+                    <h1 className="text-xl font-black text-white tracking-wide drop-shadow-sm hidden sm:block">
+                        {getTitle()}
+                    </h1>
+                </div>
+
+                {/* Right: Access */}
+                <div className="flex items-center gap-3">
                     {isAuthenticated ? (
                         <button
                             onClick={signOut}
@@ -67,9 +65,10 @@ export default function Header() {
                     ) : (
                         <Link
                             href="/login"
-                            className="bg-brand-green hover:bg-brand-green/80 text-black px-5 py-2 rounded-full text-[10px] font-bold uppercase tracking-wider transition-all shadow-lg hover:scale-105 flex items-center gap-2"
+                            className="text-white/70 hover:text-white transition-colors"
+                            aria-label="Iniciar sesión"
                         >
-                            <User size={14} /> INICIAR SESIÓN
+                            <Lock size={22} />
                         </Link>
                     )}
                 </div>
