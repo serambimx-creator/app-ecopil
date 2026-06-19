@@ -6,6 +6,7 @@ import { Document, Page, Text, View, StyleSheet, PDFDownloadLink, Image as PDFIm
 import { supabase } from '@/lib/supabase';
 import { calculateImpact, calculateFinances } from '@/lib/reports';
 import { FileDown, Loader2 } from 'lucide-react';
+import RouteGuard from '@/components/auth/RouteGuard';
 
 // Styles for PDF
 const styles = StyleSheet.create({
@@ -94,6 +95,14 @@ const ReportDocument = ({ impact, finances, activities }: { impact: any, finance
 // React-pdf renderer can run on client. 
 
 export default function ReportesPage() {
+    return (
+        <RouteGuard requiredRole="admin">
+            <ReportesContent />
+        </RouteGuard>
+    );
+}
+
+function ReportesContent() {
     const [impact, setImpact] = useState<any>(null);
     const [finances, setFinances] = useState<any>(null);
     const [activities, setActivities] = useState<any[]>([]);

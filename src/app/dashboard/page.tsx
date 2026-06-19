@@ -6,11 +6,20 @@ import { Project, AgendaActivity, Finance, ActivityAssignment, PersonalTask } fr
 import DashboardWidgets from '@/components/dashboard/DashboardWidgets';
 import PersonalBunker from '@/components/dashboard/PersonalBunker';
 import ReportPreview from '@/components/dashboard/ReportPreview';
+import RouteGuard from '@/components/auth/RouteGuard';
 
 // Mock User ID (Replace with real Auth later)
 const USER_ID = 'CURRENT_USER_ID_PLACEHOLDER';
 
 export default function DashboardPage() {
+    return (
+        <RouteGuard requiredRole="coordinator">
+            <DashboardContent />
+        </RouteGuard>
+    );
+}
+
+function DashboardContent() {
     const [projects, setProjects] = useState<Project[]>([]);
     const [activities, setActivities] = useState<AgendaActivity[]>([]);
     const [finances, setFinances] = useState<Finance[]>([]);

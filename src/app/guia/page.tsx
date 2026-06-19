@@ -12,7 +12,7 @@ const SEDES_DATA = [
     day: 18,
     name: 'Parque Nacional Tula',
     icon: Landmark,
-    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/27/Zona_arqueol%C3%B3gica_de_Tula%2C_Hidalgo_%288%29.jpg/800px-Zona_arqueol%C3%B3gica_de_Tula%2C_Hidalgo_%288%29.jpg',
+    imageUrl: '/guia/tula.webp',
     altText: 'Pirámides y atlantes de Tula',
     altitud: '2,020 msnm',
     clima: '5–18°C',
@@ -29,7 +29,7 @@ const SEDES_DATA = [
     day: 18,
     name: 'Grutas Xoxafi',
     icon: Mountain,
-    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9b/Grotte_de_Clamouse_-_20.jpg/800px-Grotte_de_Clamouse_-_20.jpg',
+    imageUrl: '/guia/grutas-xoxafi.webp',
     altText: 'Grutas Xoxafi con formaciones kársticas',
     altitud: '1,900 msnm',
     clima: '4–17°C',
@@ -46,7 +46,7 @@ const SEDES_DATA = [
     day: 19,
     name: 'Villa de Tezontepec',
     icon: Trees,
-    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Hidalgo_Tezontepec_de_Aldama.jpg/800px-Hidalgo_Tezontepec_de_Aldama.jpg',
+    imageUrl: '/guia/tezontepec.webp',
     altText: 'Vista del municipio de Villa de Tezontepec',
     altitud: '1,800 msnm',
     clima: '4–18°C',
@@ -63,7 +63,7 @@ const SEDES_DATA = [
     day: 19,
     name: 'Mineral del Chico · Rocabosque',
     icon: TreePine,
-    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/12/Bosque_de_oyamel.jpg/800px-Bosque_de_oyamel.jpg',
+    imageUrl: '/guia/mineral-del-chico.webp',
     altText: 'Parque Nacional El Chico con formaciones rocosas',
     altitud: '2,360 msnm',
     clima: '2–14°C',
@@ -80,7 +80,7 @@ const SEDES_DATA = [
     day: 20,
     name: 'Acaxochitlán · Cascadas Dos Mundos',
     icon: Waves,
-    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c6/Cascada_en_M%C3%A9xico.jpg/800px-Cascada_en_M%C3%A9xico.jpg',
+    imageUrl: '/guia/acaxochitlan.webp',
     altText: 'Cascadas Dos Mundos en Acaxochitlán',
     altitud: '2,260 msnm',
     clima: '5–16°C',
@@ -97,7 +97,7 @@ const SEDES_DATA = [
     day: 20,
     name: 'Tulancingo · Ajolotequio',
     icon: Fish,
-    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/Ambystoma_mexicanum_1.jpg/800px-Ambystoma_mexicanum_1.jpg',
+    imageUrl: '/guia/ajolotequio.webp',
     altText: 'Axolote mexicano (Ambystoma mexicanum)',
     altitud: '2,100 msnm',
     clima: '6–20°C',
@@ -138,9 +138,8 @@ function ImageWithFallback({
     <Image
       src={url}
       alt={alt}
-      width={400}
-      height={144}
-      unoptimized={true}
+      width={800}
+      height={400}
       onError={() => setError(true)}
       className="w-full h-36 object-cover rounded-t-2xl"
     />

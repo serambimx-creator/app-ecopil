@@ -6,8 +6,17 @@ import { Clock, User, FileText, Filter } from 'lucide-react';
 import { clsx } from 'clsx';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
+import RouteGuard from '@/components/auth/RouteGuard';
 
 export default function HistorialPage() {
+    return (
+        <RouteGuard requiredRole="admin">
+            <HistorialContent />
+        </RouteGuard>
+    );
+}
+
+function HistorialContent() {
     const [logs, setLogs] = useState<any[]>([]);
     const [filterUser, setFilterUser] = useState<string>('');
     const [loading, setLoading] = useState(true);

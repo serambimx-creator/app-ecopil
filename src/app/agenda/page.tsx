@@ -10,8 +10,17 @@ import ActivityDrawer from '@/components/dashboard/ActivityDrawer';
 import AgendaCalendar from '@/components/dashboard/AgendaCalendar';
 import { clsx } from 'clsx';
 import { List, Calendar as CalendarIcon } from 'lucide-react';
+import RouteGuard from '@/components/auth/RouteGuard';
 
 export default function AgendaPage() {
+    return (
+        <RouteGuard requiredRole="volunteer">
+            <AgendaContent />
+        </RouteGuard>
+    );
+}
+
+function AgendaContent() {
     const [activities, setActivities] = useState<AgendaActivity[]>([]);
     const [loading, setLoading] = useState(true);
     const [selectedActivityId, setSelectedActivityId] = useState<string | undefined>(undefined);

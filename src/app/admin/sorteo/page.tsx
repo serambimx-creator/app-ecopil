@@ -5,6 +5,7 @@ import { supabase } from '@/lib/supabase';
 import { Trophy, Shuffle, User, Filter, PartyPopper } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { clsx } from 'clsx';
+import RouteGuard from '@/components/auth/RouteGuard';
 
 // Mock Profiles until real users seeded
 const MOCK_PARTICIPANTS = [
@@ -19,6 +20,14 @@ const MOCK_PARTICIPANTS = [
 ];
 
 export default function SorteoPage() {
+    return (
+        <RouteGuard requiredRole="admin">
+            <SorteoContent />
+        </RouteGuard>
+    );
+}
+
+function SorteoContent() {
     const [participants, setParticipants] = useState<any[]>([]);
     const [filteredParticipants, setFilteredParticipants] = useState<any[]>([]);
     const [selectedNode, setSelectedNode] = useState<string>('all');

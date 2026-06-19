@@ -14,7 +14,7 @@ interface Message {
 }
 
 export default function AssistantFab() {
-    const { userId } = useAuth();
+    const { userId, user } = useAuth();
     const [isOpen, setIsOpen] = useState(false);
     const [messages, setMessages] = useState<Message[]>([
         { id: 'welcome', role: 'bot', text: '¡Hola! Soy tu asistente Ecopil. Pregúntame sobre proyectos, finanzas o actividades.' }
@@ -93,6 +93,7 @@ export default function AssistantFab() {
     };
 
     if (!isMounted) return null;
+    if (!userId || (user?.role !== 'coordinator' && user?.role !== 'admin')) return null;
 
     return (
         <>

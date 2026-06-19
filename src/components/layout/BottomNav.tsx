@@ -1,25 +1,47 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
-import { Home, Calendar, BookOpen, Map, User, MessageCircle } from 'lucide-react';
+import { Home, Calendar, BookOpen, Map, User, MessageCircle, Lock } from 'lucide-react';
 import { usePathname } from 'next/navigation';
+import { useAuth } from '@/context/AuthContext';
 
 export default function BottomNav() {
     const pathname = usePathname();
+    const { user } = useAuth();
     const [isMounted, setIsMounted] = useState(false);
 
     useEffect(() => {
         setIsMounted(true);
     }, []);
 
-    const navItems = [
-        { name: 'Inicio', href: '/', icon: Home },
-        { name: 'Agenda', href: '/agenda', icon: Calendar },
-        { name: 'Guía', href: '/guia', icon: BookOpen },
-        { name: 'Mapa', href: '/mapa', icon: Map },
-        { name: 'Perfil', href: '/perfil', icon: User },
-    ];
+    const navItems = useMemo(() => {
+        const role = user?.role;
+
+        if (!user) {
+            return [
+                { name: 'Inicio', href: '/', icon: Home },
+                { name: 'Guía', href: '/guia', icon: BookOpen },
+                { name: 'Mapa', href: '/mapa', icon: Map },
+                { name: 'Acceso', href: '/login', icon: Lock },
+            ];
+        }
+
+        const items = [
+            { name: 'Inicio', href: '/', icon: Home },
+            { name: 'Agenda', href: '/agenda', icon: Calendar },
+            { name: 'Guía', href: '/guia', icon: BookOpen },
+        ];
+
+        if (role === 'coordinator' || role === 'admin') {
+            items.push({ name: 'Chat', href: '/chat', icon: MessageCircle });
+        }
+
+        items.push({ name: 'Mapa', href: '/mapa', icon: Map });
+        items.push({ name: 'Perfil', href: '/perfil', icon: User });
+
+        return items;
+    }, [user]);
 
     if (!isMounted) return null;
 

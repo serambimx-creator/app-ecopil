@@ -6,11 +6,20 @@ import { Info, MapPin, Clock, Star, Bell, ArrowRight } from 'lucide-react';
 import { clsx } from 'clsx';
 import LocationContext from '@/components/participant/LocationContext';
 import { AgendaActivity } from '@/types/database';
+import RouteGuard from '@/components/auth/RouteGuard';
 
 // Mock User (Participant)
 const USER_ID = 'CURRENT_USER_ID_PLACEHOLDER'; // In real app, auth.getUser()
 
 export default function ParticipantPage() {
+    return (
+        <RouteGuard requiredRole="volunteer">
+            <ParticipantContent />
+        </RouteGuard>
+    );
+}
+
+function ParticipantContent() {
     const [activities, setActivities] = useState<AgendaActivity[]>([]);
     const [assignments, setAssignments] = useState<Set<string>>(new Set());
     const [profile, setProfile] = useState<any>(null);

@@ -10,8 +10,17 @@ import StaffBunker from '@/components/profile/StaffBunker';
 import ExecutiveBrief from '@/components/profile/ExecutiveBrief';
 import AnnouncementCreator from '@/components/profile/AnnouncementCreator';
 import { Megaphone } from 'lucide-react';
+import RouteGuard from '@/components/auth/RouteGuard';
 
 export default function ProfilePage() {
+    return (
+        <RouteGuard requiredRole="volunteer">
+            <ProfileContent />
+        </RouteGuard>
+    );
+}
+
+function ProfileContent() {
     const router = useRouter();
     const { user, isAuthenticated, signOut, isLoading } = useAuth();
     const [isAnnouncementOpen, setIsAnnouncementOpen] = useState(false);
