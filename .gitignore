@@ -40,3 +40,7 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 DumpStack.log
+
+# raw guide images (optimized WebP versions are in /public/guia/optimized/)
+public/guia/*.jpg
+public/guia/*.png
