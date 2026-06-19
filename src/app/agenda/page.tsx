@@ -84,8 +84,8 @@ function AgendaContent() {
     };
 
     return (
-        <div className="pb-24 animate-in fade-in duration-500">
-            <header className="mb-8 px-4 pt-4 flex items-end justify-between">
+        <div className="pb-24 pt-20 animate-in fade-in duration-500">
+            <header className="mb-8 px-4 flex items-end justify-between">
                 <div>
                     <h1 className="text-3xl font-black text-white mb-1">Agenda Operativa</h1>
                     <p className="text-gray-400 text-sm">Cronograma oficial Pachuca 2026</p>

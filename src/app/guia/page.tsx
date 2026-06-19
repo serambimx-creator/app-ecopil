@@ -128,7 +128,7 @@ function ImageWithFallback({
 
   if (error) {
     return (
-      <div className="w-full h-36 bg-[#1a2a1a] rounded-t-2xl flex items-center justify-center">
+      <div className="w-full h-52 bg-[#1a2a1a] flex items-center justify-center">
         <IconComponent size={48} className="text-gray-600" />
       </div>
     );
@@ -141,7 +141,7 @@ function ImageWithFallback({
       width={800}
       height={400}
       onError={() => setError(true)}
-      className="w-full h-36 object-cover rounded-t-2xl"
+      className="w-full h-52 object-cover"
     />
   );
 }
@@ -175,7 +175,7 @@ function SedeCard({ sede, isActive }: { sede: (typeof SEDES_DATA)[0]; isActive: 
 
   return (
     <div className={clsx(
-      'bg-[#1a1a1a] border border-[#252525] rounded-2xl overflow-hidden transition-all',
+      'bg-[#1a1a1a] rounded-2xl overflow-hidden transition-all',
       isActive ? 'opacity-100' : 'hidden'
     )}>
       <ImageWithFallback url={sede.imageUrl} alt={sede.altText} icon={IconComponent} />
@@ -256,7 +256,7 @@ export default function GuiaPage() {
   const sedesForDay = SEDES_DATA.filter((s) => s.day === activeDay);
 
   return (
-    <div className="min-h-screen bg-[#121212] text-white font-sans pb-32 px-4 pt-6 max-w-md mx-auto">
+    <div className="min-h-screen bg-[#121212] text-white font-sans pb-32 pt-20 max-w-md mx-auto">
       <header className="mb-8">
         <h1 className="text-3xl font-black mb-2">Guía de Sedes</h1>
         <p className="text-gray-400 text-sm">7mo Encuentro Nacional Ecopil MX 2026</p>

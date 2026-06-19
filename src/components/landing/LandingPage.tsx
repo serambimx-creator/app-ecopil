@@ -234,10 +234,10 @@ export default function LandingPage() {
     ];
 
     return (
-        <div className="min-h-screen bg-[#121212] text-white font-sans pb-32">
+        <div className="min-h-screen bg-[#121212] text-white font-sans pb-32 -mx-4">
 
             {/* ===== HERO ===== */}
-            <section className="relative min-h-[55vh] flex flex-col items-center justify-end text-center overflow-hidden pb-8">
+            <section className="relative min-h-[65vh] flex flex-col items-center justify-end text-center overflow-hidden pb-8">
                 <Image
                     src="/impacto/optimized/hero-ecopil.webp"
                     alt="Encuentro Ecopil"
@@ -245,7 +245,7 @@ export default function LandingPage() {
                     className="object-cover"
                     priority
                 />
-                <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, rgba(0,0,0,0.55), rgba(0,0,0,0.85))' }} />
+                <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.5) 50%, rgba(0,0,0,0.9) 100%)' }} />
 
                 <div className="relative z-10 w-full space-y-5 px-6">
                     <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-green/15 border border-brand-green/40 text-brand-green text-[10px] font-bold uppercase tracking-wider">
@@ -265,7 +265,7 @@ export default function LandingPage() {
             </section>
 
             {/* ===== TAB BAR ===== */}
-            <nav className="sticky top-0 z-40 bg-[#0d0d0d] border-b border-[#252525]">
+            <nav className="sticky top-[64px] z-30 bg-[#0d0d0d] border-b border-[#252525]">
                 <div className="flex">
                     {tabs.map((tab) => (
                         <button
@@ -423,6 +423,107 @@ export default function LandingPage() {
                                     {tag}
                                 </span>
                             ))}
+                        </div>
+                    </section>
+
+                    {/* El Encuentro Nacional Ecopil */}
+                    <section className="space-y-6">
+                        <h2 className="text-lg font-black">El Encuentro Nacional Ecopil</h2>
+
+                        <div className="bg-[#1a1a1a] border border-[#252525] rounded-2xl p-5">
+                            <p className="text-sm text-gray-300 leading-relaxed">
+                                Evento anual donde convergen los nodos de toda la república para compartir aprendizajes, capacitarse, ejecutar acciones de restauración y fortalecer la red nacional de jóvenes líderes ambientales. Cada año se realiza en un ecosistema diferente de México. Esta es la 7ma edición nacional y el 2do encuentro en Hidalgo, coordinado por SERAMBI.
+                            </p>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-3">
+                            {[
+                                { title: 'Encuentro', desc: 'Jóvenes de 22 ciudades comparten experiencias', img: '/impacto/optimized/hero-ecopil.webp' },
+                                { title: 'Capacitación', desc: 'Talleres STEAM, SbN y liderazgo ambiental', img: '/impacto/optimized/Arroyo Moreno-Ecopil-374.webp' },
+                                { title: 'Restauración', desc: 'Reforestación y monitoreo en campo', img: '/impacto/optimized/Jornada Alpura_AeroMexico-077.webp' },
+                                { title: 'Innovación', desc: 'Soluciones basadas en la naturaleza', img: '/impacto/optimized/Arroyo Moreno-Ecopil-416.webp' },
+                            ].map((pilar) => (
+                                <div key={pilar.title} className="relative rounded-xl overflow-hidden h-28">
+                                    <Image src={pilar.img} alt={pilar.title} fill className="object-cover opacity-40" />
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
+                                    <div className="absolute bottom-0 left-0 right-0 p-3">
+                                        <p className="text-xs font-black text-white">{pilar.title}</p>
+                                        <p className="text-[10px] text-gray-300 leading-tight mt-0.5">{pilar.desc}</p>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+
+                        <div className="grid grid-cols-3 gap-3">
+                            {[
+                                { big: '22,765', small: 'personas beneficiadas' },
+                                { big: '90+', small: 'agentes de cambio' },
+                                { big: '2do', small: 'encuentro en Hidalgo' },
+                            ].map((s) => (
+                                <div key={s.big} className="bg-[#1a1a1a] border border-[#252525] rounded-2xl p-4 text-center">
+                                    <p className="text-xl font-black text-white">{s.big}</p>
+                                    <p className="text-[10px] text-gray-500 uppercase tracking-wider mt-1">{s.small}</p>
+                                </div>
+                            ))}
+                        </div>
+
+                        <div className="space-y-3">
+                            <h3 className="text-sm font-black text-white">Red de Nodos</h3>
+                            <p className="text-xs text-gray-500">Grupos juveniles activos en todo el país</p>
+                            <div className="grid grid-cols-4 gap-2">
+                                {[
+                                    { name: 'Hidalgo', host: true },
+                                    { name: 'CDMX' }, { name: 'Edo. México' }, { name: 'Jalisco' },
+                                    { name: 'Querétaro' }, { name: 'Veracruz' }, { name: 'Monterrey' }, { name: 'Morelos' },
+                                    { name: 'Puebla' }, { name: 'Oaxaca' }, { name: 'Mérida' }, { name: 'Coahuila' },
+                                ].map((nodo) => (
+                                    <div
+                                        key={nodo.name}
+                                        className={clsx(
+                                            'text-[10px] font-bold text-center py-1.5 px-1 rounded-lg border',
+                                            nodo.host
+                                                ? 'bg-[#1a2a1a] text-[#00DF81] border-[#2a3a2a]'
+                                                : 'bg-[#1a1a1a] text-[#666] border-[#252525]'
+                                        )}
+                                    >
+                                        {nodo.name}
+                                    </div>
+                                ))}
+                            </div>
+                            <p className="text-[10px] text-gray-600 leading-relaxed">
+                                El nodo anfitrión es Hidalgo — coordinado por SERAMBI, 2do encuentro presencial en la Sierra Hidalguense.
+                            </p>
+                        </div>
+
+                        <div className="space-y-3">
+                            <h3 className="text-sm font-black text-white">¿Qué aprenden los jóvenes?</h3>
+                            <p className="text-xs text-gray-500">Estrategia Nacional de Impulso al Talento</p>
+                            <div className="space-y-3">
+                                {[
+                                    { title: 'Modelo de Innovación Ecopil', desc: 'Línea base, Nodos, Restauración, Monitoreo' },
+                                    { title: 'Soluciones basadas en la Naturaleza', desc: 'Infraestructura verde, humedales, reforestación' },
+                                    { title: 'STEAM ambiental', desc: 'Ciencia y tecnología aplicada a ecosistemas locales' },
+                                    { title: 'Acción para el Empoderamiento Climático', desc: 'Marco CMNUCC' },
+                                    { title: 'Liderazgo y gestión de nodos', desc: 'Vinculación con sector privado y gobierno' },
+                                ].map((item, i) => (
+                                    <div key={i} className="flex gap-4 items-start">
+                                        <div className="w-7 h-7 rounded-full bg-brand-green/15 text-[#00DF81] flex items-center justify-center text-xs font-black shrink-0">
+                                            {i + 1}
+                                        </div>
+                                        <div>
+                                            <p className="text-sm font-bold text-white">{item.title}</p>
+                                            <p className="text-xs text-gray-500 mt-0.5">{item.desc}</p>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                            <div className="flex flex-wrap gap-1.5 pt-2">
+                                {['UNESCO México', 'CMNUCC', 'ODS 2030', 'CEMEFI', 'Pacto Global ONU'].map((tag) => (
+                                    <span key={tag} className="text-[9px] font-bold uppercase tracking-wider rounded-full px-2.5 py-1 bg-[#1a1a1a] text-gray-500 border border-[#252525]">
+                                        {tag}
+                                    </span>
+                                ))}
+                            </div>
                         </div>
                     </section>
 

@@ -31,7 +31,7 @@ export default function RootLayout({
       >
         <AuthProvider>
           <Header />
-          <main className="p-4">
+          <main className="px-4">
             {children}
           </main>
           <BottomNav />
