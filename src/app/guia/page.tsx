@@ -256,7 +256,7 @@ export default function GuiaPage() {
   const sedesForDay = SEDES_DATA.filter((s) => s.day === activeDay);
 
   return (
-    <div className="min-h-screen bg-[#121212] text-white font-sans pb-32 pt-20 max-w-md mx-auto">
+    <div className="min-h-screen bg-[#121212] text-white font-sans pb-32 pt-4 max-w-md mx-auto">
       <header className="mb-8">
         <h1 className="text-3xl font-black mb-2">Guía de Sedes</h1>
         <p className="text-gray-400 text-sm">7mo Encuentro Nacional Ecopil MX 2026</p>

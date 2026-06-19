@@ -234,10 +234,10 @@ export default function LandingPage() {
     ];
 
     return (
-        <div className="min-h-screen bg-[#121212] text-white font-sans pb-32 -mx-4">
+        <div className="min-h-screen bg-[#121212] text-white font-sans pb-32">
 
             {/* ===== HERO ===== */}
-            <section className="relative min-h-[65vh] flex flex-col items-center justify-end text-center overflow-hidden pb-8">
+            <section className="relative min-h-[60vh] flex flex-col items-center justify-end text-center overflow-hidden pb-8 -mx-4">
                 <Image
                     src="/impacto/optimized/hero-ecopil.webp"
                     alt="Encuentro Ecopil"
@@ -265,7 +265,7 @@ export default function LandingPage() {
             </section>
 
             {/* ===== TAB BAR ===== */}
-            <nav className="sticky top-[64px] z-30 bg-[#0d0d0d] border-b border-[#252525]">
+            <nav className="sticky top-[56px] z-30 bg-[#0d0d0d] border-b border-[#252525] -mx-4">
                 <div className="flex">
                     {tabs.map((tab) => (
                         <button

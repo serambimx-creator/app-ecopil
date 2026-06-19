@@ -79,7 +79,7 @@ function ParticipantContent() {
     }, {} as Record<string, AgendaActivity[]>);
 
     return (
-        <div className="min-h-screen pb-24 pt-20 bg-black text-white">
+        <div className="min-h-screen pb-24 bg-black text-white">
 
             {/* Header: Identity */}
             <div className="pt-8 pb-6 px-6 bg-gradient-to-b from-brand-green/10 to-transparent">

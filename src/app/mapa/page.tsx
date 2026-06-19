@@ -14,7 +14,7 @@ function MapContent() {
     const defaultMode = searchParams.get('mode') === 'recorrido' ? 'recorrido' as const : undefined;
 
     return (
-        <div className="h-[calc(100vh-140px)] md:h-[calc(100vh-100px)] w-full rounded-b-3xl overflow-hidden glass-card relative -mt-2">
+        <div className="h-[calc(100vh-140px)] md:h-[calc(100vh-100px)] w-full rounded-b-3xl overflow-hidden glass-card relative">
             <MainMap defaultMode={defaultMode} />
         </div>
     );

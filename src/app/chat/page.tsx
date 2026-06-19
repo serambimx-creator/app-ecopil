@@ -13,8 +13,8 @@ export default function ChatPage() {
 
 function ChatContent() {
     return (
-        <div className="pb-24 pt-20 animate-in fade-in zoom-in duration-500">
-            <header className="mb-4 px-4">
+        <div className="pb-24 animate-in fade-in zoom-in duration-500">
+            <header className="mb-4 px-4 pt-4">
                 <h1 className="text-3xl font-black text-white mb-1">
                     Comunicaciones
                 </h1>

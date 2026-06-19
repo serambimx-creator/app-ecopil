@@ -23,32 +23,32 @@ export default function Header() {
     };
 
     return (
-        <header className="fixed top-0 left-0 right-0 z-40 w-full max-w-md mx-auto bg-black/40 backdrop-blur-sm border-b border-white/10 transition-all duration-300">
+        <header className="sticky top-0 z-40 w-full bg-black/50 backdrop-blur-md border-b border-white/10 transition-all duration-300">
             <div className="flex items-center justify-between px-4 py-2">
                 {/* Left: Logos + Title */}
-                <div className="flex items-center gap-3">
-                    <div className="relative h-12 w-28">
+                <div className="flex items-center gap-2">
+                    <div className="relative h-10 w-24">
                         <Image
                             src="/logos/ecopil.png"
                             alt="Ecopil Logo"
                             fill
                             className="object-contain drop-shadow-lg"
-                            sizes="112px"
+                            sizes="96px"
                             priority
                         />
                     </div>
 
-                    <div className="relative h-9 w-20">
+                    <div className="relative h-7 w-16">
                         <Image
                             src="/logos/serambi.png"
                             alt="Serambi Logo"
                             fill
                             className="object-contain opacity-90 hover:opacity-100 transition-opacity drop-shadow-lg"
-                            sizes="80px"
+                            sizes="64px"
                         />
                     </div>
 
-                    <h1 className="text-xl font-black text-white tracking-wide drop-shadow-md hidden sm:block">
+                    <h1 className="text-lg font-black text-white tracking-wide drop-shadow-md hidden sm:block">
                         {getTitle()}
                     </h1>
                 </div>
