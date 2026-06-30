@@ -27,23 +27,25 @@ export default function Header() {
             <div className="flex items-center justify-between px-4 py-2">
                 {/* Left: Logos + Title */}
                 <div className="flex items-center gap-2">
-                    <div className="relative h-10 w-24">
+                    <div className="relative h-11 w-24 flex items-center justify-center">
+                        <div className="absolute inset-0 scale-110 bg-white rounded-full blur-md opacity-90 z-0" />
                         <Image
                             src="/logos/ecopil.png"
                             alt="Ecopil Logo"
                             fill
-                            className="object-contain drop-shadow-lg"
+                            className="object-contain drop-shadow-lg relative z-10"
                             sizes="96px"
                             priority
                         />
                     </div>
 
-                    <div className="relative h-7 w-16">
+                    <div className="relative h-9 w-16 flex items-center justify-center">
+                        <div className="absolute inset-0 scale-110 bg-white rounded-full blur-md opacity-90 z-0" />
                         <Image
                             src="/logos/serambi.png"
                             alt="Serambi Logo"
                             fill
-                            className="object-contain opacity-90 hover:opacity-100 transition-opacity drop-shadow-lg"
+                            className="object-contain opacity-90 hover:opacity-100 transition-opacity drop-shadow-lg relative z-10"
                             sizes="64px"
                         />
                     </div>
