@@ -1,39 +1,15 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { ArrowRight, Star, MapPin, Users, Handshake, Building2, Map, MessageCircle, FileText, Phone, Mail, Award, Check, ChevronRight, Clock, Droplets, GraduationCap, TreePine, Briefcase, Globe, Heart } from 'lucide-react';
+import { ArrowRight, Star, MapPin, Users, Handshake, Building2, Map, MessageCircle, FileText, Phone, Mail, Award, Check, ChevronRight, ChevronDown, Clock, Droplets, GraduationCap, TreePine, Briefcase, Globe, Heart } from 'lucide-react';
 import { clsx } from 'clsx';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { supabase } from '@/lib/supabase';
-import { AgendaActivity } from '@/types/database';
 import AlliesCarousel from '@/components/public/AlliesCarousel';
+import { ITINERARIO, ACTIVIDAD_EXTRA } from '@/data/itinerario';
 
 type ViewType = 'miembros' | 'aliados' | 'patrocinadores';
 
-const AGENDA_DATA = [
-    {
-        day: '18 DIC',
-        items: [
-            { time: '09:00', place: 'Parque Nacional Tula', tags: ['Inauguración', 'Taller henopoita'] },
-            { time: '14:00', place: 'Grutas de Xoxafi', tags: ['Feria ambiental', 'Recorrido'] },
-        ]
-    },
-    {
-        day: '19 DIC',
-        items: [
-            { time: '08:00', place: 'Villa de Tezontepec', tags: ['Reforestación', 'Feria ambiental'] },
-            { time: '10:00', place: 'Mineral del Chico', tags: ['Recorrido', 'Capacitación'] },
-        ]
-    },
-    {
-        day: '20 DIC',
-        items: [
-            { time: '08:00', place: 'Acaxochitlan', tags: ['Manantiales', 'Capacitación', 'Feria'] },
-            { time: '16:00', place: 'Tulancingo · Ajolotequio', tags: ['Tentativo'], tentative: true },
-        ]
-    },
-];
 
 const EVIDENCE_IMAGES = [
     { src: '/impacto/optimized/Jornada Alpura_AeroMexico-077.webp', label: 'Reforestación masiva' },
@@ -189,9 +165,8 @@ function ContactCards({ onSwitchView }: { onSwitchView?: (v: ViewType) => void }
 
 export default function LandingPage() {
     const router = useRouter();
-    const [activities, setActivities] = useState<AgendaActivity[]>([]);
-    const [loading, setLoading] = useState(true);
     const [activeView, setActiveView] = useState<ViewType>('miembros');
+    const [openDay, setOpenDay] = useState<string | null>(null);
     const [donationAmount, setDonationAmount] = useState(500);
     const galeriaRef = useRef<HTMLDivElement>(null);
 
@@ -208,24 +183,6 @@ export default function LandingPage() {
         window.location.href = url.toString();
     };
 
-    useEffect(() => {
-        async function fetchAgenda() {
-            try {
-                const { data } = await supabase
-                    .from('agenda_activities')
-                    .select('*')
-                    .eq('status', 'green')
-                    .order('date', { ascending: true })
-                    .limit(5);
-                if (data) setActivities(data);
-            } catch (error) {
-                console.error("Error fetching public agenda", error);
-            } finally {
-                setLoading(false);
-            }
-        }
-        fetchAgenda();
-    }, []);
 
     const tabs: { key: ViewType; icon: typeof Users; label: string }[] = [
         { key: 'miembros', icon: Users, label: 'Miembros Ecopil' },
@@ -306,38 +263,87 @@ export default function LandingPage() {
                     {/* Agenda del encuentro */}
                     <section className="space-y-4">
                         <h2 className="text-lg font-black">Agenda del encuentro</h2>
-                        {AGENDA_DATA.map((day) => (
-                            <div key={day.day} className="space-y-3">
-                                <div className="inline-flex items-center gap-1.5 text-xs font-bold text-brand-green bg-[#1a2a1a] px-3 py-1 rounded-full">
-                                    <MapPin size={12} /> {day.day}
-                                </div>
-                                {day.items.map((item) => (
-                                    <div key={item.time + item.place} className="bg-[#1a1a1a] border border-[#252525] rounded-2xl p-4 flex gap-4">
-                                        <div className="text-sm font-bold text-gray-400 pt-0.5 shrink-0 w-12">
-                                            {item.time}
-                                        </div>
-                                        <div className="space-y-2">
-                                            <p className="text-sm font-bold text-white">{item.place}</p>
-                                            <div className="flex flex-wrap gap-1.5">
-                                                {item.tags.map((tag) => (
-                                                    <span
-                                                        key={tag}
+                        <div className="space-y-2">
+                            {ITINERARIO.map((bloque) => {
+                                const isOpen = openDay === bloque.dia;
+                                return (
+                                    <div key={bloque.dia} className="bg-[#1a1a1a] border border-[#252525] rounded-2xl overflow-hidden">
+                                        <button
+                                            onClick={() => setOpenDay(isOpen ? null : bloque.dia)}
+                                            className="w-full flex items-center gap-4 p-4 text-left"
+                                        >
+                                            <div className="shrink-0 text-center min-w-[52px]">
+                                                <p className="text-xs font-black text-brand-green">{bloque.dia}</p>
+                                            </div>
+                                            <div className="w-px h-8 bg-white/10 shrink-0" />
+                                            <div className="flex items-center gap-1.5 flex-1 min-w-0">
+                                                <MapPin size={12} className="text-gray-500 shrink-0" />
+                                                <span className="text-sm font-medium text-white truncate">{bloque.sede}</span>
+                                            </div>
+                                            <ChevronDown
+                                                size={16}
+                                                className={clsx(
+                                                    "text-gray-500 shrink-0 transition-transform duration-200",
+                                                    isOpen && "rotate-180"
+                                                )}
+                                            />
+                                        </button>
+
+                                        {isOpen && (
+                                            <div className="bg-[#0d0d0d] px-4 pb-4">
+                                                {bloque.actividades.map((act, i) => (
+                                                    <div
+                                                        key={i}
                                                         className={clsx(
-                                                            "text-xs rounded-full px-2 py-0.5 font-medium",
-                                                            item.tentative
-                                                                ? "bg-[#2a2a1a] text-amber-400"
-                                                                : "bg-[#1a2a1a] text-[#00DF81]"
+                                                            "flex gap-3 py-2.5",
+                                                            i < bloque.actividades.length - 1 && "border-b border-[#1e1e1e]"
                                                         )}
                                                     >
-                                                        {tag}
-                                                    </span>
+                                                        <span className="text-[10px] pt-0.5 shrink-0 w-16 font-mono flex items-center justify-center">
+                                                            {act.hora ? (
+                                                                <span className="text-gray-500">{act.hora}</span>
+                                                            ) : (
+                                                                <span className="text-brand-green text-lg leading-none">●</span>
+                                                            )}
+                                                        </span>
+                                                        <div className="flex-1 flex items-start gap-2 flex-wrap">
+                                                            <span className="text-sm text-white">{act.titulo}</span>
+                                                            {act.pendiente && (
+                                                                <span className="text-[9px] font-bold text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-full">
+                                                                    Pendiente logística
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                    </div>
                                                 ))}
                                             </div>
-                                        </div>
+                                        )}
                                     </div>
-                                ))}
+                                );
+                            })}
+                        </div>
+
+                        <div className="border border-dashed border-white/20 rounded-2xl p-4">
+                            <div className="flex items-start gap-3">
+                                <div className="w-7 h-7 rounded-full bg-white/5 border border-white/10 flex items-center justify-center shrink-0">
+                                    <span className="text-xs font-bold text-gray-400">+</span>
+                                </div>
+                                <div>
+                                    <p className="text-sm font-bold text-gray-300">{ACTIVIDAD_EXTRA.titulo}</p>
+                                    <span className="text-[9px] font-bold text-gray-500 uppercase tracking-widest">
+                                        Actividad extra · Opcional
+                                    </span>
+                                    <p className="text-xs text-gray-500 mt-1">{ACTIVIDAD_EXTRA.descripcion}</p>
+                                </div>
                             </div>
-                        ))}
+                        </div>
+
+                        <button
+                            onClick={() => router.push('/agenda')}
+                            className="w-full text-center text-xs text-gray-600 hover:text-gray-400 transition-colors py-1"
+                        >
+                            Ver también en /agenda →
+                        </button>
                     </section>
 
                     {/* Accesos rápidos */}

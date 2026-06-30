@@ -3,9 +3,8 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { AgendaActivity } from '@/types/database';
-import { Plus, MapPin, ChevronRight, Loader2 } from 'lucide-react';
-import { format } from 'date-fns';
-import { es } from 'date-fns/locale';
+import { Plus, Loader2, ChevronDown } from 'lucide-react';
+import { ITINERARIO, ACTIVIDAD_EXTRA } from '@/data/itinerario';
 import ActivityDrawer from '@/components/dashboard/ActivityDrawer';
 import AgendaCalendar from '@/components/dashboard/AgendaCalendar';
 import { clsx } from 'clsx';
@@ -27,6 +26,16 @@ function AgendaContent() {
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
     const [role, setRole] = useState<'admin' | 'coordinator' | 'guest'>('coordinator');
     const [viewMode, setViewMode] = useState<'list' | 'calendar'>('list');
+    const [openDays, setOpenDays] = useState<Set<string>>(new Set(['18 DIC']));
+
+    const toggleDay = (dia: string) => {
+        setOpenDays(prev => {
+            const next = new Set(prev);
+            if (next.has(dia)) next.delete(dia);
+            else next.add(dia);
+            return next;
+        });
+    };
 
     useEffect(() => {
         fetchActivities();
@@ -115,87 +124,82 @@ function AgendaContent() {
                 </div>
             </header>
 
-            {loading ? (
-                <div className="flex justify-center py-20">
-                    <Loader2 className="animate-spin text-brand-green" />
-                </div>
-            ) : viewMode === 'calendar' ? (
-                <AgendaCalendar
-                    activities={activities}
-                    onActivityClick={handleActivityClick}
-                    role={role}
-                />
+            {viewMode === 'calendar' ? (
+                loading ? (
+                    <div className="flex justify-center py-20">
+                        <Loader2 className="animate-spin text-brand-green" />
+                    </div>
+                ) : (
+                    <AgendaCalendar
+                        activities={activities}
+                        onActivityClick={handleActivityClick}
+                        role={role}
+                    />
+                )
             ) : (
-                <div className="space-y-4 px-4">
-                    {activities.length === 0 && (
-                        <div className="text-center py-10 text-gray-500 opacity-50">
-                            No hay actividades programadas.
-                        </div>
-                    )}
-
-                    {activities.map((activity, index) => {
-                        const isSameDay = index > 0 &&
-                            new Date(activity.date).toDateString() === new Date(activities[index - 1].date).toDateString();
-
-                        return (
-                            <div key={activity.id}>
-                                {/* Date Divider */}
-                                {(!isSameDay || index === 0) && (
-                                    <div className="sticky top-20 z-10 py-2 bg-dark-surface/95 backdrop-blur-sm mb-4">
-                                        <span className="text-xs font-bold uppercase tracking-widest text-brand-green bg-brand-green/10 px-3 py-1 rounded-full border border-brand-green/20">
-                                            {format(new Date(activity.date), "EEEE d 'de' MMMM", { locale: es })}
-                                        </span>
-                                    </div>
-                                )}
-
-                                {/* Activity Card */}
-                                <div
-                                    onClick={() => handleActivityClick(activity.id)}
-                                    className={clsx(
-                                        "group relative glass-card p-5 rounded-3xl border border-white/5 transition-all duration-300",
-                                        (role === 'admin' || role === 'coordinator') && "hover:bg-white/10 cursor-pointer active:scale-[0.98]"
-                                    )}
-                                >
-                                    <div className="flex gap-4">
-                                        {/* Time Column */}
-                                        <div className="flex flex-col items-center min-w-[60px] pt-1">
-                                            <span className="text-xl font-bold text-white">
-                                                {format(new Date(activity.date), "HH:mm")}
-                                            </span>
-                                            <div className="h-full w-px bg-white/10 my-2 group-last:hidden" />
-                                        </div>
-
-                                        {/* Content Column */}
-                                        <div className="flex-1 space-y-2">
-                                            <div className="flex justify-between items-start">
-                                                <h3 className="text-lg font-bold text-white leading-tight">
-                                                    {activity.title}
-                                                </h3>
-                                                {/* Status Indicator */}
-                                                <div className={clsx(
-                                                    "w-3 h-3 rounded-full flex-shrink-0 shadow-[0_0_10px]",
-                                                    activity.status === 'red' ? "bg-status-red shadow-status-red/50" :
-                                                        activity.status === 'green' ? "bg-brand-green shadow-brand-green/50" :
-                                                            "bg-status-yellow shadow-status-yellow/50"
-                                                )} />
-                                            </div>
-
-                                            <div className="flex items-center gap-2 text-sm text-gray-400">
-                                                <MapPin size={14} className="text-gray-500" />
-                                                <span className="truncate max-w-[200px]">{activity.location || 'Ubicación por definir'}</span>
-                                            </div>
-
-                                            {(role === 'admin' || role === 'coordinator') && (
-                                                <div className="pt-2 flex items-center text-xs text-brand-green font-medium opacity-0 group-hover:opacity-100 transition-opacity">
-                                                    Editar actividad <ChevronRight size={14} />
-                                                </div>
-                                            )}
-                                        </div>
-                                    </div>
+                <div className="space-y-3 px-4">
+                    {ITINERARIO.map((bloque) => (
+                        <div key={bloque.dia} className="glass-card rounded-3xl border border-white/5 overflow-hidden">
+                            <button
+                                onClick={() => toggleDay(bloque.dia)}
+                                className="w-full flex items-center justify-between p-5 text-left"
+                            >
+                                <div>
+                                    <span className="text-xs font-bold text-brand-green uppercase tracking-widest">
+                                        {bloque.dia}
+                                    </span>
+                                    <p className="text-sm font-bold text-white mt-0.5">{bloque.sede}</p>
                                 </div>
+                                <ChevronDown
+                                    size={18}
+                                    className={clsx(
+                                        "text-gray-400 transition-transform duration-300 shrink-0",
+                                        openDays.has(bloque.dia) && "rotate-180"
+                                    )}
+                                />
+                            </button>
+
+                            {openDays.has(bloque.dia) && (
+                                <div className="px-5 pb-5 space-y-3 border-t border-white/5 pt-4">
+                                    {bloque.actividades.map((act, i) => (
+                                        <div key={i} className="flex gap-3">
+                                            <span className="text-xs text-gray-500 pt-0.5 shrink-0 w-20 font-mono">
+                                                {act.hora || '—'}
+                                            </span>
+                                            <div className="flex-1">
+                                                <div className="flex items-center gap-2 flex-wrap">
+                                                    <span className="text-sm font-medium text-white">{act.titulo}</span>
+                                                    {act.pendiente && (
+                                                        <span className="text-[10px] font-bold text-amber-400 bg-amber-400/10 border border-amber-400/20 px-2 py-0.5 rounded-full">
+                                                            Pendiente logística
+                                                        </span>
+                                                    )}
+                                                </div>
+                                                {act.detalle && (
+                                                    <p className="text-xs text-gray-500 mt-0.5">{act.detalle}</p>
+                                                )}
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    ))}
+
+                    <div className="border border-dashed border-white/20 rounded-3xl p-5 mt-2">
+                        <div className="flex items-start gap-3">
+                            <div className="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center shrink-0">
+                                <span className="text-xs font-bold text-gray-400">+</span>
                             </div>
-                        );
-                    })}
+                            <div>
+                                <p className="text-sm font-bold text-gray-300">{ACTIVIDAD_EXTRA.titulo}</p>
+                                <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">
+                                    Actividad extra · Opcional
+                                </span>
+                                <p className="text-xs text-gray-500 mt-1">{ACTIVIDAD_EXTRA.descripcion}</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             )}
 
