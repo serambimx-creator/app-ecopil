@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { AgendaActivity } from '@/types/database';
-import { Plus, Loader2, ChevronDown } from 'lucide-react';
+import { Plus, Loader2, ChevronDown, Route } from 'lucide-react';
 import { ITINERARIO, ACTIVIDAD_EXTRA } from '@/data/itinerario';
 import ActivityDrawer from '@/components/dashboard/ActivityDrawer';
 import AgendaCalendar from '@/components/dashboard/AgendaCalendar';
@@ -163,13 +163,23 @@ function AgendaContent() {
                                 <div className="px-5 pb-5 space-y-3 border-t border-white/5 pt-4">
                                     {bloque.actividades.map((act, i) => (
                                         <div key={i} className="flex gap-3">
-                                            <span className="text-xs text-gray-500 pt-0.5 shrink-0 w-20 font-mono">
-                                                {act.hora || '—'}
+                                            <span className="shrink-0 w-20 flex items-center justify-center pt-0.5">
+                                                {act.esTraslado ? (
+                                                    <Route size={13} className="text-gray-600" />
+                                                ) : act.hora ? (
+                                                    <span className="text-xs text-gray-500 font-mono">{act.hora}</span>
+                                                ) : (
+                                                    <span className="text-brand-green text-lg leading-none">●</span>
+                                                )}
                                             </span>
                                             <div className="flex-1">
                                                 <div className="flex items-center gap-2 flex-wrap">
-                                                    <span className="text-sm font-medium text-white">{act.titulo}</span>
-                                                    {act.pendiente && (
+                                                    {act.esTraslado ? (
+                                                        <span className="text-sm text-gray-500">→ {act.titulo}</span>
+                                                    ) : (
+                                                        <span className="text-sm font-medium text-white">{act.titulo}</span>
+                                                    )}
+                                                    {act.pendiente && !act.esTraslado && (
                                                         <span className="text-[10px] font-bold text-amber-400 bg-amber-400/10 border border-amber-400/20 px-2 py-0.5 rounded-full">
                                                             Pendiente logística
                                                         </span>

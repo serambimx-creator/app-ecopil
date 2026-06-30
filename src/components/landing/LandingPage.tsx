@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { ArrowRight, Star, MapPin, Users, Handshake, Building2, Map, MessageCircle, FileText, Phone, Mail, Award, Check, ChevronRight, ChevronDown, Clock, Droplets, GraduationCap, TreePine, Briefcase, Globe, Heart } from 'lucide-react';
+import { ArrowRight, Star, MapPin, Users, Handshake, Building2, Map, MessageCircle, FileText, Phone, Mail, Award, Check, ChevronRight, ChevronDown, Route, Clock, Droplets, GraduationCap, TreePine, Briefcase, Globe, Heart } from 'lucide-react';
 import { clsx } from 'clsx';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
@@ -299,16 +299,22 @@ export default function LandingPage() {
                                                             i < bloque.actividades.length - 1 && "border-b border-[#1e1e1e]"
                                                         )}
                                                     >
-                                                        <span className="text-[10px] pt-0.5 shrink-0 w-16 font-mono flex items-center justify-center">
-                                                            {act.hora ? (
-                                                                <span className="text-gray-500">{act.hora}</span>
+                                                        <span className="shrink-0 w-16 flex items-center justify-center pt-0.5">
+                                                            {act.esTraslado ? (
+                                                                <Route size={12} className="text-gray-600" />
+                                                            ) : act.hora ? (
+                                                                <span className="text-[10px] text-gray-500 font-mono">{act.hora}</span>
                                                             ) : (
                                                                 <span className="text-brand-green text-lg leading-none">●</span>
                                                             )}
                                                         </span>
                                                         <div className="flex-1 flex items-start gap-2 flex-wrap">
-                                                            <span className="text-sm text-white">{act.titulo}</span>
-                                                            {act.pendiente && (
+                                                            {act.esTraslado ? (
+                                                                <span className="text-sm text-gray-500">→ {act.titulo}</span>
+                                                            ) : (
+                                                                <span className="text-sm text-white">{act.titulo}</span>
+                                                            )}
+                                                            {act.pendiente && !act.esTraslado && (
                                                                 <span className="text-[9px] font-bold text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-full">
                                                                     Pendiente logística
                                                                 </span>
