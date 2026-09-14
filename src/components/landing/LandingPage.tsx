@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import AlliesCarousel from '@/components/public/AlliesCarousel';
 import { ITINERARIO, ACTIVIDAD_EXTRA } from '@/data/itinerario';
+import { useTheme } from '@/context/ThemeContext';
 
 type ViewType = 'miembros' | 'aliados' | 'patrocinadores';
 
@@ -35,6 +36,8 @@ const CONTACTS = [
 ];
 
 function CountdownTimer() {
+    const { theme } = useTheme();
+    const isLight = theme === 'light';
     const [timeLeft, setTimeLeft] = useState<{ days: number; hours: number; minutes: number; started: boolean } | null>(null);
 
     useEffect(() => {
@@ -65,21 +68,26 @@ function CountdownTimer() {
         return <div className="text-lg font-bold text-brand-green">¡En curso!</div>;
     }
 
+    const boxClass = isLight
+        ? "bg-white/80 border border-[var(--t-border)] shadow-sm rounded-xl px-4 py-2"
+        : "bg-[#1a2a1a] border border-[#2a3a2a] rounded-xl px-4 py-2";
+    const labelClass = isLight ? "text-xs text-[var(--t-text-faint)] uppercase" : "text-xs text-gray-500 uppercase";
+
     return (
         <div className="flex items-center justify-center gap-2">
-            <div className="bg-[#1a2a1a] border border-[#2a3a2a] rounded-xl px-4 py-2">
+            <div className={boxClass}>
                 <p className="text-xl font-bold text-brand-green">{timeLeft.days}</p>
-                <p className="text-xs text-gray-500 uppercase">días</p>
+                <p className={labelClass}>días</p>
             </div>
             <span className="text-brand-green font-bold">:</span>
-            <div className="bg-[#1a2a1a] border border-[#2a3a2a] rounded-xl px-4 py-2">
+            <div className={boxClass}>
                 <p className="text-xl font-bold text-brand-green">{String(timeLeft.hours).padStart(2, '0')}</p>
-                <p className="text-xs text-gray-500 uppercase">horas</p>
+                <p className={labelClass}>horas</p>
             </div>
             <span className="text-brand-green font-bold">:</span>
-            <div className="bg-[#1a2a1a] border border-[#2a3a2a] rounded-xl px-4 py-2">
+            <div className={boxClass}>
                 <p className="text-xl font-bold text-brand-green">{String(timeLeft.minutes).padStart(2, '0')}</p>
-                <p className="text-xs text-gray-500 uppercase">minutos</p>
+                <p className={labelClass}>minutos</p>
             </div>
         </div>
     );
@@ -165,6 +173,8 @@ function ContactCards({ onSwitchView }: { onSwitchView?: (v: ViewType) => void }
 
 export default function LandingPage() {
     const router = useRouter();
+    const { theme } = useTheme();
+    const isLight = theme === 'light';
     const [activeView, setActiveView] = useState<ViewType>('miembros');
     const [openDay, setOpenDay] = useState<string | null>(null);
     const [donationAmount, setDonationAmount] = useState(500);
@@ -202,7 +212,14 @@ export default function LandingPage() {
                     className="object-cover"
                     priority
                 />
-                <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.5) 50%, rgba(0,0,0,0.9) 100%)' }} />
+                <div
+                    className="absolute inset-0"
+                    style={{
+                        background: isLight
+                            ? 'linear-gradient(to bottom, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.55) 55%, rgba(255,255,255,0.97) 100%)'
+                            : 'linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.5) 50%, rgba(0,0,0,0.9) 100%)'
+                    }}
+                />
 
                 <div className="relative z-10 w-full space-y-5 px-6">
                     <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-green/15 border border-brand-green/40 text-brand-green text-[10px] font-bold uppercase tracking-wider">
@@ -211,11 +228,11 @@ export default function LandingPage() {
 
                     <CountdownTimer />
 
-                    <h1 className="text-2xl font-black leading-tight tracking-tight text-white">
+                    <h1 className={clsx("text-2xl font-black leading-tight tracking-tight", isLight ? "text-[var(--t-text)]" : "text-white")}>
                         Innovación Social <span className="text-brand-green">&</span> Gestión Ambiental
                     </h1>
 
-                    <p className="text-sm text-gray-300 flex items-center justify-center gap-1.5">
+                    <p className={clsx("text-sm flex items-center justify-center gap-1.5", isLight ? "text-[var(--t-text-secondary)]" : "text-gray-300")}>
                         <MapPin size={14} className="text-brand-green" /> Pachuca &middot; 18–20 dic 2026
                     </p>
                 </div>
