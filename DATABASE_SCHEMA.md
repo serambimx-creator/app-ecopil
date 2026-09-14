@@ -41,6 +41,17 @@ This schema serves as the Single Source of Truth for the application's data stru
 ### personal_tasks
 *Notas privadas (Private tasks and notes for users).*
 
+### staff_tasks
+*Checklist compartido de preparación de staff, visible en el War Room (ver `create_staff_tasks_table.sql`).*
+*   `id`: text (PK, slug legible en vez de uuid)
+*   `title`: text
+*   `responsible`: text (Optional)
+*   `detail`: text (Optional)
+*   `task_date`: text (Optional, ej. "10 dic")
+*   `sort_order`: int
+*   `is_completed`: boolean
+*   `completed_by`: uuid (FK -> profiles.id, Optional)
+
 ### evidence
 *Multimedia de campo (Google Drive links, images, etc).*
 *   `file_url`: Link al recurso.
