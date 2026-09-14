@@ -163,7 +163,7 @@ export default function TeamChat() {
     };
 
     return (
-        <div className="flex flex-col h-[calc(100vh-140px)] bg-black/20 rounded-3xl overflow-hidden border border-white/5 relative">
+        <div className="flex flex-col h-full bg-black/20 rounded-3xl overflow-hidden border border-white/5 relative">
 
             {/* 1. Header (Telegram Style) */}
             <div className="flex items-center gap-3 px-4 py-3 bg-white/5 border-b border-white/10 backdrop-blur-md z-10">
@@ -183,8 +183,7 @@ export default function TeamChat() {
             <div className="flex-1 overflow-y-auto p-4 space-y-3 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
                 {messages.length === 0 && (
                     <div className="text-center text-gray-500 mt-10 p-6 glass-card rounded-2xl mx-auto max-w-[200px]">
-                        <p className="text-sm">💬</p>
-                        <p className="text-xs mt-2">Inicia la conversación con tu equipo.</p>
+                        <p className="text-xs">Inicia la conversación con tu equipo.</p>
                     </div>
                 )}
 

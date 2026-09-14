@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
-import { User, LogOut } from 'lucide-react';
+import { User, FileText, Trophy, History } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { Profile, PersonalTask, AgendaActivity } from '@/types/database';
 import StaffBunker from '@/components/profile/StaffBunker';
@@ -22,7 +22,7 @@ export default function ProfilePage() {
 
 function ProfileContent() {
     const router = useRouter();
-    const { user, isAuthenticated, signOut, isLoading } = useAuth();
+    const { user, isAuthenticated, isLoading } = useAuth();
     const [isAnnouncementOpen, setIsAnnouncementOpen] = useState(false);
 
     // Data for components
@@ -83,11 +83,6 @@ function ProfileContent() {
         }
     }
 
-    const handleLogout = () => {
-        signOut();
-        router.push('/login');
-    };
-
     const handleAddTask = (title: string) => {
         // ... handled in subcomponent usually, but keeping context
     };
@@ -129,22 +124,14 @@ function ProfileContent() {
                     </h1>
                     <p className="text-gray-400 text-sm">{isNational ? 'Tablero Estratégico' : 'Espacio Personal'}</p>
                 </div>
-                <div className="flex gap-2">
-                    {isAdmin && (
-                        <button
-                            onClick={() => setIsAnnouncementOpen(true)}
-                            className="bg-white/10 text-white px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider hover:bg-white/20 transition-colors flex items-center gap-2"
-                        >
-                            <Megaphone size={14} /> Aviso
-                        </button>
-                    )}
+                {isAdmin && (
                     <button
-                        onClick={handleLogout}
-                        className="bg-status-red/10 text-status-red px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider hover:bg-status-red/20 transition-colors flex items-center gap-2"
+                        onClick={() => setIsAnnouncementOpen(true)}
+                        className="bg-white/10 text-white px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider hover:bg-white/20 transition-colors flex items-center gap-2"
                     >
-                        <LogOut size={14} /> Salir
+                        <Megaphone size={14} /> Aviso
                     </button>
-                </div>
+                )}
             </header>
 
             <div className="px-4 space-y-6">
@@ -175,6 +162,36 @@ function ProfileContent() {
                         </div>
                     </div>
                 </div>
+
+                {/* Admin Tools */}
+                {isAdmin && (
+                    <section className="space-y-3">
+                        <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider px-1">Herramientas de Administrador</h3>
+                        <div className="grid grid-cols-3 gap-3">
+                            <button
+                                onClick={() => router.push('/admin/reportes')}
+                                className="glass-card border border-white/10 rounded-2xl p-4 flex flex-col items-center gap-2 hover:bg-white/10 transition-colors active:scale-95"
+                            >
+                                <FileText size={20} className="text-brand-green" />
+                                <span className="text-xs font-bold text-gray-300">Reportes</span>
+                            </button>
+                            <button
+                                onClick={() => router.push('/admin/sorteo')}
+                                className="glass-card border border-white/10 rounded-2xl p-4 flex flex-col items-center gap-2 hover:bg-white/10 transition-colors active:scale-95"
+                            >
+                                <Trophy size={20} className="text-brand-green" />
+                                <span className="text-xs font-bold text-gray-300">Sorteo</span>
+                            </button>
+                            <button
+                                onClick={() => router.push('/admin/historial')}
+                                className="glass-card border border-white/10 rounded-2xl p-4 flex flex-col items-center gap-2 hover:bg-white/10 transition-colors active:scale-95"
+                            >
+                                <History size={20} className="text-brand-green" />
+                                <span className="text-xs font-bold text-gray-300">Historial</span>
+                            </button>
+                        </div>
+                    </section>
+                )}
 
                 {/* Smart Dashboard Switch */}
                 {isNational ? (

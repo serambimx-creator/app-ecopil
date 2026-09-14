@@ -14,7 +14,7 @@ const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 if (!supabaseUrl || !supabaseKey) {
-    console.error("❌ CRITICAL: Supabase Vars missing in Server Action");
+    console.error("CRITICAL: Supabase Vars missing in Server Action");
 }
 
 const ALLOWED_ORIGINS = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
@@ -35,8 +35,8 @@ export async function processChatMessage(userMessage: string, userId: string) {
             project_id: (await getProjectId())
         };
         const { error } = await supabase.from('agenda_activities').insert(payload);
-        if (error) return { success: true, text: `❌ DB Test Failed: ${error.message}` };
-        return { success: true, text: `✅ DB Test Exitoso: Actividad creada correcamente en la tabla.` };
+        if (error) return { success: true, text: `DB Test Failed: ${error.message}` };
+        return { success: true, text: `DB Test Exitoso: Actividad creada correcamente en la tabla.` };
     }
 
     // 1. Secure API Key Check (Server Side Only)
@@ -49,7 +49,7 @@ export async function processChatMessage(userMessage: string, userId: string) {
         console.error("Server: Missing GOOGLE_GENERATIVE_AI_API_KEY");
         return {
             success: false,
-            text: "🚨 Error de Configuración del Servidor: No se encontró la variable `GOOGLE_GENERATIVE_AI_API_KEY` en el archivo .env. Por favor agrégala para usar el modo Real."
+            text: "Error de Configuración del Servidor: No se encontró la variable `GOOGLE_GENERATIVE_AI_API_KEY` en el archivo .env. Por favor agrégala para usar el modo Real."
         };
     }
 
@@ -99,7 +99,7 @@ export async function processChatMessage(userMessage: string, userId: string) {
         const actionBlock = ExtractActionJSON(text);
 
         if (actionBlock) {
-            console.log("🤖 AI Action Detected:", actionBlock);
+            console.log("AI Action Detected:", actionBlock);
             const { action, data } = actionBlock;
 
             if (action === 'addActivity') {
@@ -124,10 +124,10 @@ export async function processChatMessage(userMessage: string, userId: string) {
 
                 if (error) {
                     console.error("DB Error:", error);
-                    return { success: true, text: `😅 Ups Luis, falló la conexión con la agenda. Error técnico: ${error.message}` };
+                    return { success: true, text: `Ups Luis, falló la conexión con la agenda. Error técnico: ${error.message}` };
                 }
 
-                return { success: true, text: `¡Listo Luis! 🗓️ He agendado "${finalTitle}" para el ${finalDate} a las ${finalTime} hrs en ${finalLocation}. Semáforo iniciado en Amarillo 🟡.` };
+                return { success: true, text: `¡Listo Luis! He agendado "${finalTitle}" para el ${finalDate} a las ${finalTime} hrs en ${finalLocation}. Semáforo iniciado en Amarillo.` };
             }
 
             if (action === 'addExpense') {
@@ -146,7 +146,7 @@ export async function processChatMessage(userMessage: string, userId: string) {
                 const { error } = await supabase.from('finances').insert(payload);
                 if (error) return { success: true, text: `No pude registrar el gasto: ${error.message}` };
 
-                return { success: true, text: `¡Entendido! 💸 Gasto de $${finalAmount} registrado bajo concepto "${finalDesc}". Tu balance se actualizó.` };
+                return { success: true, text: `¡Entendido! Gasto de $${finalAmount} registrado bajo concepto "${finalDesc}". Tu balance se actualizó.` };
             }
         }
 
@@ -156,8 +156,8 @@ export async function processChatMessage(userMessage: string, userId: string) {
     } catch (error: any) {
         // Handle Rate Limits (User Feedback)
         if (error.message?.includes('429') || error.toString().includes('Quota')) {
-            console.warn("⚠️ API Quota Exceeded (handled gracefully)"); // Warn instead of Error to avoid "Issue" badge
-            return { success: false, text: "⚠️ Límite de Cuota Excedido (429): La API Key gratuita ha alcanzado su límite. Intenta usar `/test-agenda` para probar la BD sin IA." };
+            console.warn("API Quota Exceeded (handled gracefully)"); // Warn instead of Error to avoid "Issue" badge
+            return { success: false, text: "Límite de Cuota Excedido (429): La API Key gratuita ha alcanzado su límite. Intenta usar `/test-agenda` para probar la BD sin IA." };
         }
 
         console.error("Server Action Error:", error);

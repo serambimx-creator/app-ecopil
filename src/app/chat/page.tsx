@@ -13,15 +13,15 @@ export default function ChatPage() {
 
 function ChatContent() {
     return (
-        <div className="pb-24 animate-in fade-in zoom-in duration-500">
-            <header className="mb-4 px-4 pt-4">
+        <div className="flex flex-col h-[calc(100dvh-142px)] animate-in fade-in zoom-in duration-500">
+            <header className="mb-4 px-4 pt-4 shrink-0">
                 <h1 className="text-3xl font-black text-white mb-1">
                     Comunicaciones
                 </h1>
                 <p className="text-gray-400 text-sm">Canal Oficial • Staff Nacional</p>
             </header>
 
-            <div className="h-[calc(100vh-180px)] glass-card border border-white/5 rounded-[32px] overflow-hidden bg-black/20 mx-2">
+            <div className="flex-1 min-h-0 glass-card border border-white/5 rounded-[32px] overflow-hidden bg-black/20 mx-2">
                 <TeamChat />
             </div>
         </div>

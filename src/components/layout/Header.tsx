@@ -4,11 +4,18 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
-import { LogOut, Lock } from 'lucide-react';
+import { useTheme } from '@/context/ThemeContext';
+import { LogOut, Lock, Sun, Moon } from 'lucide-react';
+import { clsx } from 'clsx';
 
 export default function Header() {
     const pathname = usePathname();
     const { isAuthenticated, signOut } = useAuth();
+    const { theme, toggleTheme } = useTheme();
+
+    // Light mode only applies to the public landing page + login (the shell
+    // chrome mirrors that here); internal staff/admin screens stay dark.
+    const isLightPage = (pathname === '/' && !isAuthenticated) || pathname === '/login';
 
     // Display Ecopil MX on landing page instead of Panel Principal
     const getTitle = () => {
@@ -23,7 +30,12 @@ export default function Header() {
     };
 
     return (
-        <header className="sticky top-0 z-40 w-full bg-black/50 backdrop-blur-md border-b border-white/10 transition-all duration-300">
+        <header
+            className={clsx(
+                "sticky top-0 z-40 w-full backdrop-blur-md border-b transition-all duration-300",
+                isLightPage ? "bg-[var(--t-header-bg)] border-[var(--t-border)]" : "bg-black/50 border-white/10"
+            )}
+        >
             <div className="flex items-center justify-between px-4 py-2">
                 {/* Left: Logos + Title */}
                 <div className="flex items-center gap-2">
@@ -50,13 +62,27 @@ export default function Header() {
                         />
                     </div>
 
-                    <h1 className="text-lg font-black text-white tracking-wide drop-shadow-md hidden sm:block">
+                    <h1
+                        className={clsx(
+                            "text-lg font-black tracking-wide drop-shadow-md hidden sm:block",
+                            isLightPage ? "text-[var(--t-text)]" : "text-white"
+                        )}
+                    >
                         {getTitle()}
                     </h1>
                 </div>
 
                 {/* Right: Access */}
                 <div className="flex items-center gap-3">
+                    {isLightPage && (
+                        <button
+                            onClick={toggleTheme}
+                            aria-label={theme === 'light' ? 'Activar modo oscuro' : 'Activar modo claro'}
+                            className="text-[var(--t-icon-muted)] hover:text-[var(--t-text)] transition-colors"
+                        >
+                            {theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}
+                        </button>
+                    )}
                     {isAuthenticated ? (
                         <button
                             onClick={signOut}
@@ -67,7 +93,10 @@ export default function Header() {
                     ) : (
                         <Link
                             href="/login"
-                            className="text-white/70 hover:text-white transition-colors"
+                            className={clsx(
+                                "transition-colors",
+                                isLightPage ? "text-[var(--t-icon-muted)] hover:text-[var(--t-text)]" : "text-white/70 hover:text-white"
+                            )}
                             aria-label="Iniciar sesión"
                         >
                             <Lock size={22} />

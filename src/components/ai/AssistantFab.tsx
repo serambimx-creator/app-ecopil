@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
+import { usePathname } from 'next/navigation';
 import { Sparkles, X, Send, Bot, RotateCcw } from 'lucide-react';
 import { sendMessageToGemini, rollbackLastAction } from '@/lib/chatbot';
 import { useAuth } from '@/context/AuthContext';
@@ -14,6 +15,7 @@ interface Message {
 }
 
 export default function AssistantFab() {
+    const pathname = usePathname();
     const { userId, user } = useAuth();
     const [isOpen, setIsOpen] = useState(false);
     const [messages, setMessages] = useState<Message[]>([
@@ -93,14 +95,16 @@ export default function AssistantFab() {
     };
 
     if (!isMounted) return null;
-    if (!userId || (user?.role !== 'coordinator' && user?.role !== 'admin')) return null;
+    if (!userId || user?.role !== 'admin') return null;
+    if (pathname === '/chat') return null;
 
     return (
-        <>
+        <div className="fixed inset-x-0 bottom-0 z-40 flex justify-center pointer-events-none">
+            <div className="relative w-full app-shell-width h-0">
             <button
                 onClick={() => setIsOpen(!isOpen)}
                 className={clsx(
-                    "fixed bottom-24 right-6 z-50 p-4 rounded-full shadow-2xl transition-all duration-300 transform hover:scale-110 active:scale-95",
+                    "pointer-events-auto absolute bottom-24 right-6 z-50 p-4 rounded-full shadow-2xl transition-all duration-300 transform hover:scale-110 active:scale-95",
                     isOpen ? "bg-status-red text-white rotate-90" : "bg-brand-green text-dark-surface"
                 )}
                 aria-label="Abrir Asistente"
@@ -110,7 +114,7 @@ export default function AssistantFab() {
 
             <div
                 className={clsx(
-                    "fixed bottom-24 right-6 z-40 w-[90vw] md:w-[400px] h-[500px] bg-dark-surface/95 backdrop-blur-md border border-white/10 rounded-3xl shadow-2xl flex flex-col overflow-hidden transition-all duration-300 origin-bottom-right",
+                    "pointer-events-auto absolute bottom-24 right-6 z-40 w-[min(90%,400px)] h-[500px] bg-dark-surface/95 backdrop-blur-md border border-white/10 rounded-3xl shadow-2xl flex flex-col overflow-hidden transition-all duration-300 origin-bottom-right",
                     isOpen ? "opacity-100 scale-100 translate-y-0" : "opacity-0 scale-90 translate-y-10 pointer-events-none"
                 )}
             >
@@ -187,6 +191,7 @@ export default function AssistantFab() {
                     </button>
                 </div>
             </div>
-        </>
+            </div>
+        </div>
     );
 }

@@ -1,6 +1,7 @@
 'use client';
 
 import { Activity, AlertTriangle, CheckCircle, TrendingUp, FileText } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { AgendaActivity } from '@/types/database';
 
 interface ExecutiveBriefProps {
@@ -9,6 +10,7 @@ interface ExecutiveBriefProps {
 }
 
 export default function ExecutiveBrief({ activities, agreements }: ExecutiveBriefProps) {
+    const router = useRouter();
     // Calculate Stats
     const total = activities.length;
     const completed = activities.filter(a => a.status === 'green').length;
@@ -98,7 +100,10 @@ export default function ExecutiveBrief({ activities, agreements }: ExecutiveBrie
             </div>
 
             <div className="text-center">
-                <button className="text-xs text-gray-500 hover:text-white uppercase tracking-widest font-bold transition-colors">
+                <button
+                    onClick={() => router.push('/admin/reportes')}
+                    className="text-xs text-gray-500 hover:text-white uppercase tracking-widest font-bold transition-colors"
+                >
                     Descargar Reporte PDF
                 </button>
             </div>

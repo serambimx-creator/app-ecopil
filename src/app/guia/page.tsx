@@ -199,13 +199,13 @@ function SedeCard({ sede, isActive }: { sede: (typeof SEDES_DATA)[0]; isActive: 
         <InfoCard label="Clima" value={sede.climaTipo} type="clima" />
       </div>
 
-      <div className="flex gap-1 border-b border-[#252525]">
+      <div className="flex gap-1 border-b border-[#252525] overflow-x-auto">
         {tabs.map((tab) => (
           <button
             key={tab.key}
             onClick={() => setActiveTab(tab.key)}
             className={clsx(
-              'text-[10px] font-bold uppercase tracking-wider px-3 py-2 transition-colors',
+              'shrink-0 whitespace-nowrap text-[10px] font-bold uppercase tracking-wider px-3 py-2 transition-colors',
               activeTab === tab.key
                 ? 'text-brand-green border-b-2 border-brand-green'
                 : 'text-gray-500 hover:text-gray-400'
@@ -238,7 +238,7 @@ function SedeCard({ sede, isActive }: { sede: (typeof SEDES_DATA)[0]; isActive: 
             </div>
             {sede.llevar.alerta && (
               <div className="bg-[#2a1a00] border border-amber-500/20 rounded-xl p-3">
-                <p className="text-xs text-amber-400 font-bold uppercase mb-1">⚠️ Alerta</p>
+                <p className="text-xs text-amber-400 font-bold uppercase mb-1">Alerta</p>
                 <p className="text-sm text-amber-300">{sede.llevar.alerta}</p>
               </div>
             )}
@@ -256,7 +256,7 @@ export default function GuiaPage() {
   const sedesForDay = SEDES_DATA.filter((s) => s.day === activeDay);
 
   return (
-    <div className="min-h-screen bg-[#121212] text-white font-sans pb-32 pt-4 max-w-md mx-auto">
+    <div className="min-h-screen bg-[#121212] text-white font-sans pb-32 pt-4">
       <header className="mb-8">
         <h1 className="text-3xl font-black mb-2">Guía de Sedes</h1>
         <p className="text-gray-400 text-sm">7mo Encuentro Nacional Ecopil MX 2026</p>
@@ -281,7 +281,7 @@ export default function GuiaPage() {
       </div>
 
       {/* Sedes for active day */}
-      <div className="space-y-4">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-start">
         {sedesForDay.map((sede, idx) => (
           <SedeCard key={sede.name} sede={sede} isActive={true} />
         ))}

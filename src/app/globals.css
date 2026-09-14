@@ -57,3 +57,75 @@ body {
 .animate-scroll-infinite {
   animation: scroll-infinite 20s linear infinite;
 }
+
+/* Shared app-shell width: mobile-first card that widens on larger screens.
+   Used by the root layout AND every fixed-position overlay (bottom nav, FAB)
+   so they always line up with the actual content column. Plain media queries
+   (rather than @apply + responsive variants) to sidestep build quirks. */
+.app-shell-width {
+  max-width: 28rem; /* max-w-md */
+}
+
+@media (min-width: 40rem) {
+  .app-shell-width {
+    max-width: 36rem; /* max-w-xl */
+  }
+}
+
+@media (min-width: 48rem) {
+  .app-shell-width {
+    max-width: 48rem; /* max-w-3xl */
+  }
+}
+
+@media (min-width: 64rem) {
+  .app-shell-width {
+    max-width: 64rem; /* max-w-5xl */
+  }
+}
+
+/* Light/dark theme tokens for the public shell (Header, BottomNav, landing
+   page, login). Internal staff/admin screens keep their fixed dark palette
+   and don't reference these variables, so the toggle has no effect there.
+   Dark is the default (matches the existing look); [data-theme="light"] on
+   <html> switches these to a warm off-white palette tuned to sit well next
+   to the SERAMBI logo (white background, charcoal wordmark, orange accent). */
+:root {
+  --t-bg: #121212;
+  --t-surface: #1a1a1a;
+  --t-surface-2: #0d0d0d;
+  --t-border: #252525;
+  --t-border-soft: #1e1e1e;
+  --t-text: #ffffff;
+  --t-text-secondary: #d1d5db;
+  --t-text-muted: #9ca3af;
+  --t-text-faint: #6b7280;
+  --t-text-faint-2: #4b5563;
+  --t-accent-tint-bg: #1a2a1a;
+  --t-accent-tint-border: #2a3a2a;
+  --t-header-bg: rgba(0, 0, 0, 0.5);
+  --t-icon-muted: rgba(255, 255, 255, 0.7);
+  --t-overlay-5: rgba(255, 255, 255, 0.05);
+  --t-overlay-10: rgba(255, 255, 255, 0.1);
+  --t-overlay-15: rgba(255, 255, 255, 0.15);
+}
+
+[data-theme="light"] {
+  --t-bg: #ffffff;
+  --t-surface: #f7f5f0;
+  --t-surface-2: #fbfaf7;
+  --t-border: #e7e3da;
+  --t-border-soft: #efebe2;
+  --t-text: #1c1c1c;
+  --t-text-secondary: #3f3d38;
+  --t-text-muted: #6b6862;
+  --t-text-faint: #8a8780;
+  --t-text-faint-2: #a6a399;
+  --t-accent-tint-bg: #e3f9ee;
+  --t-accent-tint-border: #bfedd6;
+  --t-header-bg: rgba(255, 255, 255, 0.75);
+  --t-icon-muted: rgba(28, 28, 28, 0.6);
+  --t-overlay-5: rgba(28, 28, 28, 0.04);
+  --t-overlay-10: rgba(28, 28, 28, 0.07);
+  --t-overlay-15: rgba(28, 28, 28, 0.1);
+}

@@ -125,19 +125,19 @@ function ReportesContent() {
     if (loading) return <div className="min-h-screen bg-black flex items-center justify-center text-white">Generando datos...</div>;
 
     return (
-        <div className="min-h-screen bg-black text-white p-6 md:p-10 pt-24 max-w-4xl mx-auto flex flex-col items-center justify-center text-center">
+        <div className="min-h-screen bg-black text-white p-4 sm:p-6 md:p-10 pt-24 max-w-4xl mx-auto flex flex-col items-center justify-center text-center">
 
-            <div className="bg-gradient-to-br from-brand-green/20 to-transparent p-1 rounded-3xl mb-8 animate-in fade-in zoom-in duration-700">
-                <div className="bg-dark-surface rounded-[20px] p-10 border border-white/10">
-                    <h1 className="text-4xl font-black mb-4">Reporte de Impacto 2026</h1>
-                    <p className="text-gray-400 max-w-md mx-auto mb-8">
+            <div className="w-full bg-gradient-to-br from-brand-green/20 to-transparent p-1 rounded-3xl mb-8 animate-in fade-in zoom-in duration-700">
+                <div className="bg-dark-surface rounded-[20px] p-6 sm:p-10 border border-white/10">
+                    <h1 className="text-2xl sm:text-4xl font-black mb-4">Reporte de Impacto 2026</h1>
+                    <p className="text-gray-400 max-w-md mx-auto mb-8 text-sm sm:text-base">
                         Descarga el documento oficial con el resumen de métricas, finanzas y acuerdos estratégicos del Encuentro Nacional.
                     </p>
 
                     <PDFDownloadLink
                         document={<ReportDocument impact={impact} finances={finances} activities={activities} />}
                         fileName="Ecopil_Reporte_2026.pdf"
-                        className="inline-flex items-center gap-2 bg-brand-green text-dark-surface font-bold text-lg px-8 py-4 rounded-full hover:bg-white hover:scale-105 transition-all shadow-[0_0_30px_rgba(0,223,129,0.3)]"
+                        className="inline-flex items-center gap-2 bg-brand-green text-dark-surface font-bold text-sm sm:text-lg px-5 sm:px-8 py-3 sm:py-4 rounded-full hover:bg-white hover:scale-105 transition-all shadow-[0_0_30px_rgba(0,223,129,0.3)] whitespace-nowrap"
                     >
                         {({ blob, url, loading, error }) =>
                             loading ? (

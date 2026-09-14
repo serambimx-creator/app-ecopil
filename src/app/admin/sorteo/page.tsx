@@ -126,17 +126,17 @@ function SorteoContent() {
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-brand-green/10 via-black to-black animate-pulse" />
 
             {/* Header Controls */}
-            <div className="absolute top-4 left-0 right-0 flex justify-between items-center px-6 z-10 w-full max-w-4xl mx-auto">
-                <div className="flex items-center gap-2 text-brand-green font-bold text-xl uppercase tracking-widest">
-                    <Trophy /> Sorteo Ecopil
+            <div className="absolute top-4 left-0 right-0 flex flex-wrap justify-center items-center gap-3 px-4 z-10 w-full max-w-4xl mx-auto">
+                <div className="flex items-center gap-2 text-brand-green font-bold text-base uppercase tracking-widest whitespace-nowrap">
+                    <Trophy size={20} className="shrink-0" /> Sorteo Ecopil
                 </div>
 
-                <div className="flex items-center gap-2 bg-white/10 rounded-full px-4 py-2 border border-white/10">
-                    <Filter size={14} className="text-gray-400" />
+                <div className="flex items-center gap-2 bg-white/10 rounded-full px-3 py-1.5 border border-white/10">
+                    <Filter size={14} className="text-gray-400 shrink-0" />
                     <select
                         value={selectedNode}
                         onChange={(e) => setSelectedNode(e.target.value)}
-                        className="bg-transparent text-white text-sm focus:outline-none appearance-none font-bold uppercase"
+                        className="bg-transparent text-white text-xs focus:outline-none appearance-none font-bold uppercase"
                     >
                         <option value="all" className="bg-black">Todos los Nodos</option>
                         <option value="Hidalgo" className="bg-black">Hidalgo</option>
@@ -147,11 +147,11 @@ function SorteoContent() {
             </div>
 
             {/* Main Stage */}
-            <div className="relative z-20 w-full max-w-2xl text-center space-y-12">
+            <div className="relative z-20 w-full max-w-2xl text-center space-y-8 sm:space-y-12 mt-24">
 
                 {/* Name Display */}
                 <div className={clsx(
-                    "relative bg-dark-surface border rounded-3xl p-12 transition-all duration-300 flex items-center justify-center min-h-[300px]",
+                    "relative bg-dark-surface border rounded-3xl p-6 sm:p-12 transition-all duration-300 flex items-center justify-center min-h-[220px] sm:min-h-[300px]",
                     isSpinning
                         ? "border-brand-green shadow-[0_0_50px_rgba(0,223,129,0.3)] scale-105"
                         : winner
@@ -167,8 +167,8 @@ function SorteoContent() {
                     <div>
                         {winner && <div className="text-brand-green font-bold uppercase tracking-[0.5em] mb-4 animate-in fade-in slide-in-from-bottom-2">¡Ganador!</div>}
                         <h1 className={clsx(
-                            "font-black text-white leading-none transition-all",
-                            isSpinning ? "text-6xl opacity-80 blur-[2px]" : "text-7xl md:text-8xl",
+                            "font-black text-white leading-none transition-all break-words",
+                            isSpinning ? "text-4xl sm:text-6xl opacity-80 blur-[2px]" : "text-5xl sm:text-7xl md:text-8xl",
                             winner && "text-transparent bg-clip-text bg-gradient-to-r from-brand-green to-blue-400"
                         )}>
                             {currentName}
@@ -187,13 +187,13 @@ function SorteoContent() {
                     onClick={handleSpin}
                     disabled={isSpinning}
                     className={clsx(
-                        "group relative px-12 py-6 rounded-full font-black text-xl uppercase tracking-widest transition-all",
+                        "group relative px-8 sm:px-12 py-4 sm:py-6 rounded-full font-black text-base sm:text-xl uppercase tracking-widest transition-all",
                         isSpinning
                             ? "bg-gray-800 text-gray-500 cursor-not-allowed"
                             : "bg-white text-black hover:scale-105 hover:bg-brand-green hover:shadow-[0_0_40px_rgba(0,223,129,0.5)] active:scale-95"
                     )}
                 >
-                    <span className="flex items-center gap-3">
+                    <span className="flex items-center gap-3 whitespace-nowrap">
                         {isSpinning ? "Girando..." : "Girar Tómbola"}
                         {!isSpinning && <Shuffle className="group-hover:rotate-180 transition-transform duration-500" />}
                     </span>

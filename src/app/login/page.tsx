@@ -5,10 +5,14 @@ import { useRouter } from 'next/navigation';
 import { Lock, Mail, ArrowRight, Loader2, AlertTriangle } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/context/AuthContext';
+import { useTheme } from '@/context/ThemeContext';
+import { clsx } from 'clsx';
 
 export default function LoginPage() {
     const router = useRouter();
     const { signIn } = useAuth();
+    const { theme } = useTheme();
+    const isLight = theme === 'light';
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
@@ -100,30 +104,50 @@ export default function LoginPage() {
     };
 
     return (
-        <div className="min-h-screen bg-black flex flex-col items-center justify-center p-4 relative overflow-hidden">
-            {/* Background Effects */}
-            <div className="absolute top-0 left-0 w-full h-full bg-[url('https://images.unsplash.com/photo-1542601906990-b4d3fb7d5763?q=80')] bg-cover bg-center opacity-20 blur-sm scale-110" />
-            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-black/40" />
+        <div
+            className={clsx(
+                "min-h-screen flex flex-col items-center justify-center p-4 relative overflow-hidden",
+                isLight ? "bg-[var(--t-bg)]" : "bg-black"
+            )}
+        >
+            {/* Background Effects (dark mode only — a moody photo doesn't fit the light palette) */}
+            {!isLight && (
+                <>
+                    <div className="absolute top-0 left-0 w-full h-full bg-[url('https://images.unsplash.com/photo-1542601906990-b4d3fb7d5763?q=80')] bg-cover bg-center opacity-20 blur-sm scale-110" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-black/40" />
+                </>
+            )}
 
             <div className="relative z-10 w-full max-w-md">
                 <div className="text-center mb-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
                     <div className="w-16 h-16 bg-brand-green rounded-2xl mx-auto flex items-center justify-center mb-4 shadow-[0_0_30px_rgba(0,223,129,0.3)]">
                         <Lock className="text-black" size={32} />
                     </div>
-                    <h1 className="text-3xl font-black text-white">Acceso Organizador</h1>
-                    <p className="text-gray-400 mt-2">Plataforma Ecopil 2026</p>
+                    <h1 className={clsx("text-3xl font-black", isLight ? "text-[var(--t-text)]" : "text-white")}>Acceso Organizador</h1>
+                    <p className={clsx("mt-2", isLight ? "text-[var(--t-text-muted)]" : "text-gray-400")}>Plataforma Ecopil 2026</p>
                 </div>
 
-                <form onSubmit={handleLogin} className="glass-card p-8 rounded-[32px] space-y-6 animate-in fade-in zoom-in duration-500 delay-100">
+                <form
+                    onSubmit={handleLogin}
+                    className={clsx(
+                        "p-8 rounded-[32px] space-y-6 animate-in fade-in zoom-in duration-500 delay-100",
+                        isLight ? "bg-[var(--t-surface)] border border-[var(--t-border)] shadow-sm" : "glass-card"
+                    )}
+                >
                     <div>
-                        <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 pl-4">Correo Institucional</label>
+                        <label className={clsx("block text-xs font-bold uppercase tracking-wider mb-2 pl-4", isLight ? "text-[var(--t-text-faint)]" : "text-gray-500")}>Correo Institucional</label>
                         <div className="relative">
-                            <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" size={18} />
+                            <Mail className={clsx("absolute left-4 top-1/2 -translate-y-1/2", isLight ? "text-[var(--t-text-faint)]" : "text-gray-500")} size={18} />
                             <input
                                 type="email"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
-                                className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-white placeholder-gray-600 focus:outline-none focus:border-brand-green/50 transition-colors"
+                                className={clsx(
+                                    "w-full rounded-2xl py-4 pl-12 pr-4 focus:outline-none focus:border-brand-green/50 transition-colors",
+                                    isLight
+                                        ? "bg-[var(--t-overlay-5)] border border-[var(--t-border)] text-[var(--t-text)] placeholder-[var(--t-text-faint)]"
+                                        : "bg-white/5 border border-white/10 text-white placeholder-gray-600"
+                                )}
                                 placeholder="tu@ecopil.org"
                                 required
                             />
@@ -131,14 +155,19 @@ export default function LoginPage() {
                     </div>
 
                     <div>
-                        <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 pl-4">Contraseña</label>
+                        <label className={clsx("block text-xs font-bold uppercase tracking-wider mb-2 pl-4", isLight ? "text-[var(--t-text-faint)]" : "text-gray-500")}>Contraseña</label>
                         <div className="relative">
-                            <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" size={18} />
+                            <Lock className={clsx("absolute left-4 top-1/2 -translate-y-1/2", isLight ? "text-[var(--t-text-faint)]" : "text-gray-500")} size={18} />
                             <input
                                 type="password"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
-                                className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-white placeholder-gray-600 focus:outline-none focus:border-brand-green/50 transition-colors"
+                                className={clsx(
+                                    "w-full rounded-2xl py-4 pl-12 pr-4 focus:outline-none focus:border-brand-green/50 transition-colors",
+                                    isLight
+                                        ? "bg-[var(--t-overlay-5)] border border-[var(--t-border)] text-[var(--t-text)] placeholder-[var(--t-text-faint)]"
+                                        : "bg-white/5 border border-white/10 text-white placeholder-gray-600"
+                                )}
                                 placeholder="••••••••"
                                 required
                             />
@@ -164,7 +193,7 @@ export default function LoginPage() {
                         )}
                     </button>
 
-                    <p className="text-center text-xs text-gray-600 mt-4">
+                    <p className={clsx("text-center text-xs mt-4", isLight ? "text-[var(--t-text-faint)]" : "text-gray-600")}>
                         Si usas el entorno de prueba, usa la contraseña maestra.
                     </p>
                 </form>

@@ -16,9 +16,9 @@ const ALLIES = [
 
 export default function AlliesCarousel() {
     return (
-        <section className="py-12 bg-black border-t border-white/5 relative overflow-hidden">
+        <section className="py-12 bg-[var(--t-bg)] border-t border-[var(--t-border)] relative overflow-hidden">
             <div className="text-center mb-8">
-                <p className="text-xs font-bold text-gray-500 uppercase tracking-[0.2em]">Nuestros Aliados & Partners</p>
+                <p className="text-xs font-bold text-[var(--t-text-faint)] uppercase tracking-[0.2em]">Nuestros Aliados & Partners</p>
             </div>
 
             {/* Infinite Scroll Container */}
@@ -27,7 +27,7 @@ export default function AlliesCarousel() {
                 {[...ALLIES, ...ALLIES, ...ALLIES].map((ally, i) => (
                     <div key={i} className="flex items-center grayscale hover:grayscale-0 transition-all opacity-50 hover:opacity-100 duration-300 cursor-pointer">
                         {/* Placeholder Styling matching Glass look */}
-                        <div className="h-16 w-32 bg-white/5 rounded-lg border border-white/5 flex items-center justify-center font-bold text-[10px] text-gray-400">
+                        <div className="h-16 w-32 bg-[var(--t-overlay-5)] rounded-lg border border-[var(--t-border)] flex items-center justify-center font-bold text-[10px] text-[var(--t-text-muted)]">
                             {/* In real app: <img src={ally.logo} /> */}
                             {ally.name}
                         </div>
@@ -36,8 +36,8 @@ export default function AlliesCarousel() {
             </div>
 
             {/* Fade Edges */}
-            <div className="absolute inset-y-0 left-0 w-20 bg-gradient-to-r from-black to-transparent pointer-events-none" />
-            <div className="absolute inset-y-0 right-0 w-20 bg-gradient-to-l from-black to-transparent pointer-events-none" />
+            <div className="absolute inset-y-0 left-0 w-20 bg-gradient-to-r from-[var(--t-bg)] to-transparent pointer-events-none" />
+            <div className="absolute inset-y-0 right-0 w-20 bg-gradient-to-l from-[var(--t-bg)] to-transparent pointer-events-none" />
         </section>
     );
 }

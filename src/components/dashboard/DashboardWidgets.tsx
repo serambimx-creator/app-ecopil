@@ -103,7 +103,7 @@ export default function DashboardWidgets({ projects, activities, finances }: Das
                         </div>
                     </>
                 ) : (
-                    <div className="text-sm text-gray-500 mt-2">Todo limpio 🎉</div>
+                    <div className="text-sm text-gray-500 mt-2">Todo limpio</div>
                 )}
             </div>
 

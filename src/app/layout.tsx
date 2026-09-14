@@ -5,6 +5,7 @@ import AssistantFab from "@/components/ai/AssistantFab";
 import Header from "@/components/layout/Header";
 
 import { AuthProvider } from "@/context/AuthContext";
+import { ThemeProvider } from "@/context/ThemeContext";
 
 export const metadata: Metadata = {
   title: "App-Ecopil Organización",
@@ -26,17 +27,19 @@ export default function RootLayout({
   return (
     <html lang="es" suppressHydrationWarning>
       <body
-        className={`bg-dark-surface text-foreground antialiased min-h-screen pb-32 max-w-md mx-auto overflow-x-hidden shadow-2xl border-x border-white/5`}
+        className={`bg-dark-surface text-foreground antialiased min-h-screen pb-32 app-shell-width mx-auto overflow-x-hidden shadow-2xl border-x border-white/5`}
         suppressHydrationWarning
       >
-        <AuthProvider>
-          <Header />
-          <main className="px-4">
-            {children}
-          </main>
-          <BottomNav />
-          <AssistantFab />
-        </AuthProvider>
+        <ThemeProvider>
+          <AuthProvider>
+            <Header />
+            <main className="px-4">
+              {children}
+            </main>
+            <BottomNav />
+            <AssistantFab />
+          </AuthProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

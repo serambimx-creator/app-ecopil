@@ -80,13 +80,11 @@ export default function LocationPicker({ latitude, longitude, onLocationChange }
                 className="z-0"
             >
                 <TileLayer
-                    attribution='&copy; CARTO'
-                    url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png" // Light map for better contrast in drawer? Or keep Dark? Let's use Light for "Field Work" feel contrast or Dark for consistency? User said Dark Mode for MainMap. For drawer picker, maybe Dark too for consistency with App theme.
+                    attribution='&copy; Esri'
+                    url="https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}"
                 />
-                {/* Override with Dark mode tile if preferred, but let's stick to Consistency */}
                 <TileLayer
-                    attribution='&copy; CARTO'
-                    url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+                    url="https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}"
                 />
 
                 <DraggableMarker position={position} onDragEnd={handleUpdate} />
