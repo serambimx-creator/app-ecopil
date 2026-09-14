@@ -6,6 +6,7 @@ import { Project, AgendaActivity, Finance, PersonalTask } from '@/types/database
 import DashboardWidgets from '@/components/dashboard/DashboardWidgets';
 import PersonalBunker from '@/components/dashboard/PersonalBunker';
 import ReportPreview from '@/components/dashboard/ReportPreview';
+import StaffTasksCard from '@/components/dashboard/StaffTasksCard';
 import TeamChat from '@/components/chat/TeamChat';
 import { useAuth } from '@/context/AuthContext';
 
@@ -155,6 +156,9 @@ export default function WarRoom({ role = 'admin' }: WarRoomProps) {
                     </div>
                 </div>
             </div>
+
+            {/* 4. Staff Prep Tasks (shared, visible to admin and coordinator) */}
+            <StaffTasksCard />
 
         </div>
     );
