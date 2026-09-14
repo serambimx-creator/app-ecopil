@@ -14,19 +14,32 @@ export interface BloqueDia {
 
 export const ITINERARIO: BloqueDia[] = [
   {
+    dia: '17 DIC',
+    sede: 'Llegada y bienvenida  ·  Hotel City Express Tula',
+    actividades: [
+      {
+        hora: '19:30',
+        titulo: 'Bienvenida oficial',
+        detalle: 'Hotel Tula · Pormenores del encuentro, asignación de Grupo A y Grupo B, explicación de la actividad de Heno Motita y Huellitas. Se recomienda llevar efectivo.',
+      },
+    ],
+  },
+  {
     dia: '18 DIC',
     sede: 'Parque Nacional Tula → Grutas Xoxafi  ·  Base: Hotel City Express Tula',
     actividades: [
-      { hora: '06:00–07:00', titulo: 'Desayuno en 2 equipos', detalle: 'Hotel Tula' },
+      { hora: '06:00–07:00', titulo: 'Desayuno en 2 equipos', detalle: 'Grupo A 6:00–6:30 · Grupo B 6:30–7:00 · Hotel Tula' },
+      { hora: '07:10–07:25', titulo: 'Traslado al Parque Nacional Tula', esTraslado: true },
       { hora: '07:30–08:30', titulo: 'App de Heno Motita y Huellas de Fauna' },
       { hora: '08:30–09:30', titulo: 'Inauguración del encuentro', detalle: 'Parque Nacional Tula' },
       { hora: '09:30–11:30', titulo: 'Traslado a Grutas de Xoxafi', esTraslado: true },
-      { hora: '11:30–13:00', titulo: 'Recorrido en Grutas de Xoxafi' },
-      { hora: '13:00–14:00', titulo: 'Comida e inauguración del mural', detalle: 'Mural en Xoxafi' },
-      { hora: '14:00–16:30', titulo: 'Reforestación con Maguey en Xoxafi' },
-      { hora: '16:30–18:00', titulo: 'Feria ambiental' },
+      { hora: '11:30–12:45', titulo: 'Recorrido en Grutas de Xoxafi', detalle: 'Lleva efectivo para propinas y compras personales' },
+      { hora: '12:50–14:00', titulo: 'Comida e inauguración del mural', detalle: 'Mural Alejandro Nahual · Xoxafi' },
+      { hora: '14:00–16:10', titulo: 'Feria ambiental' },
+      { hora: '16:30–18:00', titulo: 'Reforestación con Maguey en Xoxafi' },
       { hora: '18:30–20:30', titulo: 'Traslado a hotel y cena', esTraslado: true },
-      { hora: '', titulo: 'Capacitación SIGs Defensa del Territorio', detalle: 'Posible, pendiente confirmar', pendiente: true },
+      { hora: '19:40', titulo: 'Información de Villa de Tezontepec y Mineral del Chico', detalle: 'Charla informativa sobre las sedes del día siguiente' },
+      { hora: '20:30–22:00', titulo: 'Capacitación SIGs Defensa del Territorio' },
     ],
   },
   {
