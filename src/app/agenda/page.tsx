@@ -113,18 +113,25 @@ function AgendaContent() {
 
             {role !== 'admin' ? (
                 <div className="space-y-3 px-4">
-                    {ITINERARIO.map((bloque) => (
-                        <div key={bloque.dia} className="glass-card rounded-3xl border border-white/5 p-5 flex items-center gap-4">
-                            <div className="shrink-0 text-center min-w-[52px]">
-                                <p className="text-xs font-black text-brand-green uppercase tracking-widest">{bloque.dia}</p>
-                            </div>
-                            <div className="w-px h-8 bg-white/10 shrink-0" />
-                            <div className="flex-1 min-w-0">
-                                <p className="text-sm font-bold text-white truncate">{bloque.sede}</p>
-                                <p className="text-xs text-gray-400 mt-1 leading-snug">{bloque.teaser}</p>
-                            </div>
-                        </div>
-                    ))}
+                    {ITINERARIO.map((bloque) => {
+                        const isExpanded = openDays.has(bloque.dia);
+                        return (
+                            <button
+                                key={bloque.dia}
+                                onClick={() => toggleDay(bloque.dia)}
+                                className="w-full glass-card rounded-3xl border border-white/5 p-5 flex items-center gap-4 text-left transition-colors hover:bg-white/5"
+                            >
+                                <div className="shrink-0 text-center min-w-[52px]">
+                                    <p className="text-xs font-black text-brand-green uppercase tracking-widest">{bloque.dia}</p>
+                                </div>
+                                <div className="w-px h-8 bg-white/10 shrink-0 self-start mt-0.5" />
+                                <div className="flex-1 min-w-0">
+                                    <p className={clsx("text-sm font-bold text-white", !isExpanded && "truncate")}>{bloque.sede}</p>
+                                    <p className="text-xs text-gray-400 mt-1 leading-snug">{bloque.teaser}</p>
+                                </div>
+                            </button>
+                        );
+                    })}
 
                     <div className="border border-dashed border-white/20 rounded-3xl p-5 mt-2">
                         <div className="flex items-start gap-3">

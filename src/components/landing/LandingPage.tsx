@@ -176,6 +176,7 @@ export default function LandingPage() {
     const { theme } = useTheme();
     const isLight = theme === 'light';
     const [activeView, setActiveView] = useState<ViewType>('miembros');
+    const [expandedDay, setExpandedDay] = useState<string | null>(null);
     const [donationAmount, setDonationAmount] = useState(500);
     const galeriaRef = useRef<HTMLDivElement>(null);
 
@@ -280,23 +281,32 @@ export default function LandingPage() {
                     <section className="space-y-4">
                         <h2 className="text-lg font-black">Agenda del encuentro</h2>
                         <div className="space-y-2">
-                            {ITINERARIO.map((bloque) => (
-                                <div key={bloque.dia} className="bg-[var(--t-surface)] border border-[var(--t-border)] rounded-2xl p-4 flex items-center gap-4">
-                                    <div className="shrink-0 text-center min-w-[52px]">
-                                        <p className="text-xs font-black text-brand-green">{bloque.dia}</p>
-                                    </div>
-                                    <div className="w-px h-8 bg-[var(--t-border)] shrink-0" />
-                                    <div className="flex-1 min-w-0">
-                                        <div className="flex items-center gap-1.5">
-                                            <MapPin size={12} className="text-brand-green shrink-0" />
-                                            <span className="text-sm font-medium text-[var(--t-text)] truncate">{bloque.sede}</span>
+                            {ITINERARIO.map((bloque) => {
+                                const isExpanded = expandedDay === bloque.dia;
+                                return (
+                                    <button
+                                        key={bloque.dia}
+                                        onClick={() => setExpandedDay(isExpanded ? null : bloque.dia)}
+                                        className="w-full bg-[var(--t-surface)] border border-[var(--t-border)] rounded-2xl p-4 flex items-center gap-4 text-left transition-colors hover:bg-[var(--t-overlay-5)]"
+                                    >
+                                        <div className="shrink-0 text-center min-w-[52px]">
+                                            <p className="text-xs font-black text-brand-green">{bloque.dia}</p>
                                         </div>
-                                        <p className="text-xs text-[var(--t-text-faint)] mt-1 leading-snug">
-                                            {bloque.teaser}
-                                        </p>
-                                    </div>
-                                </div>
-                            ))}
+                                        <div className="w-px h-8 bg-[var(--t-border)] shrink-0 self-start mt-0.5" />
+                                        <div className="flex-1 min-w-0">
+                                            <div className="flex items-start gap-1.5">
+                                                <MapPin size={12} className="text-brand-green shrink-0 mt-0.5" />
+                                                <span className={clsx("text-sm font-medium text-[var(--t-text)]", !isExpanded && "truncate")}>
+                                                    {bloque.sede}
+                                                </span>
+                                            </div>
+                                            <p className="text-xs text-[var(--t-text-faint)] mt-1 leading-snug">
+                                                {bloque.teaser}
+                                            </p>
+                                        </div>
+                                    </button>
+                                );
+                            })}
                         </div>
                         <p className="text-xs text-[var(--t-text-faint)] text-center px-4">
                             Tres días para conectar, aprender y dejar huella — ¡te esperamos!
