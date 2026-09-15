@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { AgendaActivity } from '@/types/database';
-import { Plus, Loader2, ChevronDown, Route, Lock } from 'lucide-react';
+import { Plus, Loader2, ChevronDown, Route } from 'lucide-react';
 import { ITINERARIO, ACTIVIDAD_EXTRA } from '@/data/itinerario';
 import ActivityDrawer from '@/components/dashboard/ActivityDrawer';
 import AgendaCalendar from '@/components/dashboard/AgendaCalendar';
@@ -121,9 +121,8 @@ function AgendaContent() {
                             <div className="w-px h-8 bg-white/10 shrink-0" />
                             <div className="flex-1 min-w-0">
                                 <p className="text-sm font-bold text-white truncate">{bloque.sede}</p>
-                                <p className="text-[11px] text-gray-500 mt-1">{bloque.actividades.length} actividades sorpresa</p>
+                                <p className="text-xs text-gray-400 mt-1 leading-snug">{bloque.teaser}</p>
                             </div>
-                            <Lock size={16} className="text-gray-500 shrink-0" />
                         </div>
                     ))}
 
@@ -143,7 +142,7 @@ function AgendaContent() {
                     </div>
 
                     <p className="text-xs text-gray-500 text-center px-4 pt-2">
-                        El itinerario hora por hora se revela para el staff acreditado — ¡prepárate para sorprenderte!
+                        Tres días para conectar, aprender y dejar huella — ¡te esperamos!
                     </p>
                 </div>
             ) : viewMode === 'calendar' ? (

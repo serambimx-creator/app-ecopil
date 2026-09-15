@@ -9,6 +9,7 @@ export interface ActividadDetalle {
 export interface BloqueDia {
   dia: string;
   sede: string;
+  teaser: string;
   actividades: ActividadDetalle[];
 }
 
@@ -16,6 +17,7 @@ export const ITINERARIO: BloqueDia[] = [
   {
     dia: '17 DIC',
     sede: 'Llegada y bienvenida  ·  Hotel City Express Tula',
+    teaser: 'El punto de partida: conoce a tu equipo y arranca la energía del encuentro.',
     actividades: [
       {
         hora: '19:30',
@@ -27,6 +29,7 @@ export const ITINERARIO: BloqueDia[] = [
   {
     dia: '18 DIC',
     sede: 'Parque Nacional Tula → Grutas Xoxafi  ·  Base: Hotel City Express Tula',
+    teaser: 'Inauguración, cuevas, murales y una tarde de manos en la tierra.',
     actividades: [
       { hora: '06:00–07:00', titulo: 'Desayuno en 2 equipos', detalle: 'Grupo A 6:00–6:30 · Grupo B 6:30–7:00 · Hotel Tula' },
       { hora: '07:10–07:25', titulo: 'Traslado al Parque Nacional Tula', esTraslado: true },
@@ -45,6 +48,7 @@ export const ITINERARIO: BloqueDia[] = [
   {
     dia: '19 DIC',
     sede: 'Villa de Tezontepec → Mineral del Chico  ·  Base: Hotel City Express Tula',
+    teaser: 'De la sierra a la montaña: naturaleza, altura y sorpresas nocturnas.',
     actividades: [
       { hora: '', titulo: 'Desayuno', detalle: 'Hotel Tula' },
       { hora: '', titulo: 'Hotel Tula → Villa de Tezontepec', detalle: '~45–55 min', esTraslado: true },
@@ -65,6 +69,7 @@ export const ITINERARIO: BloqueDia[] = [
   {
     dia: '20 DIC',
     sede: 'Tulancingo (Ajolotequio) → Acaxochitlán  ·  Hospedaje final en Acaxochitlán',
+    teaser: 'Ajolotes, cascadas y un cierre que se celebra por todo lo alto.',
     actividades: [
       { hora: '', titulo: 'Desayuno y checkout', detalle: 'Hotel Tula' },
       { hora: '', titulo: 'Tula → Tulancingo', detalle: '~80–100 min', esTraslado: true },

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { ArrowRight, Star, MapPin, Users, Handshake, Building2, Map, MessageCircle, FileText, Phone, Mail, Award, Check, ChevronRight, Lock, Clock, Droplets, GraduationCap, TreePine, Briefcase, Globe, Heart } from 'lucide-react';
+import { ArrowRight, Star, MapPin, Users, Handshake, Building2, Map, MessageCircle, FileText, Phone, Mail, Award, Check, ChevronRight, Clock, Droplets, GraduationCap, TreePine, Briefcase, Globe, Heart } from 'lucide-react';
 import { clsx } from 'clsx';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
@@ -276,7 +276,7 @@ export default function LandingPage() {
                         ))}
                     </div>
 
-                    {/* Agenda del encuentro — resumen, el detalle es solo para staff */}
+                    {/* Agenda del encuentro — un adelanto que emociona, no una lista de permisos */}
                     <section className="space-y-4">
                         <h2 className="text-lg font-black">Agenda del encuentro</h2>
                         <div className="space-y-2">
@@ -288,19 +288,18 @@ export default function LandingPage() {
                                     <div className="w-px h-8 bg-[var(--t-border)] shrink-0" />
                                     <div className="flex-1 min-w-0">
                                         <div className="flex items-center gap-1.5">
-                                            <MapPin size={12} className="text-[var(--t-text-faint)] shrink-0" />
+                                            <MapPin size={12} className="text-brand-green shrink-0" />
                                             <span className="text-sm font-medium text-[var(--t-text)] truncate">{bloque.sede}</span>
                                         </div>
-                                        <p className="text-[11px] text-[var(--t-text-faint)] mt-1">
-                                            {bloque.actividades.length} actividades sorpresa
+                                        <p className="text-xs text-[var(--t-text-faint)] mt-1 leading-snug">
+                                            {bloque.teaser}
                                         </p>
                                     </div>
-                                    <Lock size={14} className="text-[var(--t-text-faint)] shrink-0" />
                                 </div>
                             ))}
                         </div>
                         <p className="text-xs text-[var(--t-text-faint)] text-center px-4">
-                            El itinerario hora por hora se revela para el staff acreditado — ¡prepárate para sorprenderte!
+                            Tres días para conectar, aprender y dejar huella — ¡te esperamos!
                         </p>
 
                         <div className="border border-dashed border-[var(--t-border)] rounded-2xl p-4">
