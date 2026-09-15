@@ -52,9 +52,9 @@ export default function StaffTasksCard() {
             .select('*')
             .order('sort_order', { ascending: true });
 
-        if (!error && data && data.length > 0) {
-            setTasks(data as StaffTaskRow[]);
+        if (!error && data) {
             setIsLive(true);
+            if (data.length > 0) setTasks(data as StaffTaskRow[]);
         }
     };
 

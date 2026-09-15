@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { ArrowRight, Star, MapPin, Users, Handshake, Building2, Map, MessageCircle, FileText, Phone, Mail, Award, Check, ChevronRight, ChevronDown, Route, Clock, Droplets, GraduationCap, TreePine, Briefcase, Globe, Heart } from 'lucide-react';
+import { ArrowRight, Star, MapPin, Users, Handshake, Building2, Map, MessageCircle, FileText, Phone, Mail, Award, Check, ChevronRight, Lock, Clock, Droplets, GraduationCap, TreePine, Briefcase, Globe, Heart } from 'lucide-react';
 import { clsx } from 'clsx';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
@@ -176,7 +176,6 @@ export default function LandingPage() {
     const { theme } = useTheme();
     const isLight = theme === 'light';
     const [activeView, setActiveView] = useState<ViewType>('miembros');
-    const [openDay, setOpenDay] = useState<string | null>(null);
     const [donationAmount, setDonationAmount] = useState(500);
     const galeriaRef = useRef<HTMLDivElement>(null);
 
@@ -277,74 +276,32 @@ export default function LandingPage() {
                         ))}
                     </div>
 
-                    {/* Agenda del encuentro */}
+                    {/* Agenda del encuentro — resumen, el detalle es solo para staff */}
                     <section className="space-y-4">
                         <h2 className="text-lg font-black">Agenda del encuentro</h2>
                         <div className="space-y-2">
-                            {ITINERARIO.map((bloque) => {
-                                const isOpen = openDay === bloque.dia;
-                                return (
-                                    <div key={bloque.dia} className="bg-[var(--t-surface)] border border-[var(--t-border)] rounded-2xl overflow-hidden">
-                                        <button
-                                            onClick={() => setOpenDay(isOpen ? null : bloque.dia)}
-                                            className="w-full flex items-center gap-4 p-4 text-left"
-                                        >
-                                            <div className="shrink-0 text-center min-w-[52px]">
-                                                <p className="text-xs font-black text-brand-green">{bloque.dia}</p>
-                                            </div>
-                                            <div className="w-px h-8 bg-[var(--t-border)] shrink-0" />
-                                            <div className="flex items-center gap-1.5 flex-1 min-w-0">
-                                                <MapPin size={12} className="text-[var(--t-text-faint)] shrink-0" />
-                                                <span className="text-sm font-medium text-[var(--t-text)] truncate">{bloque.sede}</span>
-                                            </div>
-                                            <ChevronDown
-                                                size={16}
-                                                className={clsx(
-                                                    "text-[var(--t-text-faint)] shrink-0 transition-transform duration-200",
-                                                    isOpen && "rotate-180"
-                                                )}
-                                            />
-                                        </button>
-
-                                        {isOpen && (
-                                            <div className="bg-[var(--t-surface-2)] px-4 pb-4">
-                                                {bloque.actividades.map((act, i) => (
-                                                    <div
-                                                        key={i}
-                                                        className={clsx(
-                                                            "flex gap-3 py-2.5",
-                                                            i < bloque.actividades.length - 1 && "border-b border-[var(--t-border-soft)]"
-                                                        )}
-                                                    >
-                                                        <span className="shrink-0 w-16 flex items-center justify-center pt-0.5">
-                                                            {act.esTraslado ? (
-                                                                <Route size={12} className="text-[var(--t-text-faint-2)]" />
-                                                            ) : act.hora ? (
-                                                                <span className="text-[10px] text-[var(--t-text-faint)] font-mono">{act.hora}</span>
-                                                            ) : (
-                                                                <span className="text-brand-green text-lg leading-none">●</span>
-                                                            )}
-                                                        </span>
-                                                        <div className="flex-1 flex items-start gap-2 flex-wrap">
-                                                            {act.esTraslado ? (
-                                                                <span className="text-sm text-[var(--t-text-faint)]">→ {act.titulo}</span>
-                                                            ) : (
-                                                                <span className="text-sm text-[var(--t-text)]">{act.titulo}</span>
-                                                            )}
-                                                            {act.pendiente && !act.esTraslado && (
-                                                                <span className="text-[9px] font-bold text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-full">
-                                                                    Pendiente logística
-                                                                </span>
-                                                            )}
-                                                        </div>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        )}
+                            {ITINERARIO.map((bloque) => (
+                                <div key={bloque.dia} className="bg-[var(--t-surface)] border border-[var(--t-border)] rounded-2xl p-4 flex items-center gap-4">
+                                    <div className="shrink-0 text-center min-w-[52px]">
+                                        <p className="text-xs font-black text-brand-green">{bloque.dia}</p>
                                     </div>
-                                );
-                            })}
+                                    <div className="w-px h-8 bg-[var(--t-border)] shrink-0" />
+                                    <div className="flex-1 min-w-0">
+                                        <div className="flex items-center gap-1.5">
+                                            <MapPin size={12} className="text-[var(--t-text-faint)] shrink-0" />
+                                            <span className="text-sm font-medium text-[var(--t-text)] truncate">{bloque.sede}</span>
+                                        </div>
+                                        <p className="text-[11px] text-[var(--t-text-faint)] mt-1">
+                                            {bloque.actividades.length} actividades sorpresa
+                                        </p>
+                                    </div>
+                                    <Lock size={14} className="text-[var(--t-text-faint)] shrink-0" />
+                                </div>
+                            ))}
                         </div>
+                        <p className="text-xs text-[var(--t-text-faint)] text-center px-4">
+                            El itinerario hora por hora se revela para el staff acreditado — ¡prepárate para sorprenderte!
+                        </p>
 
                         <div className="border border-dashed border-[var(--t-border)] rounded-2xl p-4">
                             <div className="flex items-start gap-3">
