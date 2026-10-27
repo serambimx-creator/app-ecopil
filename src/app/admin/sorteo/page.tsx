@@ -103,14 +103,14 @@ function SorteoContent() {
                 angle: 60,
                 spread: 55,
                 origin: { x: 0 },
-                colors: ['#00DF81', '#FFD233', '#FF4B4B']
+                colors: ['#6BB32E', '#F9BC3A', '#E8434F']
             });
             confetti({
                 particleCount: 5,
                 angle: 120,
                 spread: 55,
                 origin: { x: 1 },
-                colors: ['#00DF81', '#FFD233', '#FF4B4B']
+                colors: ['#6BB32E', '#F9BC3A', '#E8434F']
             });
 
             if (Date.now() < end) {
@@ -153,9 +153,9 @@ function SorteoContent() {
                 <div className={clsx(
                     "relative bg-dark-surface border rounded-3xl p-6 sm:p-12 transition-all duration-300 flex items-center justify-center min-h-[220px] sm:min-h-[300px]",
                     isSpinning
-                        ? "border-brand-green shadow-[0_0_50px_rgba(0,223,129,0.3)] scale-105"
+                        ? "border-brand-green shadow-[0_0_50px_rgba(107,179,46,0.3)] scale-105"
                         : winner
-                            ? "border-brand-green bg-brand-green/10 shadow-[0_0_100px_rgba(0,223,129,0.6)] scale-110"
+                            ? "border-brand-green bg-brand-green/10 shadow-[0_0_100px_rgba(107,179,46,0.6)] scale-110"
                             : "border-white/10 shadow-2xl"
                 )}>
                     {winner && (
@@ -190,7 +190,7 @@ function SorteoContent() {
                         "group relative px-8 sm:px-12 py-4 sm:py-6 rounded-full font-black text-base sm:text-xl uppercase tracking-widest transition-all",
                         isSpinning
                             ? "bg-gray-800 text-gray-500 cursor-not-allowed"
-                            : "bg-white text-black hover:scale-105 hover:bg-brand-green hover:shadow-[0_0_40px_rgba(0,223,129,0.5)] active:scale-95"
+                            : "bg-white text-black hover:scale-105 hover:bg-brand-green hover:shadow-[0_0_40px_rgba(107,179,46,0.5)] active:scale-95"
                     )}
                 >
                     <span className="flex items-center gap-3 whitespace-nowrap">

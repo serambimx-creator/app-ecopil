@@ -11,11 +11,11 @@ import RouteGuard from '@/components/auth/RouteGuard';
 // Styles for PDF
 const styles = StyleSheet.create({
     page: { padding: 40, fontFamily: 'Helvetica', backgroundColor: '#ffffff' },
-    header: { marginBottom: 20, borderBottomWidth: 2, borderBottomColor: '#00DF81', paddingBottom: 10, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+    header: { marginBottom: 20, borderBottomWidth: 2, borderBottomColor: '#6BB32E', paddingBottom: 10, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
     title: { fontSize: 24, fontWeight: 'bold', color: '#111' },
     subtitle: { fontSize: 12, color: '#666', marginTop: 4 },
     section: { marginBottom: 20 },
-    sectionTitle: { fontSize: 16, fontWeight: 'bold', marginBottom: 10, color: '#00DF81' },
+    sectionTitle: { fontSize: 16, fontWeight: 'bold', marginBottom: 10, color: '#6BB32E' },
     metricRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 5 },
     metricLabel: { fontSize: 12, color: '#444' },
     metricValue: { fontSize: 12, fontWeight: 'bold', color: '#111' },
@@ -37,7 +37,7 @@ const ReportDocument = ({ impact, finances, activities }: { impact: any, finance
                     <Text style={styles.subtitle}>Ecopil · Serambi · Encuentro Nacional</Text>
                 </View>
                 {/* Logo Placeholder - In real app, allow local/hosted image */}
-                <View style={{ width: 40, height: 40, backgroundColor: '#00DF81', borderRadius: 20 }} />
+                <View style={{ width: 40, height: 40, backgroundColor: '#6BB32E', borderRadius: 20 }} />
             </View>
 
             {/* Impact Section */}
@@ -137,7 +137,7 @@ function ReportesContent() {
                     <PDFDownloadLink
                         document={<ReportDocument impact={impact} finances={finances} activities={activities} />}
                         fileName="Ecopil_Reporte_2026.pdf"
-                        className="inline-flex items-center gap-2 bg-brand-green text-dark-surface font-bold text-sm sm:text-lg px-5 sm:px-8 py-3 sm:py-4 rounded-full hover:bg-white hover:scale-105 transition-all shadow-[0_0_30px_rgba(0,223,129,0.3)] whitespace-nowrap"
+                        className="inline-flex items-center gap-2 bg-brand-green text-dark-surface font-bold text-sm sm:text-lg px-5 sm:px-8 py-3 sm:py-4 rounded-full hover:bg-white hover:scale-105 transition-all shadow-[0_0_30px_rgba(107,179,46,0.3)] whitespace-nowrap"
                     >
                         {({ blob, url, loading, error }) =>
                             loading ? (

@@ -11,6 +11,7 @@ import ExecutiveBrief from '@/components/profile/ExecutiveBrief';
 import AnnouncementCreator from '@/components/profile/AnnouncementCreator';
 import { Megaphone } from 'lucide-react';
 import RouteGuard from '@/components/auth/RouteGuard';
+import Mixtli from '@/components/brand/Mixtli';
 
 export default function ProfilePage() {
     return (
@@ -101,12 +102,10 @@ function ProfileContent() {
         return (
             <div className="flex flex-col items-center justify-center min-h-[60vh] text-center px-6">
                 {/* ... Guest View ... */}
-                <div className="bg-white/5 p-6 rounded-full mb-4">
-                    <User size={48} className="text-gray-500" />
-                </div>
-                <h2 className="text-2xl font-bold text-white mb-2">Modo Invitado</h2>
+                <Mixtli pose="asoma" height={110} className="mb-4" />
+                <h2 className="font-display text-2xl font-semibold text-white mb-2">Modo invitado</h2>
                 <p className="text-gray-400 mb-8">Inicia sesión para ver tu perfil y estadísticas.</p>
-                <button onClick={() => router.push('/login')} className="bg-brand-green text-black px-6 py-3 rounded-xl font-bold">Inicio</button>
+                <button onClick={() => router.push('/login')} className="font-futura sticker bg-brand-green text-ink px-6 py-3 rounded-full font-bold">Iniciar sesión</button>
             </div>
         );
     }
@@ -116,10 +115,10 @@ function ProfileContent() {
     const isAdmin = displayProfile.role === 'admin';
 
     return (
-        <div className="pb-24 animate-in fade-in zoom-in duration-500">
+        <div data-theme="dark" className="pb-24 animate-in fade-in zoom-in duration-500">
             <header className="mb-8 px-4 pt-4 flex justify-between items-end">
                 <div>
-                    <h1 className="text-3xl font-black text-white mb-1">
+                    <h1 className="font-display text-3xl font-semibold text-white mb-1">
                         {isNational ? 'Brief Ejecutivo' : 'Mi Búnker'}
                     </h1>
                     <p className="text-gray-400 text-sm">{isNational ? 'Tablero Estratégico' : 'Espacio Personal'}</p>
@@ -127,7 +126,7 @@ function ProfileContent() {
                 {isAdmin && (
                     <button
                         onClick={() => setIsAnnouncementOpen(true)}
-                        className="bg-white/10 text-white px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider hover:bg-white/20 transition-colors flex items-center gap-2"
+                        className="font-futura sticker bg-ecopil-sun text-ink px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider flex items-center gap-2"
                     >
                         <Megaphone size={14} /> Aviso
                     </button>
@@ -137,7 +136,6 @@ function ProfileContent() {
             <div className="px-4 space-y-6">
                 {/* ID Card */}
                 <div className="glass-card p-6 rounded-[32px] border border-white/10 relative overflow-hidden group">
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-brand-green/10 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2" />
 
                     <div className="flex items-center gap-5 relative z-10">
                         <div className="w-20 h-20 rounded-full bg-white/10 border-2 border-brand-green p-1">
@@ -151,7 +149,7 @@ function ProfileContent() {
                         </div>
 
                         <div>
-                            <h2 className="text-2xl font-bold text-white max-w-[180px] leading-tight mb-1">{displayProfile.full_name}</h2>
+                            <h2 className="font-display text-2xl font-semibold text-white max-w-[180px] leading-tight mb-1">{displayProfile.full_name}</h2>
                             <div className="flex items-center gap-2 text-brand-green font-mono text-sm">
                                 <span className="bg-brand-green/20 px-2 py-0.5 rounded text-xs uppercase font-bold tracking-wider">
                                     {displayProfile.role === 'admin' ? 'Líder' : 'Staff'}
@@ -166,27 +164,27 @@ function ProfileContent() {
                 {/* Admin Tools */}
                 {isAdmin && (
                     <section className="space-y-3">
-                        <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider px-1">Herramientas de Administrador</h3>
+                        <h3 className="font-futura text-xs font-bold text-gray-500 uppercase tracking-wider px-1">Herramientas de Administrador</h3>
                         <div className="grid grid-cols-3 gap-3">
                             <button
                                 onClick={() => router.push('/admin/reportes')}
                                 className="glass-card border border-white/10 rounded-2xl p-4 flex flex-col items-center gap-2 hover:bg-white/10 transition-colors active:scale-95"
                             >
-                                <FileText size={20} className="text-brand-green" />
+                                <span className="sticker flex h-9 w-9 items-center justify-center rounded-full bg-ecopil-leaf text-ink"><FileText size={17} /></span>
                                 <span className="text-xs font-bold text-gray-300">Reportes</span>
                             </button>
                             <button
                                 onClick={() => router.push('/admin/sorteo')}
                                 className="glass-card border border-white/10 rounded-2xl p-4 flex flex-col items-center gap-2 hover:bg-white/10 transition-colors active:scale-95"
                             >
-                                <Trophy size={20} className="text-brand-green" />
+                                <span className="sticker flex h-9 w-9 items-center justify-center rounded-full bg-ecopil-sun text-ink"><Trophy size={17} /></span>
                                 <span className="text-xs font-bold text-gray-300">Sorteo</span>
                             </button>
                             <button
                                 onClick={() => router.push('/admin/historial')}
                                 className="glass-card border border-white/10 rounded-2xl p-4 flex flex-col items-center gap-2 hover:bg-white/10 transition-colors active:scale-95"
                             >
-                                <History size={20} className="text-brand-green" />
+                                <span className="sticker flex h-9 w-9 items-center justify-center rounded-full bg-mixtli text-ink"><History size={17} /></span>
                                 <span className="text-xs font-bold text-gray-300">Historial</span>
                             </button>
                         </div>

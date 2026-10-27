@@ -51,8 +51,8 @@ const createCustomIcon = (color: string, dashed = false) => {
 };
 
 const STATUS_COLORS: Record<string, string> = {
-    red: '#FF4B4B',
-    yellow: '#FFD233',
+    red: '#E8434F',
+    yellow: '#F9BC3A',
     green: '#6BB32E',
     default: '#3b82f6'
 };
@@ -258,7 +258,7 @@ export default function MainMap({ defaultMode }: MainMapProps) {
                 {mode === 'encounter' && encounterRoutePositions.length > 1 && (
                     <Polyline
                         positions={encounterRoutePositions}
-                        pathOptions={{ color: '#00DF81', weight: 4, opacity: 0.8, dashArray: '8, 8' }}
+                        pathOptions={{ color: '#6BB32E', weight: 4, opacity: 0.8, dashArray: '8, 8' }}
                     />
                 )}
 

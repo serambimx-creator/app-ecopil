@@ -27,7 +27,7 @@ function DraggableMarker({ position, onDragEnd }: { position: [number, number], 
     // Custom Icon
     const icon = L.divIcon({
         className: 'custom-pin-icon',
-        html: `<div style="background-color: #00DF81; width: 20px; height: 20px; border-radius: 50%; border: 3px solid white; box-shadow: 0 4px 6px rgba(0,0,0,0.3);"></div>`,
+        html: `<div style="background-color: #6BB32E; width: 20px; height: 20px; border-radius: 50%; border: 3px solid white; box-shadow: 0 4px 6px rgba(0,0,0,0.3);"></div>`,
         iconSize: [20, 20],
         iconAnchor: [10, 10],
     });

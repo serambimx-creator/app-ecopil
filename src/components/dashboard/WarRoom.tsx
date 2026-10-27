@@ -9,6 +9,7 @@ import ReportPreview from '@/components/dashboard/ReportPreview';
 import StaffTasksCard from '@/components/dashboard/StaffTasksCard';
 import TeamChat from '@/components/chat/TeamChat';
 import { useAuth } from '@/context/AuthContext';
+import Mixtli from '@/components/brand/Mixtli';
 
 interface WarRoomProps {
     role?: 'admin' | 'coordinator';
@@ -100,17 +101,23 @@ export default function WarRoom({ role = 'admin' }: WarRoomProps) {
     };
 
     if (loading) {
-        return <div className="min-h-screen bg-black flex items-center justify-center text-white">Cargando War Room...</div>
+        return (
+            <div className="min-h-[70vh] flex flex-col items-center justify-center gap-3 text-white">
+                <Mixtli pose="asoma" height={110} animated />
+                <p className="text-sm font-bold text-gray-400">Cargando War Room…</p>
+            </div>
+        );
     }
 
     return (
-        <div className="space-y-6 animate-in fade-in zoom-in duration-500 pb-24">
+        <div data-theme="dark" className="space-y-6 animate-in fade-in zoom-in duration-500 pb-24">
 
-            <header className="mb-6">
-                <h1 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-500">
-                    War Room
-                </h1>
-                <p className="text-gray-400 font-medium">Panel de Control Estratégico</p>
+            <header className="mb-6 pt-4 flex items-center gap-3">
+                <div className="flex-1">
+                    <h1 className="font-display text-4xl font-semibold text-white">War Room</h1>
+                    <p className="text-gray-400 font-medium">Panel de control · Encuentro de Nodos 2026</p>
+                </div>
+                <Mixtli pose="pala" height={84} className="shrink-0" />
             </header>
 
             {/* 1. Widgets Grid */}
@@ -132,7 +139,8 @@ export default function WarRoom({ role = 'admin' }: WarRoomProps) {
                     />
                 ) : (
                     <div className="glass-card rounded-3xl p-8 flex flex-col items-center justify-center text-center space-y-4 border border-white/5">
-                        <h3 className="text-2xl font-bold text-white">Vista de Coordinación</h3>
+                        <Mixtli pose="lupa" height={110} />
+                        <h3 className="font-display text-2xl font-semibold text-white">Vista de coordinación</h3>
                         <p className="text-gray-400 max-w-xs">Tienes acceso de visualización a los avances del Encuentro.</p>
                     </div>
                 )}
@@ -148,7 +156,7 @@ export default function WarRoom({ role = 'admin' }: WarRoomProps) {
                     {/* Team Chat Module */}
                     <div className="glass-card rounded-3xl border border-white/5 h-[400px] overflow-hidden flex flex-col bg-black/20">
                         <div className="p-4 border-b border-white/5 bg-white/5">
-                            <h3 className="text-sm font-bold text-white uppercase tracking-wider">Chat de Equipo</h3>
+                            <h3 className="font-futura text-sm font-bold text-white uppercase tracking-wider">Chat de equipo</h3>
                         </div>
                         <div className="flex-1 overflow-hidden">
                             <TeamChat />

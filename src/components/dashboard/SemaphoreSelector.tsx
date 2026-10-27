@@ -37,7 +37,7 @@ export default function SemaphoreSelector({ currentStatus, onStatusChange, class
                 className={cn(
                     "rounded-full transition-all duration-300 relative",
                     sizeClasses[size],
-                    currentStatus === 'red' ? "bg-status-red shadow-[0_0_10px_rgba(255,75,75,0.6)] scale-110" : "bg-status-red/20 hover:bg-status-red/50"
+                    currentStatus === 'red' ? "bg-status-red shadow-[0_0_10px_rgba(232,67,79,0.6)] scale-110" : "bg-status-red/20 hover:bg-status-red/50"
                 )}
                 aria-label="Set status to Red"
             />
@@ -59,7 +59,7 @@ export default function SemaphoreSelector({ currentStatus, onStatusChange, class
                 className={cn(
                     "rounded-full transition-all duration-300 relative",
                     sizeClasses[size],
-                    currentStatus === 'green' ? "bg-brand-green shadow-[0_0_10px_rgba(0,223,129,0.6)] scale-110" : "bg-brand-green/20 hover:bg-brand-green/50"
+                    currentStatus === 'green' ? "bg-brand-green shadow-[0_0_10px_rgba(107,179,46,0.6)] scale-110" : "bg-brand-green/20 hover:bg-brand-green/50"
                 )}
                 aria-label="Set status to Green"
             />

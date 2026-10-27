@@ -28,9 +28,9 @@ export default function ActivityCard({ activity: initialActivity }: { activity: 
     };
 
     const statusStyles = {
-        red: "border-status-red/50 shadow-[0_0_20px_rgba(255,75,75,0.15)] bg-status-red/5",
+        red: "border-status-red/50 shadow-[0_0_20px_rgba(232,67,79,0.15)] bg-status-red/5",
         yellow: "border-status-yellow/50 shadow-[0_0_20px_rgba(255,210,51,0.15)] bg-status-yellow/5",
-        green: "border-brand-green/50 shadow-[0_0_20px_rgba(0,223,129,0.15)] bg-brand-green/5"
+        green: "border-brand-green/50 shadow-[0_0_20px_rgba(107,179,46,0.15)] bg-brand-green/5"
     };
 
     return (

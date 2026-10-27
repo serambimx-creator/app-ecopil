@@ -89,7 +89,7 @@ export default function ExecutiveBrief({ activities, agreements }: ExecutiveBrie
                     <ul className="space-y-4 relative before:absolute before:left-[7px] before:top-2 before:bottom-2 before:w-px before:bg-white/10">
                         {agreements.map((agreement, i) => (
                             <li key={i} className="pl-6 relative">
-                                <div className="absolute left-0 top-1.5 w-3.5 h-3.5 bg-brand-green/20 border border-brand-green rounded-full shadow-[0_0_10px_rgba(0,223,129,0.3)]" />
+                                <div className="absolute left-0 top-1.5 w-3.5 h-3.5 bg-brand-green/20 border border-brand-green rounded-full shadow-[0_0_10px_rgba(107,179,46,0.3)]" />
                                 <p className="text-gray-300 text-sm leading-relaxed">
                                     {agreement}
                                 </p>

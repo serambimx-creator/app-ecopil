@@ -11,6 +11,10 @@ import { clsx } from 'clsx';
 import { List, Calendar as CalendarIcon } from 'lucide-react';
 import RouteGuard from '@/components/auth/RouteGuard';
 import { useAuth } from '@/context/AuthContext';
+import Mixtli from '@/components/brand/Mixtli';
+
+// Un color del logo de Ecopil por día (mismo orden que la portada)
+const DAY_COLORS = ['bg-brand-green', 'bg-ecopil-sun', 'bg-ecopil-orange', 'bg-ecopil-leaf', 'bg-mixtli'];
 
 export default function AgendaPage() {
     return (
@@ -76,10 +80,10 @@ function AgendaContent() {
     };
 
     return (
-        <div className="pb-24 animate-in fade-in duration-500">
+        <div data-theme="dark" className="pb-24 animate-in fade-in duration-500">
             <header className="mb-8 px-4 pt-4 flex items-end justify-between">
                 <div>
-                    <h1 className="text-3xl font-black text-white mb-1">Agenda Operativa</h1>
+                    <h1 className="font-display text-3xl font-semibold text-white mb-1">Agenda operativa</h1>
                     <p className="text-gray-400 text-sm">
                         {role === 'admin' ? 'Cronograma oficial Hidalgo 2026' : 'Adelanto del encuentro'}
                     </p>
@@ -91,7 +95,7 @@ function AgendaContent() {
                             onClick={() => setViewMode('list')}
                             className={clsx(
                                 "p-2 rounded-full transition-all text-xs",
-                                viewMode === 'list' ? "bg-white/10 text-brand-green shadow-sm" : "text-gray-500 hover:text-white"
+                                viewMode === 'list' ? "bg-brand-green text-ink" : "text-gray-500 hover:text-white"
                             )}
                             aria-label="Vista de Lista"
                         >
@@ -101,7 +105,7 @@ function AgendaContent() {
                             onClick={() => setViewMode('calendar')}
                             className={clsx(
                                 "p-2 rounded-full transition-all text-xs",
-                                viewMode === 'calendar' ? "bg-white/10 text-brand-green shadow-sm" : "text-gray-500 hover:text-white"
+                                viewMode === 'calendar' ? "bg-brand-green text-ink" : "text-gray-500 hover:text-white"
                             )}
                             aria-label="Vista de Calendario"
                         >
@@ -113,18 +117,19 @@ function AgendaContent() {
 
             {role !== 'admin' ? (
                 <div className="space-y-3 px-4">
-                    {ITINERARIO.map((bloque) => {
+                    {ITINERARIO.map((bloque, i) => {
                         const isExpanded = openDays.has(bloque.dia);
+                        const [num, mes] = bloque.dia.split(' ');
                         return (
                             <button
                                 key={bloque.dia}
                                 onClick={() => toggleDay(bloque.dia)}
                                 className="w-full glass-card rounded-3xl border border-white/5 p-5 flex items-center gap-4 text-left transition-colors hover:bg-white/5"
                             >
-                                <div className="shrink-0 text-center min-w-[52px]">
-                                    <p className="text-xs font-black text-brand-green uppercase tracking-widest">{bloque.dia}</p>
+                                <div className={clsx("sticker shrink-0 w-14 rounded-2xl py-1.5 text-center text-ink", DAY_COLORS[i % DAY_COLORS.length])}>
+                                    <p className="font-display text-2xl font-semibold leading-none">{num}</p>
+                                    <p className="text-[9px] font-extrabold tracking-widest mt-0.5">{mes}</p>
                                 </div>
-                                <div className="w-px h-8 bg-white/10 shrink-0 self-start mt-0.5" />
                                 <div className="flex-1 min-w-0">
                                     <p className={clsx("text-sm font-bold text-white", !isExpanded && "truncate")}>{bloque.sede}</p>
                                     <p className="text-xs text-gray-400 mt-1 leading-snug">{bloque.teaser}</p>
@@ -148,14 +153,18 @@ function AgendaContent() {
                         </div>
                     </div>
 
-                    <p className="text-xs text-gray-500 text-center px-4 pt-2">
-                        Cinco días para conectar, aprender y dejar huella — ¡te esperamos!
-                    </p>
+                    <div className="flex items-center justify-center gap-3 pt-2">
+                        <Mixtli pose="sembrando" height={70} />
+                        <p className="text-xs text-gray-400 max-w-[180px]">
+                            Cinco días para conectar, aprender y dejar huella — ¡te esperamos!
+                        </p>
+                    </div>
                 </div>
             ) : viewMode === 'calendar' ? (
                 loading ? (
-                    <div className="flex justify-center py-20">
-                        <Loader2 className="animate-spin text-brand-green" />
+                    <div className="flex flex-col items-center gap-2 py-16">
+                        <Mixtli pose="asoma" height={90} animated />
+                        <Loader2 className="animate-spin text-brand-green" size={18} />
                     </div>
                 ) : (
                     <AgendaCalendar
@@ -166,17 +175,17 @@ function AgendaContent() {
                 )
             ) : (
                 <div className="space-y-3 px-4">
-                    {ITINERARIO.map((bloque) => (
+                    {ITINERARIO.map((bloque, i) => (
                         <div key={bloque.dia} className="glass-card rounded-3xl border border-white/5 overflow-hidden">
                             <button
                                 onClick={() => toggleDay(bloque.dia)}
                                 className="w-full flex items-center justify-between p-5 text-left"
                             >
-                                <div>
-                                    <span className="text-xs font-bold text-brand-green uppercase tracking-widest">
+                                <div className="flex items-center gap-3 min-w-0">
+                                    <span className={clsx("sticker shrink-0 rounded-full px-2.5 py-0.5 text-[11px] font-extrabold text-ink", DAY_COLORS[i % DAY_COLORS.length])}>
                                         {bloque.dia}
                                     </span>
-                                    <p className="text-sm font-bold text-white mt-0.5">{bloque.sede}</p>
+                                    <p className="text-sm font-bold text-white">{bloque.sede}</p>
                                 </div>
                                 <ChevronDown
                                     size={18}
@@ -208,7 +217,7 @@ function AgendaContent() {
                                                         <span className="text-sm font-medium text-white">{act.titulo}</span>
                                                     )}
                                                     {act.pendiente && !act.esTraslado && (
-                                                        <span className="text-[10px] font-bold text-amber-400 bg-amber-400/10 border border-amber-400/20 px-2 py-0.5 rounded-full">
+                                                        <span className="text-[10px] font-bold text-ecopil-sun bg-ecopil-sun/10 border border-ecopil-sun/30 px-2 py-0.5 rounded-full">
                                                             Pendiente logística
                                                         </span>
                                                     )}
@@ -247,7 +256,7 @@ function AgendaContent() {
                     <div className="relative w-full app-shell-width h-0">
                         <button
                             onClick={handleCreateClick}
-                            className="pointer-events-auto absolute bottom-24 right-6 w-14 h-14 bg-brand-green text-black rounded-full shadow-[0_0_30px_rgba(0,223,129,0.4)] flex items-center justify-center hover:scale-110 hover:shadow-[0_0_50px_rgba(0,223,129,0.6)] transition-all"
+                            className="sticker pointer-events-auto absolute bottom-24 right-6 w-14 h-14 bg-brand-green text-ink rounded-full flex items-center justify-center hover:scale-110 transition-all"
                             aria-label="Nueva Actividad"
                         >
                             <Plus size={28} strokeWidth={2.5} />

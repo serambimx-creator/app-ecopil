@@ -138,7 +138,7 @@ function ParticipantContent() {
                                         className={clsx(
                                             "relative bg-dark-surface rounded-2xl p-0 overflow-hidden border transition-all active:scale-[0.98]",
                                             isAssigned
-                                                ? "border-brand-green shadow-[0_0_20px_rgba(0,223,129,0.1)]"
+                                                ? "border-brand-green shadow-[0_0_20px_rgba(107,179,46,0.1)]"
                                                 : "border-white/5 hover:border-white/20"
                                         )}
                                     >

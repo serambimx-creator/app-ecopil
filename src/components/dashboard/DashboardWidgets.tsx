@@ -52,10 +52,10 @@ export default function DashboardWidgets({ projects, activities, finances }: Das
             <div className="glass-card p-4 rounded-3xl relative overflow-hidden group">
                 <div className="flex justify-between items-start mb-2">
                     <Activity className="text-brand-green" size={20} />
-                    <div className="text-xs font-bold text-gray-500">SALUD</div>
+                    <div className="font-futura text-xs font-bold text-gray-500">SALUD</div>
                 </div>
                 <div className="flex items-end gap-1 mb-1">
-                    <span className="text-3xl font-black text-white">{healthPercent}%</span>
+                    <span className="font-display text-3xl font-semibold text-white">{healthPercent}%</span>
                     <span className="text-xs text-brand-green mb-1">OK</span>
                 </div>
                 <div className="w-full h-1.5 bg-white/10 rounded-full overflow-hidden flex">
@@ -72,10 +72,10 @@ export default function DashboardWidgets({ projects, activities, finances }: Das
             <div className={clsx("glass-card p-4 rounded-3xl relative overflow-hidden", isOverBudget && "border-amber-500/50")}>
                 <div className="flex justify-between items-start mb-2">
                     <CreditCard className={isOverBudget ? "text-amber-500" : "text-blue-400"} size={20} />
-                    <div className="text-xs font-bold text-gray-500">PRESUPUESTO</div>
+                    <div className="font-futura text-xs font-bold text-gray-500">PRESUPUESTO</div>
                 </div>
                 <div className="flex items-end gap-1 mb-1">
-                    <span className="text-2xl font-black text-white">${(totalSpent / 1000).toFixed(1)}k</span>
+                    <span className="font-display text-2xl font-semibold text-white">${(totalSpent / 1000).toFixed(1)}k</span>
                     <span className="text-xs text-gray-400 mb-1">/ {ESTIMATED_BUDGET / 1000}k</span>
                 </div>
                 <div className="w-full h-1.5 bg-white/10 rounded-full overflow-hidden">
@@ -91,7 +91,7 @@ export default function DashboardWidgets({ projects, activities, finances }: Das
             <div className="glass-card p-4 rounded-3xl relative overflow-hidden">
                 <div className="flex justify-between items-start mb-2">
                     <Clock className="text-purple-400" size={20} />
-                    <div className="text-xs font-bold text-gray-500">PRÓXIMO</div>
+                    <div className="font-futura text-xs font-bold text-gray-500">PRÓXIMO</div>
                 </div>
                 {nextActivity ? (
                     <>
@@ -111,10 +111,10 @@ export default function DashboardWidgets({ projects, activities, finances }: Das
             <div className="glass-card p-4 rounded-3xl relative overflow-hidden">
                 <div className="flex justify-between items-start mb-2">
                     <Map className="text-pink-400" size={20} />
-                    <div className="text-xs font-bold text-gray-500">IMPACTO</div>
+                    <div className="font-futura text-xs font-bold text-gray-500">IMPACTO</div>
                 </div>
                 <div className="flex items-end gap-1 mb-1">
-                    <span className="text-3xl font-black text-white">{placesCount}</span>
+                    <span className="font-display text-3xl font-semibold text-white">{placesCount}</span>
                     <span className="text-xs text-pink-400 mb-1">Puntos</span>
                 </div>
                 <p className="text-[10px] text-gray-400 mt-2">

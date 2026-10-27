@@ -16,9 +16,31 @@
   --color-ecopil-red: #E8434F;
   --color-mixtli: #A68D7B;
   --color-ink: #22301B;
-  --color-status-red: #FF4B4B;
-  --color-status-yellow: #FFD233;
-  --color-dark-surface: #121212;
+  --color-status-red: #E8434F;
+  --color-status-yellow: #F9BC3A;
+  --color-dark-surface: #101A14;
+  --color-black: #0C140F;
+
+  /* Pantallas internas del staff: los grises y acentos neón genéricos se
+     remapean a la paleta "noche en la sierra" de Ecopil/Mixtli. */
+  --color-gray-200: #E4E6DA;
+  --color-gray-300: #D6D9CC;
+  --color-gray-400: #A7AF9C;
+  --color-gray-500: #808A76;
+  --color-gray-600: #5D6656;
+  --color-gray-800: #24352A;
+  --color-gray-900: #172319;
+  --color-blue-400: #CBDD8F;
+  --color-blue-500: #A9C76A;
+  --color-blue-600: #8DB04B;
+  --color-blue-700: #5F7F2E;
+  --color-blue-900: #26381C;
+  --color-purple-300: #FCD27A;
+  --color-purple-400: #F9BC3A;
+  --color-purple-500: #E0A21F;
+  --color-purple-900: #3D2F12;
+  --color-pink-400: #EE8139;
+  --color-pink-500: #E06A22;
 
   /* Border Radius */
   --radius-3xl: 1.5rem;
@@ -26,18 +48,12 @@
   /* Setting 3xl as default standard if desired, or just ensuring it's available */
 }
 
-/* Base Styles */
+/* Base Styles: las pantallas internas son siempre oscuras ("noche en la
+   sierra"), sin depender del modo claro/oscuro del sistema operativo. Las
+   públicas con tema pintan el body con body:has(.theme-surface), abajo. */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #121212;
-    /* Using dark-surface as main background */
-    --foreground: #ededed;
-  }
+  --background: #101A14;
+  --foreground: #ededed;
 }
 
 body {
