@@ -13,19 +13,21 @@ export default function Header() {
     const { isAuthenticated, signOut } = useAuth();
     const { theme, toggleTheme } = useTheme();
 
-    // Light mode only applies to the public landing page + login (the shell
+    // Light mode only applies to the public pages (landing, login, guía, mapa; the shell
     // chrome mirrors that here); internal staff/admin screens stay dark.
-    const isLightPage = (pathname === '/' && !isAuthenticated) || pathname === '/login';
+    const isLightPage = (pathname === '/' && !isAuthenticated) || pathname === '/login' || pathname === '/guia' || pathname === '/mapa';
 
-    // Display Ecopil MX on landing page instead of Panel Principal
+    // Display the event name on the landing page instead of Panel Principal
     const getTitle = () => {
-        if (!isAuthenticated && pathname === '/') return 'Ecopil MX';
+        if (!isAuthenticated && pathname === '/') return 'Encuentro de Nodos';
         switch (pathname) {
             case '/': return 'Panel Principal';
             case '/agenda': return 'Agenda 2026';
-            case '/mapa': return 'Mapa Operativo';
+            case '/login': return 'Acceso staff';
+            case '/mapa': return 'Mapa de sedes';
+            case '/guia': return 'Guía de sedes';
             case '/perfil': return 'Mi Perfil';
-            default: return 'Ecopil Org';
+            default: return 'Encuentro de Nodos';
         }
     };
 
@@ -36,41 +38,45 @@ export default function Header() {
                 isLightPage ? "bg-[var(--t-header-bg)] border-[var(--t-border)]" : "bg-black/50 border-white/10"
             )}
         >
-            <div className="flex items-center justify-between px-4 py-2">
+            <div className="flex items-center justify-between gap-3 px-4 py-2.5">
                 {/* Left: Logos + Title */}
-                <div className="flex items-center gap-2">
-                    <div className="relative h-11 w-24 flex items-center justify-center">
-                        <div className="absolute inset-0 scale-110 bg-white rounded-full blur-md opacity-90 z-0" />
-                        <Image
-                            src="/logos/ecopil.png"
-                            alt="Ecopil Logo"
-                            fill
-                            className="object-contain drop-shadow-lg relative z-10"
-                            sizes="96px"
-                            priority
-                        />
+                <Link href="/" className="flex items-center gap-2.5 min-w-0">
+                    <Image
+                        src="/mixtli/ecopil-icono.webp"
+                        alt="Ecopil"
+                        width={40}
+                        height={38}
+                        className="shrink-0"
+                        priority
+                    />
+                    <div className="min-w-0 leading-none">
+                        <p
+                            className={clsx(
+                                "font-display font-semibold text-[17px] truncate",
+                                isLightPage ? "text-[var(--t-text)]" : "text-white"
+                            )}
+                        >
+                            {getTitle()}
+                        </p>
+                        <p
+                            className={clsx(
+                                "text-[10px] font-bold uppercase tracking-wider mt-1 truncate",
+                                isLightPage ? "text-[var(--t-text-faint)]" : "text-white/50"
+                            )}
+                        >
+                            Ecopil MX · Hidalgo 2026
+                        </p>
                     </div>
-
-                    <div className="relative h-9 w-16 flex items-center justify-center">
-                        <div className="absolute inset-0 scale-110 bg-white rounded-full blur-md opacity-90 z-0" />
+                    <div className="relative h-7 w-12 shrink-0 ml-1 rounded-lg bg-white px-1">
                         <Image
                             src="/logos/serambi.png"
-                            alt="Serambi Logo"
+                            alt="Serambi"
                             fill
-                            className="object-contain opacity-90 hover:opacity-100 transition-opacity drop-shadow-lg relative z-10"
-                            sizes="64px"
+                            className="object-contain p-0.5"
+                            sizes="48px"
                         />
                     </div>
-
-                    <h1
-                        className={clsx(
-                            "text-lg font-black tracking-wide drop-shadow-md hidden sm:block",
-                            isLightPage ? "text-[var(--t-text)]" : "text-white"
-                        )}
-                    >
-                        {getTitle()}
-                    </h1>
-                </div>
+                </Link>
 
                 {/* Right: Access */}
                 <div className="flex items-center gap-3">

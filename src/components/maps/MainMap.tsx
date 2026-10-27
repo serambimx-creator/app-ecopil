@@ -8,6 +8,7 @@ import { Project, AgendaActivity } from '@/types/database';
 import L from 'leaflet';
 import { MapPin, ArrowRight, X, Navigation, Filter } from 'lucide-react';
 import { clsx } from 'clsx';
+import { useTheme } from '@/context/ThemeContext';
 
 function LocationMarker() {
     const map = useMap();
@@ -21,7 +22,7 @@ function LocationMarker() {
     return (
         <button
             onClick={handleLocate}
-            className="absolute bottom-24 right-4 z-[400] bg-brand-green/90 text-dark-surface p-3 rounded-full shadow-lg backdrop-blur-sm active:scale-95 transition-transform"
+            className="sticker absolute bottom-24 right-4 z-[400] bg-brand-green text-ink p-3 rounded-full active:scale-95 transition-transform"
             aria-label="Mi ubicación"
         >
             <Navigation size={24} fill="currentColor" className="opacity-80" />
@@ -40,10 +41,10 @@ function FlyToCenter({ center, zoom }: { center: [number, number]; zoom: number 
 const createCustomIcon = (color: string, dashed = false) => {
     const borderStyle = dashed
         ? `border: 3px dashed ${color}; background-color: transparent;`
-        : `border: 3px solid white; background-color: ${color};`;
+        : `border: 3px solid #22301B; background-color: ${color};`;
     return L.divIcon({
         className: 'custom-div-icon',
-        html: `<div style="${borderStyle} width: 24px; height: 24px; border-radius: 50%; box-shadow: 0 0 10px ${color}; transition: transform 0.2s;"></div>`,
+        html: `<div style="${borderStyle} width: 24px; height: 24px; border-radius: 50%; box-shadow: 2px 2px 0 #22301B; transition: transform 0.2s;"></div>`,
         iconSize: [24, 24],
         iconAnchor: [12, 12],
     });
@@ -52,29 +53,31 @@ const createCustomIcon = (color: string, dashed = false) => {
 const STATUS_COLORS: Record<string, string> = {
     red: '#FF4B4B',
     yellow: '#FFD233',
-    green: '#00DF81',
+    green: '#6BB32E',
     default: '#3b82f6'
 };
 
+// Colores del logo de Ecopil por día del recorrido
 const DAY_COLORS: Record<number, string> = {
-    18: '#00DF81',
-    19: '#3B82F6',
-    20: '#F97316',
+    18: '#6BB32E',
+    19: '#F9BC3A',
+    20: '#E8434F',
 };
 
 const DAY_LABELS: Record<number, string> = {
     18: '18 DIC',
     19: '19 DIC',
-    20: '20 DIC',
+    20: '20–21 DIC',
 };
 
 const RECORRIDO_DATA = [
-    { id: 'r1', name: 'Parque Nacional Tula', lat: 20.0664861, lng: -99.3358673, day: 18, activities: ['Inauguración', 'Taller de henopoita'], tentative: false },
-    { id: 'r2', name: 'Grutas de Xoxafi', lat: 20.388324, lng: -99.027607, day: 18, activities: ['Feria ambiental', 'Recorrido'], tentative: false },
-    { id: 'r3', name: 'Centro Villa de Tezontepec', lat: 19.8798145, lng: -98.8192859, day: 19, activities: ['Reforestación y mantenimiento', 'Feria ambiental'], tentative: false },
-    { id: 'r4', name: 'Rocabosque · Mineral del Chico', lat: 20.2150128, lng: -98.7585715, day: 19, activities: ['Recorrido y capacitación'], tentative: false },
-    { id: 'r5', name: 'Cascadas Dos Mundos · Huetziatl', lat: 20.1409452, lng: -98.1056043, day: 20, activities: ['Recorrido en los manantiales', 'Capacitación', 'Feria ambiental'], tentative: false },
-    { id: 'r6', name: 'Centro Tulancingo', lat: 20.0843785, lng: -98.3692634, day: 20, activities: ['Visita al ajolotequio'], tentative: true },
+    // Actividades según src/data/itinerario.ts (17–21 dic). El 17 es solo llegada al Hotel City Express Tula.
+    { id: 'r1', name: 'Parque Nacional Tula', lat: 20.0664861, lng: -99.3358673, day: 18, activities: ['Heno Motita y Huellas de Fauna', 'Inauguración del encuentro'], tentative: false },
+    { id: 'r2', name: 'Grutas de Xoxafi', lat: 20.388324, lng: -99.027607, day: 18, activities: ['Recorrido en grutas', 'Inauguración del mural', 'Feria ambiental', 'Reforestación con maguey'], tentative: false },
+    { id: 'r3', name: 'Centro Villa de Tezontepec', lat: 19.8798145, lng: -98.8192859, day: 19, activities: ['Mantenimiento de la reforestación', 'Feria ambiental en el centro'], tentative: false },
+    { id: 'r4', name: 'Rocabosque · Mineral del Chico', lat: 20.2150128, lng: -98.7585715, day: 19, activities: ['Capacitación TICs', 'Piñatas Ecopil MX'], tentative: false },
+    { id: 'r5', name: 'Cascadas Dos Mundos · Huetziatl', lat: 20.1409452, lng: -98.1056043, day: 20, activities: ['Caminata al manantial', 'Taller de calidad de agua', 'Clausura y sorteo'], tentative: false },
+    { id: 'r6', name: 'Ajolotequio · Tulancingo', lat: 20.0843785, lng: -98.3692634, day: 20, activities: ['Tequio (20 dic)', 'Temazcal y campamento', 'Cierre de integración (21 dic)'], tentative: false },
 ];
 
 const MONTHS = [
@@ -89,6 +92,9 @@ interface MainMapProps {
 }
 
 export default function MainMap({ defaultMode }: MainMapProps) {
+    const { theme } = useTheme();
+    // Base gris claro u oscura según el tema de la página
+    const canvas = theme === 'dark' ? 'Dark_Gray' : 'Light_Gray';
     const [projects, setProjects] = useState<Project[]>([]);
     const [activities, setActivities] = useState<AgendaActivity[]>([]);
 
@@ -123,7 +129,7 @@ export default function MainMap({ defaultMode }: MainMapProps) {
         } else if (mode === 'encounter') {
             return activities.filter(a => {
                 const d = new Date(a.date);
-                return d.getMonth() === 11 && d.getDate() >= 18 && d.getDate() <= 21;
+                return d.getMonth() === 11 && d.getDate() >= 17 && d.getDate() <= 21;
             }).map(a => ({ ...a, type: 'activity' }));
         }
         return [];
@@ -147,25 +153,25 @@ export default function MainMap({ defaultMode }: MainMapProps) {
     const currentZoom = mode === 'recorrido' ? 9 : 12;
 
     const modeButtons: { key: MapMode; label: string; activeClass: string }[] = [
-        { key: 'management', label: 'Proyectos', activeClass: 'bg-brand-green/90 border-brand-green text-dark-surface shadow-[0_0_15px_rgba(0,223,129,0.4)]' },
-        { key: 'encounter', label: 'Actividades', activeClass: 'bg-status-red/90 border-status-red text-white shadow-[0_0_15px_rgba(255,75,75,0.4)]' },
-        { key: 'recorrido', label: 'Recorrido', activeClass: 'bg-orange-500/90 border-orange-500 text-white shadow-[0_0_15px_rgba(249,115,22,0.4)]' },
+        { key: 'management', label: 'Proyectos', activeClass: 'sticker bg-brand-green text-ink' },
+        { key: 'encounter', label: 'Actividades', activeClass: 'sticker bg-ecopil-red text-ink' },
+        { key: 'recorrido', label: 'Recorrido', activeClass: 'sticker bg-ecopil-sun text-ink' },
     ];
 
     return (
         <div className="w-full h-full relative">
             {/* Top Controls */}
             <div className="absolute top-4 left-0 right-0 z-[400] flex flex-col items-center gap-3 px-4 pointer-events-none">
-                <div className="flex gap-1.5 pointer-events-auto shadow-2xl">
+                <div className="flex gap-1.5 pointer-events-auto">
                     {modeButtons.map((btn) => (
                         <button
                             key={btn.key}
                             onClick={() => { setMode(btn.key); setSelectedItem(null); }}
                             className={clsx(
-                                "px-4 py-2 rounded-full text-[11px] font-bold transition-all border backdrop-blur-md",
+                                "font-futura px-4 py-2 rounded-full text-[11px] font-bold transition-all",
                                 mode === btn.key
                                     ? btn.activeClass
-                                    : "bg-dark-surface/60 border-white/20 text-white hover:bg-dark-surface/80"
+                                    : "border-2 border-[var(--t-border)] bg-[var(--t-surface)] text-[var(--t-text)]"
                             )}
                         >
                             {btn.label}
@@ -174,16 +180,16 @@ export default function MainMap({ defaultMode }: MainMapProps) {
                 </div>
 
                 {mode === 'management' && (
-                    <div className="pointer-events-auto bg-dark-surface/60 backdrop-blur-md border border-white/20 rounded-full px-4 py-1.5 flex items-center gap-2 shadow-lg animate-in fade-in slide-in-from-top-2">
-                        <Filter size={12} className="text-gray-400" />
+                    <div className="sticker pointer-events-auto bg-[var(--t-surface)] rounded-full px-4 py-1.5 flex items-center gap-2 animate-in fade-in slide-in-from-top-2">
+                        <Filter size={12} className="text-[var(--t-text-faint)]" />
                         <select
                             value={selectedMonth}
                             onChange={(e) => setSelectedMonth(Number(e.target.value))}
-                            className="bg-transparent text-white text-xs font-bold focus:outline-none cursor-pointer appearance-none pr-4"
+                            className="bg-transparent text-[var(--t-text)] text-xs font-bold focus:outline-none cursor-pointer appearance-none pr-4"
                             style={{ backgroundImage: 'none' }}
                         >
                             {MONTHS.map((m, idx) => (
-                                <option key={idx} value={idx} className="bg-dark-surface text-gray-200">
+                                <option key={idx} value={idx} className="bg-[var(--t-surface)] text-[var(--t-text)]">
                                     {m}
                                 </option>
                             ))}
@@ -194,8 +200,8 @@ export default function MainMap({ defaultMode }: MainMapProps) {
                 {mode === 'recorrido' && (
                     <div className="pointer-events-auto flex gap-2 animate-in fade-in slide-in-from-top-2">
                         {([18, 19, 20] as const).map((d) => (
-                            <span key={d} className="flex items-center gap-1.5 text-[10px] font-bold text-white bg-dark-surface/60 backdrop-blur-md border border-white/20 rounded-full px-3 py-1">
-                                <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: DAY_COLORS[d] }} />
+                            <span key={d} className="sticker flex items-center gap-1.5 text-[10px] font-bold text-[var(--t-text)] bg-[var(--t-surface)] rounded-full px-3 py-1">
+                                <span className="w-2.5 h-2.5 rounded-full border border-ink" style={{ backgroundColor: DAY_COLORS[d] }} />
                                 {DAY_LABELS[d]}
                             </span>
                         ))}
@@ -217,11 +223,13 @@ export default function MainMap({ defaultMode }: MainMapProps) {
                 ) : (
                     <>
                         <TileLayer
+                            key={`base-${canvas}`}
                             attribution='&copy; Esri'
-                            url="https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}"
+                            url={`https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_${canvas}_Base/MapServer/tile/{z}/{y}/{x}`}
                         />
                         <TileLayer
-                            url="https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}"
+                            key={`ref-${canvas}`}
+                            url={`https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_${canvas}_Reference/MapServer/tile/{z}/{y}/{x}`}
                         />
                     </>
                 )}
@@ -264,25 +272,25 @@ export default function MainMap({ defaultMode }: MainMapProps) {
                             icon={createCustomIcon(color, point.tentative)}
                         >
                             <Popup className="recorrido-popup" maxWidth={260}>
-                                <div style={{ fontFamily: 'system-ui, sans-serif', color: '#fff', background: '#1a1a1a', margin: '-14px -20px', padding: '16px', borderRadius: '12px', minWidth: '220px' }}>
+                                <div style={{ fontFamily: 'var(--font-inter), Arial, sans-serif', color: '#22301B', background: '#FBF6EA', margin: '-14px -20px', padding: '16px', borderRadius: '16px', minWidth: '220px' }}>
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-                                        <span style={{ display: 'inline-block', width: '10px', height: '10px', borderRadius: '50%', backgroundColor: color, boxShadow: `0 0 8px ${color}` }} />
-                                        <span style={{ fontSize: '11px', fontWeight: 800, color: color, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                                        <span style={{ display: 'inline-block', width: '10px', height: '10px', borderRadius: '50%', backgroundColor: color, border: '1.5px solid #22301B' }} />
+                                        <span style={{ fontSize: '11px', fontWeight: 800, color: '#22301B', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                                             {DAY_LABELS[point.day]}
                                         </span>
                                         {point.tentative && (
-                                            <span style={{ fontSize: '10px', fontWeight: 700, color: '#F59E0B', background: '#2a2a1a', padding: '2px 8px', borderRadius: '9999px', marginLeft: 'auto' }}>
+                                            <span style={{ fontSize: '10px', fontWeight: 700, color: '#22301B', background: '#FCE3AE', border: '1px solid #EE8139', padding: '2px 8px', borderRadius: '9999px', marginLeft: 'auto' }}>
                                                 TENTATIVO
                                             </span>
                                         )}
                                     </div>
-                                    <h3 style={{ fontSize: '15px', fontWeight: 800, color: '#fff', margin: '0 0 10px 0', lineHeight: 1.3 }}>
+                                    <h3 style={{ fontFamily: 'var(--font-jost), sans-serif', fontSize: '17px', fontWeight: 600, color: '#22301B', margin: '0 0 10px 0', lineHeight: 1.2 }}>
                                         {point.name}
                                     </h3>
                                     <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                                         {point.activities.map((act) => (
-                                            <span key={act} style={{ fontSize: '12px', color: '#aaa', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                                                <span style={{ color: '#00DF81', fontSize: '8px' }}>&#9679;</span> {act}
+                                            <span key={act} style={{ fontSize: '12px', color: '#5F6A52', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                                <span style={{ color: '#6BB32E', fontSize: '8px' }}>&#9679;</span> {act}
                                             </span>
                                         ))}
                                     </div>
@@ -296,7 +304,7 @@ export default function MainMap({ defaultMode }: MainMapProps) {
                 {mode === 'recorrido' && (
                     <Polyline
                         positions={recorridoPositions}
-                        pathOptions={{ color: '#00DF81', weight: 3, opacity: 0.7 }}
+                        pathOptions={{ color: '#F9BC3A', weight: 4, opacity: 0.9, dashArray: '8 6' }}
                     />
                 )}
             </MapContainer>
@@ -310,28 +318,28 @@ export default function MainMap({ defaultMode }: MainMapProps) {
                     )}
                 >
                     {selectedItem && (
-                        <div className="glass-card rounded-3xl p-4 shadow-2xl border-t border-white/20 relative backdrop-blur-xl bg-dark-surface/90">
-                            <div className="w-12 h-1 bg-white/20 rounded-full mx-auto mb-4" />
+                        <div className="sticker rounded-3xl p-4 relative bg-[var(--t-surface)]">
+                            <div className="w-12 h-1 bg-[var(--t-border)] rounded-full mx-auto mb-4" />
 
                             <div className="flex gap-4">
-                                <div className="w-20 h-20 bg-white/10 rounded-2xl flex-shrink-0 relative overflow-hidden flex items-center justify-center text-white/20 border border-white/5">
+                                <div className="w-20 h-20 bg-[var(--t-accent-tint-bg)] rounded-2xl flex-shrink-0 relative overflow-hidden flex items-center justify-center text-[var(--t-accent)] border-2 border-[var(--t-accent-tint-border)]">
                                     <MapPin size={24} />
                                 </div>
 
                                 <div className="flex-1 min-w-0">
                                     <div className="flex justify-between items-start">
-                                        <h3 className="text-white font-bold text-lg truncate pr-2">
+                                        <h3 className="font-display text-[var(--t-text)] font-semibold text-lg truncate pr-2">
                                             {(selectedItem as any).title || (selectedItem as any).name}
                                         </h3>
                                         <button
                                             onClick={(e) => { e.stopPropagation(); setSelectedItem(null); }}
-                                            className="text-gray-400 hover:text-white bg-white/5 p-1 rounded-full"
+                                            className="text-[var(--t-text-faint)] hover:text-[var(--t-text)] bg-[var(--t-overlay-5)] p-1 rounded-full"
                                         >
                                             <X size={16} />
                                         </button>
                                     </div>
 
-                                    <p className="text-gray-400 text-xs mt-1 truncate">
+                                    <p className="text-[var(--t-text-muted)] text-xs mt-1 truncate">
                                         {(selectedItem as any).description || "Sin descripción disponible."}
                                     </p>
 
@@ -348,7 +356,7 @@ export default function MainMap({ defaultMode }: MainMapProps) {
                                 </div>
                             </div>
 
-                            <button className="w-full mt-4 bg-white text-dark-surface font-extrabold py-3 rounded-2xl flex items-center justify-center hover:bg-gray-100 transition-colors shadow-lg active:scale-[0.98]">
+                            <button className="font-futura sticker w-full mt-4 bg-brand-green text-ink font-bold py-3 rounded-full flex items-center justify-center active:scale-[0.98]">
                                 Ver Detalles <ArrowRight size={16} className="ml-2" />
                             </button>
                         </div>

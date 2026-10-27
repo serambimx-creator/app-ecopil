@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import AlliesCarousel from '@/components/public/AlliesCarousel';
 import { ITINERARIO, ACTIVIDAD_EXTRA } from '@/data/itinerario';
-import { useTheme } from '@/context/ThemeContext';
+import Mixtli, { MixtliBubble, SunHills } from '@/components/brand/Mixtli';
 
 type ViewType = 'miembros' | 'aliados' | 'patrocinadores';
 
@@ -36,8 +36,6 @@ const CONTACTS = [
 ];
 
 function CountdownTimer() {
-    const { theme } = useTheme();
-    const isLight = theme === 'light';
     const [timeLeft, setTimeLeft] = useState<{ days: number; hours: number; minutes: number; started: boolean } | null>(null);
 
     useEffect(() => {
@@ -65,40 +63,35 @@ function CountdownTimer() {
     if (!timeLeft) return null;
 
     if (timeLeft.started) {
-        return <div className="text-lg font-bold text-brand-green">¡En curso!</div>;
+        return <div className="font-display text-xl font-semibold text-[var(--t-accent)]">¡En curso!</div>;
     }
 
-    const boxClass = isLight
-        ? "bg-white/80 border border-[var(--t-border)] shadow-sm rounded-xl px-4 py-2"
-        : "bg-[#1a2a1a] border border-[#2a3a2a] rounded-xl px-4 py-2";
-    const labelClass = isLight ? "text-xs text-[var(--t-text-faint)] uppercase" : "text-xs text-gray-500 uppercase";
+    const units = [
+        { value: String(timeLeft.days), label: 'días' },
+        { value: String(timeLeft.hours).padStart(2, '0'), label: 'horas' },
+        { value: String(timeLeft.minutes).padStart(2, '0'), label: 'min' },
+    ];
 
     return (
-        <div className="flex items-center justify-center gap-2">
-            <div className={boxClass}>
-                <p className="text-xl font-bold text-brand-green">{timeLeft.days}</p>
-                <p className={labelClass}>días</p>
-            </div>
-            <span className="text-brand-green font-bold">:</span>
-            <div className={boxClass}>
-                <p className="text-xl font-bold text-brand-green">{String(timeLeft.hours).padStart(2, '0')}</p>
-                <p className={labelClass}>horas</p>
-            </div>
-            <span className="text-brand-green font-bold">:</span>
-            <div className={boxClass}>
-                <p className="text-xl font-bold text-brand-green">{String(timeLeft.minutes).padStart(2, '0')}</p>
-                <p className={labelClass}>minutos</p>
-            </div>
+        <div className="flex items-stretch gap-2">
+            {units.map((u) => (
+                <div key={u.label} className="sticker bg-[var(--t-surface)] rounded-2xl px-3 py-1.5 min-w-[64px] text-center">
+                    <p className="font-display text-2xl font-semibold leading-none text-[var(--t-text)]">{u.value}</p>
+                    <p className="text-[10px] font-bold uppercase tracking-wider text-[var(--t-text-faint)] mt-1">{u.label}</p>
+                </div>
+            ))}
         </div>
     );
 }
+
+// Un color del logo de Ecopil por día del encuentro
+const DAY_COLORS = ['bg-brand-green', 'bg-ecopil-sun', 'bg-ecopil-orange', 'bg-ecopil-leaf', 'bg-mixtli'];
 
 const TIERS = [
     {
         name: 'PLATINO',
         price: '$15,000+',
-        border: '#aaa',
-        bg: '#1a1a1a',
+        color: '#7A8070',
         perks: [
             'Logo principal en landing y materiales',
             'Mención en inauguración y cierre',
@@ -110,8 +103,7 @@ const TIERS = [
     {
         name: 'ORO',
         price: '$8,000',
-        border: '#DAA520',
-        bg: '#1a1800',
+        color: '#E0A21F',
         perks: [
             'Logo en sección de aliados y materiales',
             'Mención en redes sociales',
@@ -121,8 +113,7 @@ const TIERS = [
     {
         name: 'PLATA',
         price: '$3,000',
-        border: '#666',
-        bg: '#171717',
+        color: '#A68D7B',
         perks: [
             'Logo en materiales impresos',
             'Mención digital',
@@ -150,7 +141,7 @@ function ContactCards({ onSwitchView }: { onSwitchView?: (v: ViewType) => void }
             <h3 className="text-sm font-bold text-[var(--t-text-muted)] uppercase tracking-wider">Contacto directo</h3>
             {CONTACTS.map((c) => (
                 <div key={c.initials} className="bg-[var(--t-surface)] border border-[var(--t-border)] rounded-2xl p-4 flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-full bg-brand-green/20 text-brand-green flex items-center justify-center text-sm font-black shrink-0">
+                    <div className="w-12 h-12 rounded-full bg-brand-green/20 text-[var(--t-accent)] flex items-center justify-center text-sm font-black shrink-0">
                         {c.initials}
                     </div>
                     <div className="flex-1 min-w-0">
@@ -158,10 +149,10 @@ function ContactCards({ onSwitchView }: { onSwitchView?: (v: ViewType) => void }
                         <p className="text-[var(--t-text-faint)] text-xs">{c.role}</p>
                     </div>
                     <div className="flex gap-2 shrink-0">
-                        <a href={`tel:${c.tel}`} className="w-9 h-9 rounded-full bg-[var(--t-overlay-5)] border border-[var(--t-border)] flex items-center justify-center text-[var(--t-text-muted)] hover:text-brand-green hover:border-brand-green/40 transition-colors">
+                        <a href={`tel:${c.tel}`} className="w-9 h-9 rounded-full bg-[var(--t-overlay-5)] border border-[var(--t-border)] flex items-center justify-center text-[var(--t-text-muted)] hover:text-[var(--t-accent)] hover:border-brand-green/40 transition-colors">
                             <Phone size={14} />
                         </a>
-                        <a href={`mailto:${c.email}`} className="w-9 h-9 rounded-full bg-[var(--t-overlay-5)] border border-[var(--t-border)] flex items-center justify-center text-[var(--t-text-muted)] hover:text-brand-green hover:border-brand-green/40 transition-colors">
+                        <a href={`mailto:${c.email}`} className="w-9 h-9 rounded-full bg-[var(--t-overlay-5)] border border-[var(--t-border)] flex items-center justify-center text-[var(--t-text-muted)] hover:text-[var(--t-accent)] hover:border-brand-green/40 transition-colors">
                             <Mail size={14} />
                         </a>
                     </div>
@@ -173,8 +164,6 @@ function ContactCards({ onSwitchView }: { onSwitchView?: (v: ViewType) => void }
 
 export default function LandingPage() {
     const router = useRouter();
-    const { theme } = useTheme();
-    const isLight = theme === 'light';
     const [activeView, setActiveView] = useState<ViewType>('miembros');
     const [expandedDay, setExpandedDay] = useState<string | null>(null);
     const [donationAmount, setDonationAmount] = useState(500);
@@ -195,64 +184,55 @@ export default function LandingPage() {
 
 
     const tabs: { key: ViewType; icon: typeof Users; label: string }[] = [
-        { key: 'miembros', icon: Users, label: 'Miembros Ecopil' },
-        { key: 'aliados', icon: Handshake, label: 'Nuevos aliados' },
-        { key: 'patrocinadores', icon: Building2, label: 'Patrocinar / donar' },
+        { key: 'miembros', icon: Users, label: 'Miembros' },
+        { key: 'aliados', icon: Handshake, label: 'Aliados' },
+        { key: 'patrocinadores', icon: Building2, label: 'Patrocinar' },
     ];
 
     return (
-        <div className="min-h-screen bg-[var(--t-bg)] text-[var(--t-text)] font-sans pb-32">
+        <div className="theme-surface min-h-screen bg-[var(--t-bg)] text-[var(--t-text)] font-sans">
 
-            {/* ===== HERO ===== */}
-            <section className="relative min-h-[60vh] flex flex-col items-center justify-end text-center overflow-hidden pb-8 -mx-4">
-                <Image
-                    src="/impacto/optimized/hero-ecopil.webp"
-                    alt="Encuentro Ecopil"
-                    fill
-                    className="object-cover"
-                    priority
-                />
-                <div
-                    className="absolute inset-0"
-                    style={{
-                        background: isLight
-                            ? 'linear-gradient(to bottom, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.55) 55%, rgba(255,255,255,0.97) 100%)'
-                            : 'linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.5) 50%, rgba(0,0,0,0.9) 100%)'
-                    }}
-                />
-
-                <div className="relative z-10 w-full space-y-5 px-6">
-                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-green/15 border border-brand-green/40 text-brand-green text-[10px] font-bold uppercase tracking-wider">
-                        <Star size={10} fill="currentColor" /> 7mo Encuentro Nacional &middot; Hidalgo 2026
-                    </div>
-
-                    <CountdownTimer />
-
-                    <h1 className={clsx("text-2xl font-black leading-tight tracking-tight", isLight ? "text-[var(--t-text)]" : "text-white")}>
-                        Innovación Social <span className="text-brand-green">&</span> Gestión Ambiental
+            {/* ===== HERO: Mixtli frente al sol del logo de Ecopil ===== */}
+            <section className="relative -mx-4 overflow-hidden px-5 pt-6">
+                <div className="relative z-10 space-y-3">
+                    <span className="font-futura sticker inline-flex items-center gap-1.5 rounded-full bg-ecopil-sun px-3 py-1 text-[10px] font-extrabold uppercase tracking-wider text-ink">
+                        <Star size={10} fill="currentColor" /> Encuentro de Nodos 2026
+                    </span>
+                    <h1 className="font-display text-[34px] font-semibold leading-[1.05] tracking-tight text-[var(--t-text)]">
+                        7º Encuentro Nacional <span className="text-[var(--t-accent)]">Ecopil</span>
                     </h1>
-
-                    <p className={clsx("text-sm flex items-center justify-center gap-1.5", isLight ? "text-[var(--t-text-secondary)]" : "text-gray-300")}>
-                        <MapPin size={14} className="text-brand-green" /> Hidalgo &middot; 17–21 dic 2026
+                    <p className="flex items-center gap-1.5 text-sm font-bold text-[var(--t-text-secondary)]">
+                        <MapPin size={15} className="text-ecopil-red" /> Hidalgo &middot; 17–21 dic 2026
                     </p>
+                    <CountdownTimer />
+                </div>
+
+                <div className="relative mt-2 h-[230px]">
+                    <SunHills className="absolute inset-x-0 bottom-0 h-[170px] w-full" />
+                    <div className="absolute bottom-6 right-4">
+                        <Mixtli pose="pala" height={200} priority animated />
+                    </div>
+                    <MixtliBubble className="absolute left-5 top-8 max-w-[150px]">
+                        ¡Hola! Soy Mixtli. Te espero en Hidalgo para sembrar juntos 🌱
+                    </MixtliBubble>
                 </div>
             </section>
 
             {/* ===== TAB BAR ===== */}
-            <nav className="sticky top-[56px] z-30 bg-[var(--t-surface-2)] border-b border-[var(--t-border)] -mx-4">
-                <div className="flex">
+            <nav className="sticky top-[62px] z-30 -mx-4 bg-[var(--t-bg)]/95 px-4 py-3 backdrop-blur">
+                <div className="flex gap-1 rounded-full bg-[var(--t-surface-2)] p-1">
                     {tabs.map((tab) => (
                         <button
                             key={tab.key}
                             onClick={() => setActiveView(tab.key)}
                             className={clsx(
-                                "flex-1 flex flex-col items-center gap-1 py-3 text-[10px] font-bold uppercase tracking-wider transition-colors",
+                                "font-futura flex-1 flex items-center justify-center gap-1.5 rounded-full px-2 py-2 text-[11px] font-extrabold leading-tight transition-all",
                                 activeView === tab.key
-                                    ? "text-brand-green border-b-2 border-brand-green"
-                                    : "text-[var(--t-text-faint)] border-b-2 border-transparent"
+                                    ? "sticker bg-[var(--t-surface)] text-[var(--t-text)]"
+                                    : "border-2 border-transparent text-[var(--t-text-faint)] hover:text-[var(--t-text)]"
                             )}
                         >
-                            <tab.icon size={16} />
+                            <tab.icon size={14} className="shrink-0" />
                             {tab.label}
                         </button>
                     ))}
@@ -270,8 +250,8 @@ export default function LandingPage() {
                             { big: '5 días', small: '17–21 dic' },
                             { big: '5+', small: 'sedes Hidalgo' },
                         ].map((s) => (
-                            <div key={s.big} className="bg-[var(--t-surface)] border border-[var(--t-border)] rounded-2xl p-4 text-center">
-                                <p className="text-xl font-black text-[var(--t-text)]">{s.big}</p>
+                            <div key={s.big} className="sticker bg-[var(--t-surface)] rounded-2xl p-3 text-center">
+                                <p className="font-display text-2xl font-semibold text-[var(--t-text)]">{s.big}</p>
                                 <p className="text-[10px] text-[var(--t-text-faint)] uppercase tracking-wider mt-1">{s.small}</p>
                             </div>
                         ))}
@@ -279,28 +259,29 @@ export default function LandingPage() {
 
                     {/* Agenda del encuentro — un adelanto que emociona, no una lista de permisos */}
                     <section className="space-y-4">
-                        <h2 className="text-lg font-black">Agenda del encuentro</h2>
-                        <div className="space-y-2">
-                            {ITINERARIO.map((bloque) => {
+                        <h2 className="font-display text-2xl font-semibold">Agenda del encuentro</h2>
+                        <div className="space-y-3">
+                            {ITINERARIO.map((bloque, i) => {
                                 const isExpanded = expandedDay === bloque.dia;
+                                const [num, mes] = bloque.dia.split(' ');
                                 return (
                                     <button
                                         key={bloque.dia}
                                         onClick={() => setExpandedDay(isExpanded ? null : bloque.dia)}
-                                        className="w-full bg-[var(--t-surface)] border border-[var(--t-border)] rounded-2xl p-4 flex items-center gap-4 text-left transition-colors hover:bg-[var(--t-overlay-5)]"
+                                        className="w-full bg-[var(--t-surface)] border-2 border-[var(--t-border)] rounded-3xl p-3 flex items-center gap-3 text-left transition-colors hover:border-[var(--t-ink)]"
                                     >
-                                        <div className="shrink-0 text-center min-w-[52px]">
-                                            <p className="text-xs font-black text-brand-green">{bloque.dia}</p>
+                                        <div className={clsx("sticker shrink-0 w-14 rounded-2xl py-1.5 text-center text-ink", DAY_COLORS[i % DAY_COLORS.length])}>
+                                            <p className="font-display text-2xl font-semibold leading-none">{num}</p>
+                                            <p className="text-[9px] font-extrabold tracking-widest mt-0.5">{mes}</p>
                                         </div>
-                                        <div className="w-px h-8 bg-[var(--t-border)] shrink-0 self-start mt-0.5" />
                                         <div className="flex-1 min-w-0">
                                             <div className="flex items-start gap-1.5">
-                                                <MapPin size={12} className="text-brand-green shrink-0 mt-0.5" />
-                                                <span className={clsx("text-sm font-medium text-[var(--t-text)]", !isExpanded && "truncate")}>
+                                                <MapPin size={12} className="text-ecopil-red shrink-0 mt-1" />
+                                                <span className={clsx("text-sm font-extrabold text-[var(--t-text)]", !isExpanded && "truncate")}>
                                                     {bloque.sede}
                                                 </span>
                                             </div>
-                                            <p className="text-xs text-[var(--t-text-faint)] mt-1 leading-snug">
+                                            <p className="text-xs text-[var(--t-text-muted)] mt-1 leading-snug">
                                                 {bloque.teaser}
                                             </p>
                                         </div>
@@ -312,9 +293,9 @@ export default function LandingPage() {
                             Cinco días para conectar, aprender y dejar huella — ¡te esperamos!
                         </p>
 
-                        <div className="border border-dashed border-[var(--t-border)] rounded-2xl p-4">
+                        <div className="border-2 border-dashed border-[var(--t-border)] rounded-3xl p-4">
                             <div className="flex items-start gap-3">
-                                <div className="w-7 h-7 rounded-full bg-[var(--t-overlay-5)] border border-[var(--t-border)] flex items-center justify-center shrink-0">
+                                <div className="w-7 h-7 rounded-full bg-ecopil-sun/30 border-2 border-dashed border-ecopil-orange flex items-center justify-center shrink-0">
                                     <span className="text-xs font-bold text-[var(--t-text-muted)]">+</span>
                                 </div>
                                 <div>
@@ -329,62 +310,63 @@ export default function LandingPage() {
 
                         <button
                             onClick={() => router.push('/agenda')}
-                            className="w-full text-center text-xs text-[var(--t-text-faint-2)] hover:text-[var(--t-text-muted)] transition-colors py-1"
+                            className="w-full text-center text-xs font-bold text-[var(--t-accent)] hover:underline py-1"
                         >
-                            Ver también en /agenda →
+                            Ver la agenda completa →
                         </button>
                     </section>
 
                     {/* Accesos rápidos */}
                     <section className="space-y-3">
-                        <h2 className="text-lg font-black">Accesos rápidos</h2>
+                        <h2 className="font-display text-2xl font-semibold">Accesos rápidos</h2>
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                             <button
                                 onClick={() => router.push('/mapa?mode=recorrido')}
-                                className="bg-[var(--t-surface)] border border-[var(--t-border)] rounded-2xl p-4 flex flex-col items-center gap-2 transition-colors hover:bg-[var(--t-overlay-5)] active:scale-95"
+                                className="bg-[var(--t-surface)] border-2 border-[var(--t-border)] rounded-3xl p-4 flex flex-col items-center gap-2 transition-colors hover:border-[var(--t-ink)] active:scale-95"
                             >
-                                <Map size={20} className="text-[var(--t-text-muted)]" />
+                                <span className="sticker flex h-10 w-10 items-center justify-center rounded-full bg-ecopil-sun text-ink"><Map size={18} /></span>
                                 <span className="text-xs font-bold text-[var(--t-text-secondary)]">Mapa de sedes</span>
                             </button>
 
                             <button
                                 onClick={handleGaleriaClick}
-                                className="bg-[var(--t-surface)] border border-[var(--t-border)] rounded-2xl p-4 flex flex-col items-center gap-2 transition-colors hover:bg-[var(--t-overlay-5)] active:scale-95"
+                                className="bg-[var(--t-surface)] border-2 border-[var(--t-border)] rounded-3xl p-4 flex flex-col items-center gap-2 transition-colors hover:border-[var(--t-ink)] active:scale-95"
                             >
-                                <Heart size={20} className="text-[var(--t-text-muted)]" />
+                                <span className="sticker flex h-10 w-10 items-center justify-center rounded-full bg-ecopil-red text-ink"><Heart size={18} /></span>
                                 <span className="text-xs font-bold text-[var(--t-text-secondary)]">Galería</span>
                             </button>
 
                             <button
                                 onClick={() => router.push('/chat')}
-                                className="bg-[var(--t-surface)] border border-[var(--t-border)] rounded-2xl p-4 flex flex-col items-center gap-2 transition-colors hover:bg-[var(--t-overlay-5)] active:scale-95"
+                                className="bg-[var(--t-surface)] border-2 border-[var(--t-border)] rounded-3xl p-4 flex flex-col items-center gap-2 transition-colors hover:border-[var(--t-ink)] active:scale-95"
                             >
-                                <MessageCircle size={20} className="text-[var(--t-text-muted)]" />
+                                <span className="sticker flex h-10 w-10 items-center justify-center rounded-full bg-ecopil-leaf text-ink"><MessageCircle size={18} /></span>
                                 <span className="text-xs font-bold text-[var(--t-text-secondary)]">Chat del equipo</span>
                             </button>
 
                             <button
                                 onClick={() => router.push('/guia')}
-                                className="bg-[var(--t-surface)] border border-[var(--t-border)] rounded-2xl p-4 flex flex-col items-center gap-2 transition-colors hover:bg-[var(--t-overlay-5)] active:scale-95"
+                                className="bg-[var(--t-surface)] border-2 border-[var(--t-border)] rounded-3xl p-4 flex flex-col items-center gap-2 transition-colors hover:border-[var(--t-ink)] active:scale-95"
                             >
-                                <FileText size={20} className="text-[var(--t-text-muted)]" />
+                                <span className="sticker flex h-10 w-10 items-center justify-center rounded-full bg-mixtli text-ink"><FileText size={18} /></span>
                                 <span className="text-xs font-bold text-[var(--t-text-secondary)]">Ver guía</span>
                             </button>
                         </div>
                     </section>
 
-                    {/* Banner CTA */}
-                    <div
-                        className="bg-brand-green/10 border border-brand-green/20 rounded-2xl p-5 flex items-center justify-between cursor-pointer hover:bg-brand-green/15 transition-colors"
+                    {/* Banner CTA: Mixtli se asoma */}
+                    <button
                         onClick={() => setActiveView('patrocinadores')}
+                        className="sticker relative w-full overflow-hidden rounded-3xl bg-ecopil-leaf p-5 pr-28 text-left text-ink"
                     >
-                        <p className="text-sm font-bold text-[var(--t-text)]">
+                        <p className="font-display text-lg font-semibold leading-tight">
                             ¿Conoces a alguien que quiera apoyar?
                         </p>
-                        <span className="text-brand-green text-xs font-bold flex items-center gap-1 shrink-0">
+                        <span className="mt-2 inline-flex items-center gap-1 text-xs font-extrabold">
                             Ver opciones <ChevronRight size={14} />
                         </span>
-                    </div>
+                        <Mixtli pose="asoma" height={110} className="absolute -bottom-3 right-2" />
+                    </button>
                 </div>
             )}
 
@@ -399,8 +381,8 @@ export default function LandingPage() {
                             { big: '22', small: 'ciudades' },
                             { big: '7', small: 'encuentros' },
                         ].map((s) => (
-                            <div key={s.big} className="bg-[var(--t-surface)] border border-[var(--t-border)] rounded-2xl p-4 text-center">
-                                <p className="text-xl font-black text-[var(--t-text)]">{s.big}</p>
+                            <div key={s.big} className="sticker bg-[var(--t-surface)] rounded-2xl p-3 text-center">
+                                <p className="font-display text-2xl font-semibold text-[var(--t-text)]">{s.big}</p>
                                 <p className="text-[10px] text-[var(--t-text-faint)] uppercase tracking-wider mt-1">{s.small}</p>
                             </div>
                         ))}
@@ -408,13 +390,13 @@ export default function LandingPage() {
 
                     {/* ¿Qué es Ecopil? */}
                     <section className="space-y-4">
-                        <h2 className="text-lg font-black">¿Qué es Ecopil?</h2>
+                        <h2 className="font-display text-2xl font-semibold">¿Qué es Ecopil?</h2>
                         <p className="text-sm text-[var(--t-text-secondary)] leading-relaxed">
                             Asociación Civil mexicana que conecta comunidades, gobierno, academia y sector privado para restaurar ecosistemas y formar líderes ambientales a nivel nacional, desde 2012.
                         </p>
                         <div className="flex flex-wrap gap-2">
                             {['Soluciones basadas en Naturaleza', 'STEAM', 'Acción Climática', 'ODS 2030'].map((tag) => (
-                                <span key={tag} className="text-xs rounded-full px-3 py-1 font-medium bg-[var(--t-accent-tint-bg)] text-[#00DF81] border border-brand-green/20">
+                                <span key={tag} className="text-xs rounded-full px-3 py-1 font-bold bg-[var(--t-accent-tint-bg)] text-[var(--t-accent)] border border-[var(--t-accent-tint-border)]">
                                     {tag}
                                 </span>
                             ))}
@@ -423,7 +405,7 @@ export default function LandingPage() {
 
                     {/* El Encuentro Nacional Ecopil */}
                     <section className="space-y-6">
-                        <h2 className="text-lg font-black">El Encuentro Nacional Ecopil</h2>
+                        <h2 className="font-display text-2xl font-semibold">El Encuentro Nacional Ecopil</h2>
 
                         <div className="bg-[var(--t-surface)] border border-[var(--t-border)] rounded-2xl p-5">
                             <p className="text-sm text-[var(--t-text-secondary)] leading-relaxed">
@@ -455,15 +437,15 @@ export default function LandingPage() {
                                 { big: '90+', small: 'agentes de cambio' },
                                 { big: '2do', small: 'encuentro en Hidalgo' },
                             ].map((s) => (
-                                <div key={s.big} className="bg-[var(--t-surface)] border border-[var(--t-border)] rounded-2xl p-4 text-center">
-                                    <p className="text-xl font-black text-[var(--t-text)]">{s.big}</p>
+                                <div key={s.big} className="sticker bg-[var(--t-surface)] rounded-2xl p-3 text-center">
+                                    <p className="font-display text-xl font-semibold text-[var(--t-text)]">{s.big}</p>
                                     <p className="text-[10px] text-[var(--t-text-faint)] uppercase tracking-wider mt-1">{s.small}</p>
                                 </div>
                             ))}
                         </div>
 
                         <div className="space-y-3">
-                            <h3 className="text-sm font-black text-[var(--t-text)]">Red de Nodos</h3>
+                            <h3 className="font-display text-lg font-semibold text-[var(--t-text)]">Red de Nodos</h3>
                             <p className="text-xs text-[var(--t-text-faint)]">Grupos juveniles activos en todo el país</p>
                             <div className="grid grid-cols-4 gap-2">
                                 {[
@@ -477,7 +459,7 @@ export default function LandingPage() {
                                         className={clsx(
                                             'text-[10px] font-bold text-center py-1.5 px-1 rounded-lg border',
                                             nodo.host
-                                                ? 'bg-[var(--t-accent-tint-bg)] text-[#00DF81] border-[var(--t-accent-tint-border)]'
+                                                ? 'bg-[var(--t-accent-tint-bg)] text-[var(--t-accent)] border-[var(--t-accent-tint-border)]'
                                                 : 'bg-[var(--t-surface)] text-[var(--t-text-faint)] border-[var(--t-border)]'
                                         )}
                                     >
@@ -491,7 +473,7 @@ export default function LandingPage() {
                         </div>
 
                         <div className="space-y-3">
-                            <h3 className="text-sm font-black text-[var(--t-text)]">¿Qué aprenden los jóvenes?</h3>
+                            <h3 className="font-display text-lg font-semibold text-[var(--t-text)]">¿Qué aprenden los jóvenes?</h3>
                             <p className="text-xs text-[var(--t-text-faint)]">Estrategia Nacional de Impulso al Talento</p>
                             <div className="space-y-3">
                                 {[
@@ -502,7 +484,7 @@ export default function LandingPage() {
                                     { title: 'Liderazgo y gestión de nodos', desc: 'Vinculación con sector privado y gobierno' },
                                 ].map((item, i) => (
                                     <div key={i} className="flex gap-4 items-start">
-                                        <div className="w-7 h-7 rounded-full bg-brand-green/15 text-[#00DF81] flex items-center justify-center text-xs font-black shrink-0">
+                                        <div className="w-7 h-7 rounded-full bg-brand-green/15 text-[var(--t-accent)] flex items-center justify-center text-xs font-black shrink-0">
                                             {i + 1}
                                         </div>
                                         <div>
@@ -524,11 +506,11 @@ export default function LandingPage() {
 
                     {/* Cómo trabajamos */}
                     <section className="space-y-4">
-                        <h2 className="text-lg font-black">Cómo trabajamos</h2>
+                        <h2 className="font-display text-2xl font-semibold">Cómo trabajamos</h2>
                         <div className="space-y-3">
                             {STEPS.map((step, i) => (
                                 <div key={i} className="flex gap-4 items-start">
-                                    <div className="w-8 h-8 rounded-full bg-brand-green/15 text-brand-green flex items-center justify-center text-xs font-black shrink-0">
+                                    <div className="w-8 h-8 rounded-full bg-brand-green/15 text-[var(--t-accent)] flex items-center justify-center text-xs font-black shrink-0">
                                         {i + 1}
                                     </div>
                                     <div>
@@ -542,7 +524,7 @@ export default function LandingPage() {
 
                     {/* Galería */}
                     <section className="space-y-3" ref={galeriaRef}>
-                        <h2 className="text-lg font-black">Galería</h2>
+                        <h2 className="font-display text-2xl font-semibold">Galería</h2>
                         <div className="flex overflow-x-auto gap-3 snap-x snap-mandatory pb-2 -mx-4 px-4">
                             {EVIDENCE_IMAGES.map((img) => (
                                 <div key={img.src} className="snap-center shrink-0">
@@ -556,11 +538,11 @@ export default function LandingPage() {
 
                     {/* Reconocimientos */}
                     <section className="space-y-3">
-                        <h2 className="text-lg font-black">Reconocimientos</h2>
+                        <h2 className="font-display text-2xl font-semibold">Reconocimientos</h2>
                         <div className="space-y-2">
                             {RECOGNITIONS.map((r) => (
                                 <div key={r} className="flex items-start gap-3">
-                                    <Award size={14} className="text-brand-green mt-0.5 shrink-0" />
+                                    <Award size={14} className="text-[var(--t-accent)] mt-0.5 shrink-0" />
                                     <p className="text-sm text-[var(--t-text-secondary)]">{r}</p>
                                 </div>
                             ))}
@@ -569,11 +551,11 @@ export default function LandingPage() {
 
                     {/* ODS */}
                     <section className="space-y-3">
-                        <h2 className="text-lg font-black">ODS que impulsamos</h2>
+                        <h2 className="font-display text-2xl font-semibold">ODS que impulsamos</h2>
                         <div className="grid grid-cols-4 gap-2">
                             {ODS_LIST.map((ods) => (
                                 <div key={ods.num} className="bg-[var(--t-surface)] border border-[var(--t-border)] rounded-xl p-2.5 text-center">
-                                    <p className="text-lg font-black text-brand-green">{ods.num}</p>
+                                    <p className="text-lg font-black text-[var(--t-accent)]">{ods.num}</p>
                                     <p className="text-[9px] text-[var(--t-text-faint)] leading-tight mt-0.5">{ods.label}</p>
                                 </div>
                             ))}
@@ -589,7 +571,7 @@ export default function LandingPage() {
                     {/* CTA */}
                     <button
                         onClick={() => setActiveView('patrocinadores')}
-                        className="w-full bg-brand-green text-black h-12 rounded-2xl text-sm font-bold flex items-center justify-center gap-2 hover:bg-brand-green/90 transition-colors active:scale-95"
+                        className="font-futura sticker w-full bg-brand-green text-ink h-12 rounded-full text-sm font-extrabold flex items-center justify-center gap-2 transition-transform active:translate-x-[2px] active:translate-y-[2px] active:shadow-none"
                     >
                         Quiero ser aliado o patrocinador <ArrowRight size={16} />
                     </button>
@@ -611,7 +593,7 @@ export default function LandingPage() {
                             />
                         </div>
                         <div className="relative z-10">
-                            <h2 className="text-lg font-black">Sé patrocinador</h2>
+                            <h2 className="font-display text-2xl font-semibold">Sé patrocinador</h2>
                             <p className="text-sm text-[var(--t-text-muted)] mt-1">Tu marca junto a 12 años de impacto ambiental en México</p>
                         </div>
                     </section>
@@ -621,20 +603,20 @@ export default function LandingPage() {
                         {TIERS.map((tier) => (
                             <div
                                 key={tier.name}
-                                className="rounded-2xl p-5 space-y-3"
-                                style={{ backgroundColor: tier.bg, border: `1px solid ${tier.border}40` }}
+                                className="rounded-3xl p-5 space-y-3 bg-[var(--t-surface)] border-2 border-[var(--t-border)]"
+                                style={{ borderTop: `6px solid ${tier.color}` }}
                             >
                                 <div className="flex items-center justify-between">
-                                    <span className="text-xs font-black uppercase tracking-widest" style={{ color: tier.border }}>
+                                    <span className="text-xs font-black uppercase tracking-widest" style={{ color: tier.color }}>
                                         {tier.name}
                                     </span>
-                                    <span className="text-lg font-black text-white">{tier.price}</span>
+                                    <span className="font-display text-xl font-semibold text-[var(--t-text)]">{tier.price}</span>
                                 </div>
                                 <div className="space-y-2">
                                     {tier.perks.map((perk) => (
                                         <div key={perk} className="flex items-start gap-2">
-                                            <Check size={14} className="text-brand-green mt-0.5 shrink-0" />
-                                            <p className="text-xs text-gray-300">{perk}</p>
+                                            <Check size={14} className="text-[var(--t-accent)] mt-0.5 shrink-0" />
+                                            <p className="text-xs text-[var(--t-text-secondary)]">{perk}</p>
                                         </div>
                                     ))}
                                 </div>
@@ -646,7 +628,7 @@ export default function LandingPage() {
                     <div className="space-y-3">
                         <a
                             href="mailto:karlauv28@gmail.com?subject=Patrocinio Encuentro Ecopil 2026"
-                            className="w-full bg-brand-green text-black h-12 rounded-2xl text-sm font-bold flex items-center justify-center gap-2 hover:bg-brand-green/90 transition-colors active:scale-95"
+                            className="font-futura sticker w-full bg-brand-green text-ink h-12 rounded-full text-sm font-extrabold flex items-center justify-center gap-2 transition-transform active:translate-x-[2px] active:translate-y-[2px] active:shadow-none"
                         >
                             Quiero ser patrocinador <ArrowRight size={16} />
                         </a>
@@ -672,8 +654,8 @@ export default function LandingPage() {
                     </div>
 
                     {/* Donación directa */}
-                    <section className="bg-brand-green/10 border border-brand-green/20 rounded-2xl p-5 space-y-4">
-                        <h3 className="text-base font-black text-[var(--t-text)]">O haz una donación directa</h3>
+                    <section className="bg-[var(--t-accent-tint-bg)] border-2 border-[var(--t-accent-tint-border)] rounded-3xl p-5 space-y-4">
+                        <h3 className="font-display text-xl font-semibold text-[var(--t-text)]">O haz una donación directa</h3>
                         <p className="text-xs text-[var(--t-text-secondary)] leading-relaxed">
                             Financia traslados, materiales y talleres para los nodos comunitarios de Hidalgo.
                         </p>
@@ -685,7 +667,7 @@ export default function LandingPage() {
                                     className={clsx(
                                         "flex-1 py-2 rounded-xl text-sm font-bold transition-colors",
                                         donationAmount === amount
-                                            ? "bg-brand-green text-black"
+                                            ? "bg-brand-green text-ink border-2 border-[var(--t-ink)]"
                                             : "bg-[var(--t-overlay-5)] text-[var(--t-text-muted)] border border-[var(--t-border)] hover:bg-[var(--t-overlay-10)]"
                                     )}
                                 >
@@ -697,7 +679,7 @@ export default function LandingPage() {
                                 className={clsx(
                                     "flex-1 py-2 rounded-xl text-sm font-bold transition-colors",
                                     donationAmount === 0
-                                        ? "bg-brand-green text-black"
+                                        ? "bg-brand-green text-ink border-2 border-[var(--t-ink)]"
                                         : "bg-[var(--t-overlay-5)] text-[var(--t-text-muted)] border border-[var(--t-border)] hover:bg-[var(--t-overlay-10)]"
                                 )}
                             >
@@ -715,11 +697,13 @@ export default function LandingPage() {
             )}
 
             {/* ===== FOOTER ===== */}
-            <footer className="mt-12 py-8 text-center text-[var(--t-text-faint-2)] text-xs border-t border-[var(--t-border)]">
-                <p className="mb-4 font-bold opacity-50">&copy; 2026 Ecopil México A.C.</p>
-                <div className="flex justify-center gap-6 uppercase tracking-widest font-bold opacity-40">
-                    <a href="#" className="hover:text-brand-green transition-colors">Instagram</a>
-                    <a href="#" className="hover:text-brand-green transition-colors">Facebook</a>
+            <footer className="mt-12 -mx-4 border-t-2 border-[var(--t-border)] bg-[var(--t-surface-2)] px-6 pt-6 pb-8 text-center">
+                <Mixtli pose="sembrando" height={90} className="mx-auto" />
+                <p className="font-display text-base font-semibold text-[var(--t-text)] mt-2">Cinco días para sembrar futuro</p>
+                <p className="text-xs text-[var(--t-text-faint)] mt-1">&copy; 2026 Ecopil México A.C. &middot; Nodo Hidalgo / SERAMBI</p>
+                <div className="flex justify-center gap-6 mt-4 text-[11px] uppercase tracking-widest font-extrabold text-[var(--t-text-muted)]">
+                    <a href="#" className="hover:text-[var(--t-accent)] transition-colors">Instagram</a>
+                    <a href="#" className="hover:text-[var(--t-accent)] transition-colors">Facebook</a>
                 </div>
             </footer>
         </div>

@@ -3,11 +3,19 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-inter), Arial, sans-serif;
+  --font-futura: var(--font-jost), "Century Gothic", sans-serif;
+  --font-display: var(--font-jost), "Century Gothic", sans-serif;
   --font-mono: var(--font-geist-mono);
 
-  /* Brand Colors */
-  --color-brand-green: #00DF81;
+  /* Brand Colors: paleta del logo de Ecopil y de Mixtli */
+  --color-brand-green: #6BB32E;
+  --color-ecopil-leaf: #CBDD8F;
+  --color-ecopil-sun: #F9BC3A;
+  --color-ecopil-orange: #EE8139;
+  --color-ecopil-red: #E8434F;
+  --color-mixtli: #A68D7B;
+  --color-ink: #22301B;
   --color-status-red: #FF4B4B;
   --color-status-yellow: #FFD233;
   --color-dark-surface: #121212;
@@ -35,7 +43,7 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-inter), Arial, sans-serif;
 }
 
 /* Utilities */
@@ -87,45 +95,75 @@ body {
 /* Light/dark theme tokens for the public shell (Header, BottomNav, landing
    page, login). Internal staff/admin screens keep their fixed dark palette
    and don't reference these variables, so the toggle has no effect there.
-   Dark is the default (matches the existing look); [data-theme="light"] on
-   <html> switches these to a warm off-white palette tuned to sit well next
-   to the SERAMBI logo (white background, charcoal wordmark, orange accent). */
+   Light is the default: "papel" cálido con la paleta del logo de Ecopil y de
+   Mixtli. [data-theme="dark"] on <html> switches to "noche en la sierra"
+   (verdes profundos en lugar de grises neutros). */
 :root {
-  --t-bg: #121212;
-  --t-surface: #1a1a1a;
-  --t-surface-2: #0d0d0d;
-  --t-border: #252525;
-  --t-border-soft: #1e1e1e;
-  --t-text: #ffffff;
-  --t-text-secondary: #d1d5db;
-  --t-text-muted: #9ca3af;
-  --t-text-faint: #6b7280;
-  --t-text-faint-2: #4b5563;
-  --t-accent-tint-bg: #1a2a1a;
-  --t-accent-tint-border: #2a3a2a;
-  --t-header-bg: rgba(0, 0, 0, 0.5);
-  --t-icon-muted: rgba(255, 255, 255, 0.7);
+  --t-bg: #FBF6EA;
+  --t-surface: #ffffff;
+  --t-surface-2: #F3ECDA;
+  --t-border: #E6DCC3;
+  --t-border-soft: #EFE7D3;
+  --t-text: #22301B;
+  --t-text-secondary: #3E4A33;
+  --t-text-muted: #5F6A52;
+  --t-text-faint: #7A8070;
+  --t-text-faint-2: #9EA290;
+  --t-accent: #3F7A1A;
+  --t-accent-tint-bg: #EAF4DA;
+  --t-accent-tint-border: #CFE3AE;
+  --t-ink: #22301B;
+  --t-header-bg: rgba(251, 246, 234, 0.85);
+  --t-icon-muted: rgba(34, 48, 27, 0.6);
+  --t-overlay-5: rgba(34, 48, 27, 0.04);
+  --t-overlay-10: rgba(34, 48, 27, 0.07);
+  --t-overlay-15: rgba(34, 48, 27, 0.1);
+}
+
+[data-theme="dark"] {
+  --t-bg: #101A14;
+  --t-surface: #172319;
+  --t-surface-2: #0C140F;
+  --t-border: #26382B;
+  --t-border-soft: #1D2C21;
+  --t-text: #F5F1E6;
+  --t-text-secondary: #D6D9CC;
+  --t-text-muted: #A7AF9C;
+  --t-text-faint: #808A76;
+  --t-text-faint-2: #5D6656;
+  --t-accent: #8BCF4F;
+  --t-accent-tint-bg: #1B2E1A;
+  --t-accent-tint-border: #2D4A27;
+  --t-ink: #3E5A44;
+  --t-header-bg: rgba(16, 26, 20, 0.8);
+  --t-icon-muted: rgba(245, 241, 230, 0.7);
   --t-overlay-5: rgba(255, 255, 255, 0.05);
   --t-overlay-10: rgba(255, 255, 255, 0.1);
   --t-overlay-15: rgba(255, 255, 255, 0.15);
 }
 
-[data-theme="light"] {
-  --t-bg: #ffffff;
-  --t-surface: #f7f5f0;
-  --t-surface-2: #fbfaf7;
-  --t-border: #e7e3da;
-  --t-border-soft: #efebe2;
-  --t-text: #1c1c1c;
-  --t-text-secondary: #3f3d38;
-  --t-text-muted: #6b6862;
-  --t-text-faint: #8a8780;
-  --t-text-faint-2: #a6a399;
-  --t-accent-tint-bg: #e3f9ee;
-  --t-accent-tint-border: #bfedd6;
-  --t-header-bg: rgba(255, 255, 255, 0.75);
-  --t-icon-muted: rgba(28, 28, 28, 0.6);
-  --t-overlay-5: rgba(28, 28, 28, 0.04);
-  --t-overlay-10: rgba(28, 28, 28, 0.07);
-  --t-overlay-15: rgba(28, 28, 28, 0.1);
+/* Tarjeta tipo "estampa": contorno y sombra sólida como los trazos de Mixtli.
+   Sin fondo propio: el color va con una utilidad bg-* junto a .sticker. */
+.sticker {
+  border: 2px solid var(--t-ink);
+  box-shadow: 3px 3px 0 var(--t-ink);
+}
+
+@keyframes mixtli-bob {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-6px) rotate(-2deg); }
+}
+
+.animate-mixtli {
+  animation: mixtli-bob 3.2s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-mixtli { animation: none; }
+}
+
+/* Las pantallas públicas con tema (landing, login) pintan también el fondo
+   del body para que no queden franjas oscuras en los márgenes y al final. */
+body:has(.theme-surface) {
+  background: var(--t-bg);
 }

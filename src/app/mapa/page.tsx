@@ -6,7 +6,7 @@ import { Suspense } from 'react';
 
 const MainMap = dynamic(() => import('@/components/maps/MainMap'), {
     ssr: false,
-    loading: () => <div className="w-full h-full flex items-center justify-center text-white/50">Cargando mapa...</div>
+    loading: () => <div className="w-full h-full flex items-center justify-center text-[var(--t-text-faint)]">Cargando mapa...</div>
 });
 
 function MapContent() {
@@ -14,7 +14,7 @@ function MapContent() {
     const defaultMode = searchParams.get('mode') === 'recorrido' ? 'recorrido' as const : undefined;
 
     return (
-        <div className="h-[calc(100vh-140px)] md:h-[calc(100vh-100px)] w-full rounded-b-3xl overflow-hidden glass-card relative">
+        <div className="theme-surface h-[calc(100vh-150px)] md:h-[calc(100vh-110px)] w-full mt-3 rounded-3xl overflow-hidden sticker bg-[var(--t-surface)] relative">
             <MainMap defaultMode={defaultMode} />
         </div>
     );
@@ -22,7 +22,7 @@ function MapContent() {
 
 export default function Page() {
     return (
-        <Suspense fallback={<div className="w-full h-full flex items-center justify-center text-white/50">Cargando mapa...</div>}>
+        <Suspense fallback={<div className="w-full h-full flex items-center justify-center text-[var(--t-text-faint)]">Cargando mapa...</div>}>
             <MapContent />
         </Suspense>
     );

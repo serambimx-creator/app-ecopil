@@ -11,7 +11,7 @@ export default function BottomNav() {
     const pathname = usePathname();
     const { user } = useAuth();
     const [isMounted, setIsMounted] = useState(false);
-    const isLightPage = (pathname === '/' && !user) || pathname === '/login';
+    const isLightPage = (pathname === '/' && !user) || pathname === '/login' || pathname === '/guia' || pathname === '/mapa';
 
     useEffect(() => {
         setIsMounted(true);
@@ -51,7 +51,7 @@ export default function BottomNav() {
             className={clsx(
                 "fixed bottom-0 left-1/2 -translate-x-1/2 w-full app-shell-width z-50 border-t backdrop-blur-xl",
                 isLightPage
-                    ? "bg-[var(--t-surface-2)]/90 border-[var(--t-border)]"
+                    ? "bg-[var(--t-surface)]/95 border-[var(--t-border)]"
                     : "glass-card border-white/10"
             )}
         >
@@ -65,16 +65,19 @@ export default function BottomNav() {
                             className={clsx(
                                 "flex flex-col items-center justify-center w-full h-full transition-all duration-200",
                                 isActive
-                                    ? "text-brand-green"
+                                    ? isLightPage ? "text-[var(--t-accent)]" : "text-brand-green"
                                     : isLightPage
                                         ? "text-[var(--t-text-faint)] hover:text-[var(--t-text)]"
                                         : "text-gray-500 hover:text-white"
                             )}
                         >
-                            <div className={`p-1 rounded-xl transition-all ${isActive ? 'bg-brand-green/10 mb-1' : ''}`}>
-                                <item.icon size={24} strokeWidth={isActive ? 2.5 : 2} />
+                            <div className={clsx(
+                                "px-4 py-1 rounded-full transition-all",
+                                isActive && (isLightPage ? "bg-ecopil-leaf/60 mb-1" : "bg-brand-green/15 mb-1")
+                            )}>
+                                <item.icon size={22} strokeWidth={isActive ? 2.5 : 2} />
                             </div>
-                            <span className={`text-[10px] font-medium transition-all ${isActive ? 'opacity-100' : 'opacity-70'}`}>{item.name}</span>
+                            <span className={`text-[10px] font-bold transition-all ${isActive ? 'opacity-100' : 'opacity-70'}`}>{item.name}</span>
                         </Link>
                     );
                 })}
