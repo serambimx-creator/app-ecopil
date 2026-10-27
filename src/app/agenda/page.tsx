@@ -81,7 +81,7 @@ function AgendaContent() {
                 <div>
                     <h1 className="text-3xl font-black text-white mb-1">Agenda Operativa</h1>
                     <p className="text-gray-400 text-sm">
-                        {role === 'admin' ? 'Cronograma oficial Pachuca 2026' : 'Adelanto del encuentro'}
+                        {role === 'admin' ? 'Cronograma oficial Hidalgo 2026' : 'Adelanto del encuentro'}
                     </p>
                 </div>
                 {/* Toggle View — solo admin, que es quien ve horarios y edita */}
@@ -149,7 +149,7 @@ function AgendaContent() {
                     </div>
 
                     <p className="text-xs text-gray-500 text-center px-4 pt-2">
-                        Tres días para conectar, aprender y dejar huella — ¡te esperamos!
+                        Cinco días para conectar, aprender y dejar huella — ¡te esperamos!
                     </p>
                 </div>
             ) : viewMode === 'calendar' ? (
@@ -241,14 +241,13 @@ function AgendaContent() {
                 </div>
             )}
 
-            {/* FAB — la agenda completa solo la edita un admin. Se coloca arriba del
-                asistente flotante (misma esquina) para no encimarse con él. */}
+            {/* FAB — la agenda completa solo la edita un admin. */}
             {role === 'admin' && (
                 <div className="fixed inset-x-0 bottom-0 z-40 flex justify-center pointer-events-none">
                     <div className="relative w-full app-shell-width h-0">
                         <button
                             onClick={handleCreateClick}
-                            className="pointer-events-auto absolute bottom-44 right-6 w-14 h-14 bg-brand-green text-black rounded-full shadow-[0_0_30px_rgba(0,223,129,0.4)] flex items-center justify-center hover:scale-110 hover:shadow-[0_0_50px_rgba(0,223,129,0.6)] transition-all"
+                            className="pointer-events-auto absolute bottom-24 right-6 w-14 h-14 bg-brand-green text-black rounded-full shadow-[0_0_30px_rgba(0,223,129,0.4)] flex items-center justify-center hover:scale-110 hover:shadow-[0_0_50px_rgba(0,223,129,0.6)] transition-all"
                             aria-label="Nueva Actividad"
                         >
                             <Plus size={28} strokeWidth={2.5} />

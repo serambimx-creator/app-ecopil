@@ -1,7 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import BottomNav from "@/components/layout/BottomNav";
-import AssistantFab from "@/components/ai/AssistantFab";
 import Header from "@/components/layout/Header";
 
 import { AuthProvider } from "@/context/AuthContext";
@@ -37,7 +36,6 @@ export default function RootLayout({
               {children}
             </main>
             <BottomNav />
-            <AssistantFab />
           </AuthProvider>
         </ThemeProvider>
       </body>

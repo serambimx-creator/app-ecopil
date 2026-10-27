@@ -233,7 +233,7 @@ export default function LandingPage() {
                     </h1>
 
                     <p className={clsx("text-sm flex items-center justify-center gap-1.5", isLight ? "text-[var(--t-text-secondary)]" : "text-gray-300")}>
-                        <MapPin size={14} className="text-brand-green" /> Pachuca &middot; 18–20 dic 2026
+                        <MapPin size={14} className="text-brand-green" /> Hidalgo &middot; 17–21 dic 2026
                     </p>
                 </div>
             </section>
@@ -267,7 +267,7 @@ export default function LandingPage() {
                     <div className="grid grid-cols-3 gap-3">
                         {[
                             { big: '7mo', small: 'encuentro' },
-                            { big: '3 días', small: '18–20 dic' },
+                            { big: '5 días', small: '17–21 dic' },
                             { big: '5+', small: 'sedes Hidalgo' },
                         ].map((s) => (
                             <div key={s.big} className="bg-[var(--t-surface)] border border-[var(--t-border)] rounded-2xl p-4 text-center">
@@ -309,7 +309,7 @@ export default function LandingPage() {
                             })}
                         </div>
                         <p className="text-xs text-[var(--t-text-faint)] text-center px-4">
-                            Tres días para conectar, aprender y dejar huella — ¡te esperamos!
+                            Cinco días para conectar, aprender y dejar huella — ¡te esperamos!
                         </p>
 
                         <div className="border border-dashed border-[var(--t-border)] rounded-2xl p-4">
