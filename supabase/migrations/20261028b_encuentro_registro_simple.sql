@@ -1,19 +1,19 @@
 -- Registro simple sin cuenta: el agente llena el formulario; el staff revisa con un PIN.
 -- Reemplaza el esquema con login por correo (la tabla estaba vacía).
 
-drop trigger if exists encuentro_registros_guard on public.encuentro_registros;
+-- Primero las tablas (se llevan sus políticas y el trigger), luego las funciones.
+drop table if exists public.encuentro_registros;
+drop table if exists public.encuentro_staff;
 drop function if exists public.encuentro_registros_guard();
 drop function if exists public.encuentro_mi_rol();
 drop function if exists public.encuentro_es_staff();
 drop function if exists public.encuentro_perfil_previo();
-drop table if exists public.encuentro_registros;
-drop table if exists public.encuentro_staff;
 drop policy if exists "encuentro-fotos: subir la propia" on storage.objects;
 drop policy if exists "encuentro-fotos: reemplazar la propia" on storage.objects;
 
 create extension if not exists pgcrypto;
 
-create table public.encuentro_registros (
+create table if not exists public.encuentro_registros (
   id uuid primary key default gen_random_uuid(),
   nombre text not null check (length(trim(nombre)) > 1),
   email text not null unique check (email = lower(email)),
@@ -34,13 +34,13 @@ create table public.encuentro_registros (
 alter table public.encuentro_registros enable row level security; -- sin políticas: solo vía funciones
 
 -- PIN del staff (hash bcrypt). Se cambia con: update encuentro_config set staff_pin_hash = crypt('NUEVO', gen_salt('bf'));
-create table public.encuentro_config (
+create table if not exists public.encuentro_config (
   id boolean primary key default true check (id),
   staff_pin_hash text not null
 );
 alter table public.encuentro_config enable row level security;
 
-create table public.encuentro_pin_intentos (at timestamptz not null default now());
+create table if not exists public.encuentro_pin_intentos (at timestamptz not null default now());
 alter table public.encuentro_pin_intentos enable row level security;
 
 -- Verifica el PIN; después de 10 fallos en 15 minutos rechaza todo PIN hasta que pase la ventana.
