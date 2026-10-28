@@ -7,6 +7,7 @@ create table if not exists public.encuentro_staff (
   created_at timestamptz not null default now()
 );
 alter table public.encuentro_staff enable row level security;
+grant select on public.encuentro_staff to authenticated;
 
 create table if not exists public.encuentro_registros (
   id uuid primary key default gen_random_uuid(),
@@ -28,6 +29,7 @@ create table if not exists public.encuentro_registros (
   updated_at timestamptz not null default now()
 );
 alter table public.encuentro_registros enable row level security;
+grant select, insert, update on public.encuentro_registros to authenticated;
 
 -- ¿El usuario actual es staff del Encuentro?
 create or replace function public.encuentro_es_staff()
