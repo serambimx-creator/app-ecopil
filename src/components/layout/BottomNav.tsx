@@ -11,7 +11,7 @@ export default function BottomNav() {
     const pathname = usePathname();
     const { user } = useAuth();
     const [isMounted, setIsMounted] = useState(false);
-    const isLightPage = (pathname === '/' && !user) || pathname === '/login' || pathname === '/registro' || pathname === '/guia' || pathname === '/mapa';
+    const isLightPage = (pathname === '/' && !user) || pathname === '/login' || pathname === '/registro' || pathname === '/mi-registro' || pathname === '/guia' || pathname === '/mapa';
 
     useEffect(() => {
         setIsMounted(true);

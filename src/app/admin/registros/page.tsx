@@ -1,9 +1,8 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import Link from 'next/link';
 import { clsx } from 'clsx';
-import { Loader2, Check, X, Phone, HeartPulse, Search } from 'lucide-react';
+import { Loader2, Check, X, Phone, HeartPulse, Search, KeyRound } from 'lucide-react';
 import { ecopil, type EstadoRegistro, type Nodo, type RegistroEncuentro } from '@/lib/ecopil';
 import Mixtli from '@/components/brand/Mixtli';
 
@@ -14,35 +13,51 @@ const FILTROS: { key: EstadoRegistro; label: string }[] = [
 ];
 
 export default function RegistrosPage() {
-    const [rol, setRol] = useState<string | null | undefined>(undefined);
+    const [pin, setPin] = useState('');
+    const [dentro, setDentro] = useState(false);
+    const [errorPin, setErrorPin] = useState('');
+    const [entrando, setEntrando] = useState(false);
     const [registros, setRegistros] = useState<RegistroEncuentro[]>([]);
     const [nodos, setNodos] = useState<Record<string, string>>({});
     const [filtro, setFiltro] = useState<EstadoRegistro>('pendiente');
     const [busqueda, setBusqueda] = useState('');
     const [guardando, setGuardando] = useState<string | null>(null);
 
-    const cargar = useCallback(async () => {
-        const { data } = await ecopil.from('encuentro_registros').select('*').order('created_at', { ascending: true });
+    const cargar = useCallback(async (p: string) => {
+        const { data: ok } = await ecopil.rpc('encuentro_pin_ok', { p_pin: p });
+        if (!ok) return false;
+        const { data } = await ecopil.rpc('encuentro_listar', { p_pin: p });
         setRegistros((data as RegistroEncuentro[]) ?? []);
+        return true;
     }, []);
 
     useEffect(() => {
-        (async () => {
-            const { data: s } = await ecopil.auth.getSession();
-            if (!s.session) return setRol(null);
-            const { data } = await ecopil.rpc('encuentro_mi_rol');
-            setRol((data as string) ?? null);
-            const { data: n } = await ecopil.rpc('encuentro_nodos');
-            setNodos(Object.fromEntries(((n as Nodo[]) ?? []).map((x) => [x.id, x.nombre])));
-            if (data === 'staff' || data === 'admin') cargar();
-        })();
+        ecopil.rpc('encuentro_nodos').then(({ data }) =>
+            setNodos(Object.fromEntries(((data as Nodo[]) ?? []).map((x) => [x.id, x.nombre]))));
+        // El PIN vive solo en esta pestaña.
+        let guardado: string | null = null;
+        try { guardado = sessionStorage.getItem('encuentro_staff_pin'); } catch { /* sin storage */ }
+        if (guardado) cargar(guardado).then((ok) => { if (ok) { setPin(guardado!); setDentro(true); } });
     }, [cargar]);
+
+    const entrar = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setEntrando(true);
+        setErrorPin('');
+        const ok = await cargar(pin);
+        setEntrando(false);
+        if (!ok) return setErrorPin('PIN incorrecto. Después de 10 intentos fallidos se bloquea 15 minutos.');
+        try { sessionStorage.setItem('encuentro_staff_pin', pin); } catch { /* sin storage */ }
+        setDentro(true);
+    };
 
     const actualizar = async (id: string, cambios: Partial<Pick<RegistroEncuentro, 'estado' | 'grupo'>>) => {
         setGuardando(id);
-        const { data, error } = await ecopil.from('encuentro_registros').update(cambios).eq('id', id).select().single();
+        const { data, error } = await ecopil.rpc('encuentro_revisar', {
+            p_pin: pin, p_id: id, p_estado: cambios.estado ?? null, p_grupo: cambios.grupo ?? null,
+        });
         setGuardando(null);
-        if (!error && data) setRegistros((rs) => rs.map((r) => (r.id === id ? (data as RegistroEncuentro) : r)));
+        if (!error && data && (data as RegistroEncuentro).id) setRegistros((rs) => rs.map((r) => (r.id === id ? (data as RegistroEncuentro) : r)));
     };
 
     const conteo = useMemo(() => Object.fromEntries(FILTROS.map((f) => [f.key, registros.filter((r) => r.estado === f.key).length])), [registros]);
@@ -51,17 +66,23 @@ export default function RegistrosPage() {
         (!busqueda || `${r.nombre} ${r.email} ${nodos[r.nodo_id] ?? ''}`.toLowerCase().includes(busqueda.toLowerCase()))
     );
 
-    if (rol === undefined) {
-        return <div data-theme="dark" className="flex justify-center py-20"><Loader2 className="animate-spin text-gray-400" /></div>;
-    }
-
-    if (rol !== 'staff' && rol !== 'admin') {
+    if (!dentro) {
         return (
-            <div data-theme="dark" className="py-16 text-center space-y-4">
+            <div data-theme="dark" className="py-16 text-center space-y-4 max-w-xs mx-auto">
                 <Mixtli pose="lupa" height={130} className="mx-auto" />
-                <p className="font-display text-2xl font-semibold text-white">Solo para el staff</p>
-                <p className="text-sm text-gray-400 px-6">Entra con tu correo de staff para revisar los registros.</p>
-                <Link href="/registro" className="font-futura sticker inline-block bg-brand-green text-ink font-extrabold px-6 py-3 rounded-full">Entrar con mi correo</Link>
+                <p className="font-display text-2xl font-semibold text-white">Registros del Encuentro</p>
+                <p className="text-sm text-gray-400">Solo para el staff. Escribe el PIN del equipo.</p>
+                <form onSubmit={entrar} className="space-y-3">
+                    <div className="relative">
+                        <KeyRound className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" size={16} />
+                        <input type="password" required value={pin} onChange={(e) => setPin(e.target.value)} placeholder="PIN"
+                            className="w-full rounded-full bg-gray-900 border-2 border-gray-700 py-3 pl-10 pr-4 text-white placeholder-gray-500 focus:outline-none focus:border-brand-green" />
+                    </div>
+                    {errorPin && <p className="text-xs font-bold text-status-red">{errorPin}</p>}
+                    <button disabled={entrando} className="font-futura sticker w-full bg-brand-green text-ink font-extrabold py-3 rounded-full disabled:opacity-50">
+                        {entrando ? <Loader2 className="animate-spin mx-auto" /> : 'Entrar'}
+                    </button>
+                </form>
             </div>
         );
     }
