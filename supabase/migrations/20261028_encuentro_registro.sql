@@ -122,6 +122,9 @@ revoke execute on function public.encuentro_perfil_previo() from public, anon;
 revoke execute on function public.encuentro_mi_rol() from public, anon;
 grant execute on function public.encuentro_perfil_previo() to authenticated;
 grant execute on function public.encuentro_mi_rol() to authenticated;
+revoke execute on function public.encuentro_registros_guard() from public, anon, authenticated;
+revoke execute on function public.encuentro_es_staff() from public, anon;
+grant execute on function public.encuentro_es_staff() to authenticated;
 
 insert into public.encuentro_staff (email, rol) values ('jorgeluis55245@gmail.com', 'admin')
 on conflict (email) do nothing;
