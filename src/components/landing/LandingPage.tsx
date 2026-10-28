@@ -205,6 +205,12 @@ export default function LandingPage() {
                         <MapPin size={15} className="text-ecopil-red" /> Hidalgo &middot; 17–21 dic 2026
                     </p>
                     <CountdownTimer />
+                    <a
+                        href="/registro"
+                        className="font-futura sticker inline-flex items-center gap-2 rounded-full bg-brand-green px-5 py-3 text-sm font-extrabold text-ink transition-transform active:translate-x-[2px] active:translate-y-[2px] active:shadow-none"
+                    >
+                        Voy al Encuentro: registrarme <ArrowRight size={16} />
+                    </a>
                 </div>
 
                 <div className="relative mt-2 h-[230px]">

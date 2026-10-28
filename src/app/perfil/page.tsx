@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
-import { User, FileText, Trophy, History } from 'lucide-react';
+import { User, FileText, Trophy, History , UserCheck } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { Profile, PersonalTask, AgendaActivity } from '@/types/database';
 import StaffBunker from '@/components/profile/StaffBunker';
@@ -166,6 +166,13 @@ function ProfileContent() {
                     <section className="space-y-3">
                         <h3 className="font-futura text-xs font-bold text-gray-500 uppercase tracking-wider px-1">Herramientas de Administrador</h3>
                         <div className="grid grid-cols-3 gap-3">
+                            <button
+                                onClick={() => router.push('/admin/registros')}
+                                className="glass-card border border-white/10 rounded-2xl p-4 flex flex-col items-center gap-2 hover:bg-white/10 transition-colors active:scale-95"
+                            >
+                                <span className="sticker flex h-9 w-9 items-center justify-center rounded-full bg-brand-green text-ink"><UserCheck size={17} /></span>
+                                <span className="text-xs font-bold text-gray-300">Registros</span>
+                            </button>
                             <button
                                 onClick={() => router.push('/admin/reportes')}
                                 className="glass-card border border-white/10 rounded-2xl p-4 flex flex-col items-center gap-2 hover:bg-white/10 transition-colors active:scale-95"
