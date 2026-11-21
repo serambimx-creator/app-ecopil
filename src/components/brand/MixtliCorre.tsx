@@ -18,6 +18,8 @@ const H = 230, SUELO = 205, GRAV = 0.0022, SALTO = -0.74, MW = 84, MH = 80, MX =
 const VEL0 = 0.26, VMAX = 0.6; // velocidad inicial y máxima (px/ms)
 const ALAS_MS = 3000; // duración de las alas de mariposa
 const INMUNE_MS = 4000; // la tuna da inmunidad
+const VIDAS_MAX = 3; // cada tuna da una vida; al chocar se gasta una
+const GRACIA_MS = 1500; // inmunidad breve después de perder una vida
 const TRAMO_MS = 15_000; // tiempo de juego entre preguntas
 const TRAMO_LIBRE_MS = 60_000; // sin preguntas: 5 tramos = cambio de región
 const TAM: Record<Obstaculo, [number, number]> = {
@@ -225,7 +227,7 @@ export default function MixtliCorre({ children }: { children?: React.ReactNode }
         const medir = () => { W = cv.clientWidth; cv.width = W * dpr; cv.height = H * dpr; c.setTransform(dpr, 0, 0, dpr, 0, 0); };
         medir(); window.addEventListener('resize', medir);
 
-        let corazones: Corazon[] = [], maris: Mariposa[] = [], tunas: Mariposa[] = [], inmune = 0, sigT = 5000, alas = 0, giro = 0, giroUsado = false, sigB = 2500;
+        let corazones: Corazon[] = [], maris: Mariposa[] = [], tunas: Mariposa[] = [], inmune = 0, vidas = 0, sigT = 5000, alas = 0, giro = 0, giroUsado = false, sigB = 2500;
         let y = SUELO - MH, vy = 0, obs: Obs[] = [], mon: Moneda[] = [], vel = VEL0, dist = 0, sigO = 600, sigM = 300, prev = 0, raf = 0, pes = 0, jugado = 0, paisaje = RUTA[0], paisajeAnt = RUTA[0], fundido = 1;
         juego.current.salto = () => {
             const enSuelo = y >= SUELO - MH - 0.5;
@@ -237,7 +239,7 @@ export default function MixtliCorre({ children }: { children?: React.ReactNode }
             }
         };
         juego.current.limpiar = () => { obs = []; mon = []; maris = []; tunas = []; sigO = 600; vel = VEL0 + 0.04 * Math.floor(qR.current / 5); };
-        juego.current.reiniciar = () => { y = SUELO - MH; vy = 0; alas = 0; inmune = 0; sigT = 5000; corazones = []; dist = 0; pes = 0; jugado = 0; qR.current = 0; juego.current.limpiar(); setPesos(0); setMetros(0); setQ(0); };
+        juego.current.reiniciar = () => { y = SUELO - MH; vy = 0; alas = 0; inmune = 0; vidas = 0; sigT = 5000; corazones = []; dist = 0; pes = 0; jugado = 0; qR.current = 0; juego.current.limpiar(); setPesos(0); setMetros(0); setQ(0); };
         juego.current.estado = () => ({ pes, metros: Math.floor(dist / 10) });
         const ajustarPesos = (d: number) => { pes = Math.max(0, pes + d); setPesos(pes); };
         (juego.current as unknown as { pesos: (d: number) => void }).pesos = ajustarPesos;
@@ -278,11 +280,15 @@ export default function MixtliCorre({ children }: { children?: React.ReactNode }
                 tunas = tunas.filter((b) => b.x > -20 && !b.ok);
                 const mx = MX + 24, my = y + 18, mw = MW - 48, mh = MH - 26; // caja de choque generosa
                 maris.forEach((b) => { if (b.x > mx - 14 && b.x < mx + mw + 14 && b.y > my - 18 && b.y < my + mh + 18) { b.ok = true; alas = ALAS_MS; ajustarPesos(2); } });
-                tunas.forEach((b) => { if (b.x > mx - 12 && b.x < mx + mw + 12 && b.y > my - 14 && b.y < my + mh + 14) { b.ok = true; inmune = INMUNE_MS; ajustarPesos(2); } });
+                tunas.forEach((b) => { if (b.x > mx - 12 && b.x < mx + mw + 12 && b.y > my - 14 && b.y < my + mh + 14) { b.ok = true; inmune = INMUNE_MS; vidas = Math.min(VIDAS_MAX, vidas + 1); ajustarPesos(2); } });
                 mon.forEach((m) => { if (m.x > mx - 8 && m.x < mx + mw + 8 && m.y > my - 8 && m.y < my + mh + 8) { m.ok = true; ajustarPesos(1); } });
                 const m = Math.floor(dist / 10);
                 if (m !== antes) setMetros(m);
-                if (inmune <= 0 && obs.some((o) => mx < o.x + o.w - 6 && mx + mw > o.x + 6 && my + mh > SUELO - o.h + 6)) {
+                const choque = inmune <= 0 ? obs.find((o) => mx < o.x + o.w - 6 && mx + mw > o.x + 6 && my + mh > SUELO - o.h + 6) : undefined;
+                if (choque && vidas > 0) { // gasta una vida: quita el obstáculo y da un respiro
+                    vidas -= 1; inmune = GRACIA_MS; obs = obs.filter((o) => o !== choque);
+                    for (let k = 0; k < 6; k++) corazones.push({ x: MX + MW / 2, y: y + MH / 2, vx: (Math.random() - 0.5) * 0.3, vy: -0.1 - Math.random() * 0.15, vida: 1 });
+                } else if (choque) {
                     cambiar('fin'); juego.current.terminar();
                     setRecord((r) => { const n = Math.max(r, pes); localStorage.setItem(RECORD_KEY, String(n)); return n; });
                 } else if (jugado >= TRAMO_LIBRE_MS && !preguntasR.current) {
@@ -341,6 +347,7 @@ export default function MixtliCorre({ children }: { children?: React.ReactNode }
             if (alas > 0 && f === 'jugando') {
                 c.fillStyle = INK; c.font = 'bold 11px sans-serif'; c.textAlign = 'right'; c.fillText(`Alas ${Math.ceil(alas / 1000)} s`, W - 6, 44);
             }
+            if (vidas > 0 && f !== 'listo') for (let k = 0; k < vidas; k++) corazon(c, W - 12 - k * 16, 62 + (alas > 0 ? 14 : 0) + (inmune > 0 ? 14 : 0), 6, 1);
             if (inmune > 0 && f === 'jugando') {
                 c.fillStyle = '#C2185B'; c.font = 'bold 11px sans-serif'; c.textAlign = 'right'; c.fillText(`Inmune ${Math.ceil(inmune / 1000)} s`, W - 6, alas > 0 ? 58 : 44);
             }
@@ -417,7 +424,7 @@ export default function MixtliCorre({ children }: { children?: React.ReactNode }
                         <div className="absolute inset-y-0 left-24 right-0 flex flex-col items-center justify-center gap-1 text-center">
                             <p className="font-futura text-xs font-bold uppercase tracking-wider">{nivel.nombre}</p>
                             <p className="font-display text-3xl">{nivel.lugar}</p>
-                            <p className="text-xs opacity-80">Junta Ecopil pesos para ayudar a más nodos. Toca para saltar; en el aire, toca otra vez para girar. Las mariposas te dan alas y las tunas te hacen inmune.</p>
+                            <p className="text-xs opacity-80">Junta Ecopil pesos para ayudar a más nodos. Toca para saltar; en el aire, toca otra vez para girar. Las mariposas te dan alas y las tunas te hacen inmune y te dan una vida.</p>
                         </div>
                     )}
                     {fase === 'pregunta' && (
