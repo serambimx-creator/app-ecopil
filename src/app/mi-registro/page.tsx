@@ -1,6 +1,7 @@
 'use client';
 
 import { Suspense, useEffect, useState } from 'react';
+import QRCode from 'qrcode';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { Loader2, Check, Clock, XCircle, Copy, Share2 } from 'lucide-react';
@@ -12,7 +13,14 @@ function MiRegistroContenido() {
     const [token, setToken] = useState<string | null>(null);
     const [registro, setRegistro] = useState<MiRegistro | null | undefined>(undefined);
     const [copiado, setCopiado] = useState(false);
+    const [qr, setQr] = useState('');
     const nuevo = params.get('nuevo') === '1';
+
+    // QR del gafete: al escanearlo, el staff abre a esta persona en su panel.
+    useEffect(() => {
+        if (registro?.estado !== 'aprobado') return;
+        QRCode.toDataURL(`${window.location.origin}/gestion?r=${encodeURIComponent(registro.email)}`, { margin: 1, width: 360 }).then(setQr);
+    }, [registro]);
 
     useEffect(() => {
         let t = params.get('t');
@@ -89,6 +97,19 @@ function MiRegistroContenido() {
                     </div>
                 )}
             </div>
+
+            {qr && (
+                <div className="sticker bg-ecopil-sun rounded-[28px] p-5 text-ink text-center space-y-3">
+                    <p className="font-futura text-[11px] font-extrabold uppercase tracking-[0.2em]">Gafete · Encuentro de Nodos 2026</p>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={qr} alt="Código QR del gafete" className="mx-auto w-44 h-44 rounded-2xl border-2 border-[var(--t-ink)] bg-white p-1" />
+                    <div>
+                        <p className="font-display text-xl font-semibold">{registro.nombre}</p>
+                        <p className="text-sm font-bold">Nodo {registro.nodo}{registro.grupo ? ` · Grupo ${registro.grupo}` : ''}</p>
+                    </div>
+                    <p className="text-xs">Muéstralo al staff para pasar lista.</p>
+                </div>
+            )}
 
             <div className="border-2 border-dashed border-[var(--t-border)] rounded-3xl p-4 space-y-3">
                 <p className="text-xs font-extrabold uppercase tracking-wider text-[var(--t-text-faint)]">Tu enlace personal</p>

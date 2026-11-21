@@ -48,6 +48,11 @@ export default function GestionPage() {
     const [dia, setDia] = useState(DIAS.includes(hoy.dia) ? hoy.dia : DIAS[1]);
     const [editando, setEditando] = useState<string | 'nueva' | null>(null);
     const [busca, setBusca] = useState('');
+    const [escaneado, setEscaneado] = useState<string | null>(null);
+    useEffect(() => {
+        const r = new URLSearchParams(window.location.search).get('r');
+        if (r) { setEscaneado(r.toLowerCase()); setTab('registros'); }
+    }, []);
 
     const acts = useMemo(() => g.datos?.actividades ?? [], [g.datos]);
     if (!g.listo) return <div className="flex justify-center py-20"><Loader2 className="animate-spin text-gray-400" /></div>;
@@ -125,7 +130,7 @@ export default function GestionPage() {
 
             {tab === 'directorio' && <Directorio contactos={d.contactos} gestores={d.gestores} busca={busca} setBusca={setBusca} guardar={g.guardarFila} />}
             {tab === 'bitacora' && <Bitacora entradas={d.bitacora} actividades={acts} avisos={d.avisos} guardar={g.guardarFila} borrar={g.borrarFila} />}
-            {tab === 'registros' && <Registros datos={d} rpc={g.rpc} />}
+            {tab === 'registros' && <Registros datos={d} rpc={g.rpc} escaneado={escaneado} limpiar={() => setEscaneado(null)} />}
             {tab === 'equipo' && <Equipo gestores={d.gestores} rpc={g.rpc} />}
 
             {editando && <EditorActividad key={editando} actividad={editAct} onClose={() => setEditando(null)} guardar={g.guardarFila} borrar={g.borrarFila} />}
@@ -253,13 +258,21 @@ function Bitacora({ entradas, actividades, avisos, guardar, borrar }: {
     );
 }
 
-function Registros({ datos, rpc }: { datos: NonNullable<ReturnType<typeof useGestion>['datos']>; rpc: (fn: string, a: Record<string, unknown>) => Promise<unknown> }) {
+function Registros({ datos, rpc, escaneado, limpiar }: {
+    datos: NonNullable<ReturnType<typeof useGestion>['datos']>; rpc: (fn: string, a: Record<string, unknown>) => Promise<unknown>;
+    escaneado: string | null; limpiar: () => void;
+}) {
     const [filtro, setFiltro] = useState<'pendiente' | 'aprobado' | 'rechazado'>('pendiente');
-    const lista = datos.registros.filter((r) => r.estado === filtro);
+    const lista = escaneado ? datos.registros.filter((r) => r.email.toLowerCase() === escaneado) : datos.registros.filter((r) => r.estado === filtro);
     const confirmados = datos.registros.filter((r) => r.confirmado_en).length;
     const revisar = (id: string, estado: string | null, grupo: string | null) => rpc('gestor_revisar_registro', { p_id: id, p_estado: estado, p_grupo: grupo });
     return (
         <section className="space-y-3">
+            {escaneado && (
+                <button onClick={limpiar} className="w-full rounded-2xl bg-brand-green/15 border-2 border-brand-green p-3 text-sm font-bold text-brand-green">
+                    {lista.length ? 'Gafete escaneado ✓' : 'Ese gafete no está en los registros'} · ver todos
+                </button>
+            )}
             <p className="text-sm text-gray-400">{datos.registros.filter((r) => r.estado === 'aprobado').length} aprobados · {confirmados} confirmaron asistencia</p>
             <div className="flex gap-2">
                 {(['pendiente', 'aprobado', 'rechazado'] as const).map((f) => (
