@@ -17,7 +17,7 @@ const COORD: Record<string, [number, number]> = {
     tula: [20.0664861, -99.3358673],
     xoxafi: [20.388324, -99.027607],
     tezontepec: [19.8798145, -98.8192859],
-    // invictus (El Huixmi): falta la ubicación exacta; mientras, no sale en el mapa.
+    invictus: [20.07344, -98.81919], // Fundación Invictus, 1 de Mayo 15, El Huixmí (35FJ+98)
     acaxochitlan: [20.1409452, -98.1056043],
     ajolotequio: [20.0843785, -98.3692634],
 };
