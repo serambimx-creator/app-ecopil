@@ -1,29 +1,62 @@
--- Registro simple sin cuenta: el agente llena el formulario; el staff revisa con un PIN.
--- Reemplaza el esquema con login por correo (la tabla estaba vacía).
+-- Registro del Encuentro de Nodos 2026, sin cuenta. Va en el proyecto "Ecopil 2026" (base propia del Encuentro).
+-- Independiente de jornadas: la lista de nodos es propia (copiada de jornadas el 2026-11-21).
 
--- Primero las tablas (se llevan sus políticas y el trigger), luego las funciones.
-drop table if exists public.encuentro_registros;
-drop table if exists public.encuentro_staff;
-drop function if exists public.encuentro_registros_guard();
-drop function if exists public.encuentro_mi_rol();
-drop function if exists public.encuentro_es_staff();
-drop function if exists public.encuentro_perfil_previo();
-drop policy if exists "encuentro-fotos: subir la propia" on storage.objects;
-drop policy if exists "encuentro-fotos: reemplazar la propia" on storage.objects;
+create extension if not exists pgcrypto with schema extensions;
 
-create extension if not exists pgcrypto;
+create table if not exists public.encuentro_nodos_lista (
+  id uuid primary key default gen_random_uuid(),
+  nombre text not null unique,
+  activo boolean not null default true
+);
+alter table public.encuentro_nodos_lista enable row level security;
+insert into public.encuentro_nodos_lista (nombre) values
+  ('Xochicuautla'),
+  ('Coacalco-Tultitlán'),
+  ('Acatlán'),
+  ('Cabada'),
+  ('Oaxaca'),
+  ('Ríos'),
+  ('Guadalajara'),
+  ('Chiapa de Corzo'),
+  ('Nodo central'),
+  ('RBD'),
+  ('Torreón'),
+  ('Huichapan'),
+  ('Querétaro'),
+  ('CDMX Sur'),
+  ('Pachuca-Tulancingo'),
+  ('Centro'),
+  ('Xalapa'),
+  ('Monterrey'),
+  ('Morelos'),
+  ('Apaxco-Tequixquiac'),
+  ('Naucalpan'),
+  ('Boca del Río'),
+  ('Huixquilucan'),
+  ('Ecatepec-Tecámac')
+on conflict (nombre) do nothing;
+
+create or replace function public.encuentro_nodos()
+returns table (id uuid, nombre text)
+language sql stable security definer set search_path = public as $$
+  select id, nombre from encuentro_nodos_lista where activo order by nombre;
+$$;
+
+insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+values ('encuentro-fotos', 'encuentro-fotos', true, 5242880, array['image/jpeg', 'image/png', 'image/webp'])
+on conflict (id) do nothing;
+
 
 create table if not exists public.encuentro_registros (
   id uuid primary key default gen_random_uuid(),
   nombre text not null check (length(trim(nombre)) > 1),
   email text not null unique check (email = lower(email)),
   telefono text not null,
-  nodo_id uuid not null references public.nodos(id),
+  nodo_id uuid not null references public.encuentro_nodos_lista(id),
   ciudad text,
   foto_url text not null,
   emergencia_nombre text not null,
   emergencia_telefono text not null,
-  agente_catalogo_id uuid references public.agentes_catalogo(id) on delete set null,
   estado text not null default 'pendiente' check (estado in ('pendiente', 'aprobado', 'rechazado')),
   grupo text check (grupo in ('A', 'B')),
   revisado_en timestamptz,
@@ -71,10 +104,9 @@ begin
   if v_estado is not null and v_estado <> 'pendiente' then
     raise exception 'Este correo ya tiene un registro revisado. Usa tu enlace personal o escribe al staff.';
   end if;
-  insert into encuentro_registros (nombre, email, telefono, nodo_id, ciudad, foto_url, emergencia_nombre, emergencia_telefono, agente_catalogo_id)
+  insert into encuentro_registros (nombre, email, telefono, nodo_id, ciudad, foto_url, emergencia_nombre, emergencia_telefono)
   values (trim(p_nombre), v_email, trim(p_telefono), p_nodo_id, nullif(trim(p_ciudad), ''), p_foto_url,
-          trim(p_emergencia_nombre), trim(p_emergencia_telefono),
-          (select id from agentes_catalogo where lower(email) = v_email limit 1))
+          trim(p_emergencia_nombre), trim(p_emergencia_telefono))
   on conflict (email) do update set nombre = excluded.nombre, telefono = excluded.telefono, nodo_id = excluded.nodo_id,
     ciudad = excluded.ciudad, foto_url = excluded.foto_url, emergencia_nombre = excluded.emergencia_nombre,
     emergencia_telefono = excluded.emergencia_telefono
@@ -87,7 +119,7 @@ create or replace function public.encuentro_mi_registro(p_token text)
 returns table (nombre text, email text, nodo text, ciudad text, foto_url text, estado text, grupo text)
 language sql stable security definer set search_path = public as $$
   select r.nombre, r.email, n.nombre, r.ciudad, r.foto_url, r.estado, r.grupo
-  from encuentro_registros r join nodos n on n.id = r.nodo_id
+  from encuentro_registros r join encuentro_nodos_lista n on n.id = r.nodo_id
   where r.token = p_token;
 $$;
 

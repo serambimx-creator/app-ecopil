@@ -1,13 +1,6 @@
-import { createClient } from '@supabase/supabase-js'
-
-// Base compartida de Ecopil (la misma de jornadas): ahí vive el registro del Encuentro
-// (tablas encuentro_*). La base de `supabase.ts` sigue
-// sirviendo las herramientas del staff.
-// El registro no usa cuentas: todo pasa por funciones encuentro_* de la base.
-const url = process.env.NEXT_PUBLIC_ECOPIL_SUPABASE_URL!
-const key = process.env.NEXT_PUBLIC_ECOPIL_SUPABASE_ANON_KEY!
-
-export const ecopil = createClient(url, key, { auth: { persistSession: false } })
+// Registro del Encuentro (tablas encuentro_*) en la base propia del Encuentro, la misma de `supabase.ts`.
+// No usa cuentas: todo pasa por funciones encuentro_* de la base.
+export { supabase as ecopil } from './supabase'
 
 export type EstadoRegistro = 'pendiente' | 'aprobado' | 'rechazado'
 
