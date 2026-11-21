@@ -248,7 +248,7 @@ export default function LandingPage() {
                         <Mixtli pose="pala" height={200} priority animated />
                     </div>
                     <MixtliBubble className="absolute left-5 top-8 max-w-[170px]">
-                        ¡Bienvenidos al <b>7º Encuentro de Nodos</b>! Del 17 al 21 de diciembre, Hidalgo es su casa 🌱
+                        ¡Bienvenidos al <b>7º Encuentro de Nodos</b>! Del 17 al 21 de diciembre, Hidalgo es su casa.
                     </MixtliBubble>
                 </div>
             </section>
