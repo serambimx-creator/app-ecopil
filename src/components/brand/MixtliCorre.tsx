@@ -4,6 +4,7 @@
 // junta Ecopil pesos y cada cierto tramo responde una pregunta. 4 niveles × 5 preguntas.
 import { useEffect, useRef, useState } from 'react';
 import Mixtli from './Mixtli';
+import { RUTA, dibujarFondo } from './paisajes';
 import { NIVELES, type Obstaculo, type Pregunta } from '@/data/juego-mixtli';
 
 type Obs = { x: number; w: number; h: number; tipo: Obstaculo; giro: number };
@@ -110,7 +111,7 @@ export default function MixtliCorre({ children }: { children?: React.ReactNode }
         const medir = () => { W = cv.clientWidth; cv.width = W * dpr; cv.height = H * dpr; c.setTransform(dpr, 0, 0, dpr, 0, 0); };
         medir(); window.addEventListener('resize', medir);
 
-        let y = SUELO - MH, vy = 0, obs: Obs[] = [], mon: Moneda[] = [], vel = 0.32, dist = 0, sigO = 600, sigM = 300, prev = 0, raf = 0, pes = 0, jugado = 0;
+        let y = SUELO - MH, vy = 0, obs: Obs[] = [], mon: Moneda[] = [], vel = 0.32, dist = 0, sigO = 600, sigM = 300, prev = 0, raf = 0, pes = 0, jugado = 0, paisaje = RUTA[0], paisajeAnt = RUTA[0], fundido = 1;
         juego.current.salto = () => { if (y >= SUELO - MH - 0.5) vy = SALTO; };
         juego.current.limpiar = () => { obs = []; mon = []; sigO = 500; vel = 0.32 + 0.05 * Math.floor(qR.current / 5); };
         juego.current.reiniciar = () => { y = SUELO - MH; vy = 0; dist = 0; pes = 0; jugado = 0; qR.current = 0; juego.current.limpiar(); setPesos(0); setMetros(0); setQ(0); };
@@ -164,6 +165,12 @@ export default function MixtliCorre({ children }: { children?: React.ReactNode }
             c.clearRect(0, 0, W, H);
             if (f !== 'listo') {
                 c.globalAlpha = 0.25; c.fillStyle = nivel.cielo; c.beginPath(); c.arc(W - 50, 70, 34, 0, Math.PI * 2); c.fill(); c.globalAlpha = 1;
+                // Paisaje del tramo, con fundido al cambiar
+                const pa = RUTA[Math.min(19, qR.current)];
+                if (pa !== paisaje) { paisajeAnt = paisaje; paisaje = pa; fundido = 0; }
+                fundido = Math.min(1, fundido + dt / 1200);
+                if (fundido < 1) { c.globalAlpha = 1 - fundido; dibujarFondo(c, paisajeAnt, dist, W, SUELO); }
+                c.globalAlpha = fundido; dibujarFondo(c, paisaje, dist, W, SUELO); c.globalAlpha = 1;
             }
             c.strokeStyle = INK; c.lineWidth = 2.5; c.beginPath(); c.moveTo(0, SUELO); c.lineTo(W, SUELO); c.stroke();
             c.lineWidth = 2; c.beginPath();
