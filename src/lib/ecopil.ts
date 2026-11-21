@@ -28,6 +28,7 @@ export interface MiRegistro {
     foto_url: string
     estado: EstadoRegistro
     grupo: 'A' | 'B' | null
+    confirmado_en?: string | null
 }
 
 // Enlace personal del agente; también se guarda en el celular para no perderlo.

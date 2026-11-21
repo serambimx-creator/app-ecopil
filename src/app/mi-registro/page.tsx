@@ -22,7 +22,7 @@ function MiRegistroContenido() {
         } catch { /* sin storage */ }
         setToken(t);
         if (!t) return setRegistro(null);
-        ecopil.rpc('encuentro_mi_registro', { p_token: t }).then(({ data }) => {
+        ecopil.rpc('encuentro_mi_registro2', { p_token: t }).then(({ data }) => {
             setRegistro(Array.isArray(data) && data[0] ? (data[0] as MiRegistro) : null);
         });
     }, [params]);
@@ -74,6 +74,14 @@ function MiRegistroContenido() {
                         </p>
                     </div>
                 )}
+                {registro.estado === 'aprobado' && (registro.confirmado_en ? (
+                    <p className="text-sm font-bold text-brand-green">Asistencia confirmada ✓</p>
+                ) : (
+                    <button onClick={async () => {
+                        const { data } = await ecopil.rpc('encuentro_confirmar', { p_token: token });
+                        if (data) setRegistro({ ...registro, confirmado_en: new Date().toISOString() });
+                    }} className="font-futura sticker w-full bg-brand-green text-ink font-extrabold py-3 rounded-full">Confirmo que voy</button>
+                ))}
                 {registro.estado === 'rechazado' && (
                     <div className="rounded-2xl bg-status-red/10 p-4 flex items-start gap-3 text-left">
                         <XCircle className="text-status-red shrink-0" size={20} />

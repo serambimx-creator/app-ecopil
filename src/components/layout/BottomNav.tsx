@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
-import { Home, Calendar, BookOpen, Map, User, MessageCircle } from 'lucide-react';
+import { Home, Calendar, BookOpen, Map, User, ClipboardList } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { clsx } from 'clsx';
@@ -11,38 +11,22 @@ export default function BottomNav() {
     const pathname = usePathname();
     const { user } = useAuth();
     const [isMounted, setIsMounted] = useState(false);
-    const isLightPage = (pathname === '/' && !user) || pathname === '/login' || pathname === '/registro' || pathname === '/mi-registro' || pathname === '/guia' || pathname === '/mapa';
+    const isLightPage = (pathname === '/' && !user) || pathname === '/login' || pathname === '/registro' || pathname === '/mi-registro' || pathname === '/programa' || pathname === '/guia' || pathname === '/mapa';
 
     useEffect(() => {
         setIsMounted(true);
     }, []);
 
-    const navItems = useMemo(() => {
-        const role = user?.role;
-
-        if (!user) {
-            return [
-                { name: 'Inicio', href: '/', icon: Home },
-                { name: 'Guía', href: '/guia', icon: BookOpen },
-                { name: 'Mapa', href: '/mapa', icon: Map },
-            ];
-        }
-
-        const items = [
-            { name: 'Inicio', href: '/', icon: Home },
-            { name: 'Agenda', href: '/agenda', icon: Calendar },
-            { name: 'Guía', href: '/guia', icon: BookOpen },
-        ];
-
-        if (role === 'coordinator' || role === 'admin') {
-            items.push({ name: 'Chat', href: '/chat', icon: MessageCircle });
-        }
-
-        items.push({ name: 'Mapa', href: '/mapa', icon: Map });
-        items.push({ name: 'Perfil', href: '/perfil', icon: User });
-
-        return items;
-    }, [user]);
+    // Asistentes y público: mismas pestañas. El panel de gestores vive en /gestion.
+    const navItems = useMemo(() => [
+        { name: 'Inicio', href: '/', icon: Home },
+        { name: 'Programa', href: '/programa', icon: Calendar },
+        { name: 'Guía', href: '/guia', icon: BookOpen },
+        { name: 'Mapa', href: '/mapa', icon: Map },
+        pathname === '/gestion'
+            ? { name: 'Gestión', href: '/gestion', icon: ClipboardList }
+            : { name: 'Mi registro', href: '/mi-registro', icon: User },
+    ], [pathname]);
 
     if (!isMounted) return null;
 

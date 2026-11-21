@@ -15,7 +15,7 @@ export default function Header() {
 
     // Light mode only applies to the public pages (landing, login, guía, mapa; the shell
     // chrome mirrors that here); internal staff/admin screens stay dark.
-    const isLightPage = (pathname === '/' && !isAuthenticated) || pathname === '/login' || pathname === '/registro' || pathname === '/mi-registro' || pathname === '/guia' || pathname === '/mapa';
+    const isLightPage = (pathname === '/' && !isAuthenticated) || pathname === '/login' || pathname === '/registro' || pathname === '/mi-registro' || pathname === '/programa' || pathname === '/guia' || pathname === '/mapa';
 
     // Display the event name on the landing page instead of Panel Principal
     const getTitle = () => {
@@ -26,6 +26,8 @@ export default function Header() {
             case '/login': return 'Acceso staff';
             case '/registro': return 'Registro';
             case '/mi-registro': return 'Mi registro';
+            case '/programa': return 'Programa';
+            case '/gestion': return 'Gestión';
             case '/mapa': return 'Mapa de sedes';
             case '/guia': return 'Guía de sedes';
             case '/perfil': return 'Mi Perfil';
@@ -100,7 +102,7 @@ export default function Header() {
                         </button>
                     ) : (
                         <Link
-                            href="/login"
+                            href="/gestion"
                             className={clsx(
                                 "transition-colors",
                                 isLightPage ? "text-[var(--t-icon-muted)] hover:text-[var(--t-text)]" : "text-white/70 hover:text-white"
