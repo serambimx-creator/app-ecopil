@@ -11,7 +11,8 @@ type Moneda = { x: number; y: number; ok: boolean };
 type Fase = 'listo' | 'jugando' | 'pregunta' | 'nivel' | 'fin' | 'gano';
 
 const H = 230, SUELO = 205, GRAV = 0.0026, SALTO = -0.78, MW = 84, MH = 80, MX = 20;
-const TRAMO_MS = 60_000; // tiempo de juego entre preguntas
+const TRAMO_MS = 30_000; // tiempo de juego entre preguntas
+const TRAMO_LIBRE_MS = 60_000; // sin preguntas: 5 tramos = cambio de región
 const TAM: Record<Obstaculo, [number, number]> = {
     cactus: [26, 46], maguey: [44, 32], paste: [40, 24], pico: [38, 38], roca: [40, 28], pino: [34, 54], atomo: [50, 50], gota: [28, 40],
 };
@@ -147,14 +148,14 @@ export default function MixtliCorre({ children }: { children?: React.ReactNode }
                 if (obs.some((o) => mx < o.x + o.w - 4 && mx + mw > o.x + 4 && my + mh > SUELO - o.h + 4)) {
                     cambiar('fin');
                     setRecord((r) => { const n = Math.max(r, pes); localStorage.setItem(RECORD_KEY, String(n)); return n; });
-                } else if (jugado >= TRAMO_MS && !preguntasR.current) {
+                } else if (jugado >= TRAMO_LIBRE_MS && !preguntasR.current) {
                     // Sin preguntas: solo avanza de región cada 5 minutos
                     jugado = 0;
                     if (qR.current < 19) {
                         qR.current += 1; setQ(qR.current);
                         if (qR.current % 5 === 0) { juego.current.limpiar(); cambiar('nivel'); }
                     }
-                } else if (jugado >= TRAMO_MS) {
+                } else if (jugado >= TRAMO_MS && preguntasR.current) {
                     jugado = 0;
                     setOps(revolver(NIVELES[Math.floor(qR.current / 5)].preguntas[qR.current % 5]));
                     setResp(null); setQ(qR.current); cambiar('pregunta');
