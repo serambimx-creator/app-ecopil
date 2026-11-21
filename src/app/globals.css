@@ -1,10 +1,11 @@
 @import "tailwindcss";
 
-/* Androgyne (títulos, tipografía oficial de Ecopil): se activa al poner el
-   archivo en public/fonts/androgyne.woff2 (u .otf). Mientras, cae a Jost. */
+/* Androgyne (títulos, tipografía oficial de Ecopil; the.bend, donationware).
+   Un solo peso: se declara para todo el rango para que no se engruese falso. */
 @font-face {
   font-family: "Androgyne";
-  src: url("/fonts/androgyne.woff2") format("woff2"), url("/fonts/androgyne.otf") format("opentype");
+  src: url("/fonts/androgyne.woff2") format("woff2");
+  font-weight: 100 900;
   font-display: swap;
 }
 
