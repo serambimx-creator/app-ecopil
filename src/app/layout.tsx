@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, Jost } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 import BottomNav from "@/components/layout/BottomNav";
 import Header from "@/components/layout/Header";
@@ -11,8 +11,9 @@ import RegistrarSW from "@/components/pwa/RegistrarSW";
 // Tipografía oficial de Ecopil: Androgyne (títulos), Futura y Helvetica.
 // Futura y Helvetica son de licencia comercial, así que se usan sus equivalentes
 // libres (OFL) más cercanos: Jost por Futura e Inter por Helvetica.
-const jost = Jost({ subsets: ["latin"], weight: ["400", "500", "600", "700"], variable: "--font-jost" });
-const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
+// Fuentes autoalojadas: el build no depende de descargar de Google Fonts
+const jost = localFont({ src: "./jost.woff2", weight: "100 900", variable: "--font-jost" });
+const inter = localFont({ src: "./inter.woff2", weight: "100 900", variable: "--font-inter" });
 
 export const metadata: Metadata = {
   title: "Encuentro de Nodos 2026 · Ecopil MX",
