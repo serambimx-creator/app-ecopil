@@ -46,10 +46,10 @@ export default function Header() {
                 {/* Left: Logos + Title */}
                 <Link href="/" className="flex items-center gap-2.5 min-w-0">
                     <Image
-                        src="/mixtli/ecopil-icono.webp"
+                        src="/mixtli/ecopil-logo.webp"
                         alt="Ecopil"
                         width={40}
-                        height={38}
+                        height={48}
                         className="shrink-0"
                         priority
                     />
