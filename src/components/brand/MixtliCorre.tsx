@@ -126,6 +126,8 @@ export default function MixtliCorre({ children }: { children?: React.ReactNode }
     const [q, setQ] = useState(0);
     const [ops, setOps] = useState<{ t: string; ok: boolean }[]>([]);
     const [resp, setResp] = useState<null | boolean>(null);
+    const [bloqueo, setBloqueo] = useState(false); // evita responder con el mismo toque del salto
+    const BLOQUEO_MS = 900;
     const [record, setRecord] = useState(0);
     const faseR = useRef<Fase>('listo');
     const [conPreguntas, setConPreguntas] = useState(true);
@@ -211,6 +213,7 @@ export default function MixtliCorre({ children }: { children?: React.ReactNode }
                     jugado = 0;
                     setOps(revolver(NIVELES[Math.floor(qR.current / 5)].preguntas[qR.current % 5]));
                     setResp(null); setQ(qR.current); cambiar('pregunta');
+                    setBloqueo(true); setTimeout(() => setBloqueo(false), BLOQUEO_MS);
                 }
             }
             c.clearRect(0, 0, W, H);
@@ -267,7 +270,7 @@ export default function MixtliCorre({ children }: { children?: React.ReactNode }
     };
 
     const responder = (ok: boolean) => {
-        if (resp !== null) return;
+        if (resp !== null || bloqueo) return;
         setResp(ok); pesosDelta(ok ? 5 : -10);
         setTimeout(() => {
             qR.current += 1;
@@ -328,11 +331,12 @@ export default function MixtliCorre({ children }: { children?: React.ReactNode }
                     )}
                     {fase === 'pregunta' && (
                         <div className="sticker absolute inset-x-0 top-8 rounded-2xl bg-[var(--t-surface)] p-3">
+                            <p className="font-futura text-[10px] font-extrabold uppercase tracking-wider text-[var(--t-accent)]">¡Pregunta!</p>
                             <p className="mb-2 text-sm font-semibold leading-snug">{preg.p}</p>
                             <div className="grid gap-1.5">
                                 {ops.map((op) => (
-                                    <button key={op.t} type="button" onClick={() => responder(op.ok)}
-                                        className={`rounded-xl border-2 px-3 py-1.5 text-left text-xs font-semibold transition-colors ${
+                                    <button key={op.t} type="button" onClick={() => responder(op.ok)} disabled={bloqueo}
+                                        className={`rounded-xl border-2 px-3 py-1.5 text-left text-xs font-semibold transition-all duration-300 ${bloqueo ? 'pointer-events-none opacity-40' : ''} ${
                                             resp === null ? 'border-[var(--t-border)] active:bg-[var(--t-surface-2)]'
                                                 : op.ok ? 'border-brand-green bg-brand-green/30' : 'border-[var(--t-border)] opacity-50'}`}>
                                         {op.t}
