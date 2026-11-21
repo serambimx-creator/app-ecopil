@@ -161,6 +161,11 @@ function ContactCards({ onSwitchView }: { onSwitchView?: (v: ViewType) => void }
     );
 }
 
+// Para sumar un aliado: logo en public/logos y una línea aquí.
+const ALIADOS = [
+    { nombre: 'Reciclum', logo: '/logos/reciclum.svg' },
+];
+
 const INFO_PRACTICA = [
     { titulo: 'Hospedaje y llegada', icon: MapPin, color: 'bg-ecopil-sun', items: [
         'Llegada el 17 de diciembre. Bienvenida a las 19:30 en el Hotel City Express Tula.',
@@ -617,6 +622,20 @@ export default function LandingPage() {
             {(
                 <div id="patrocinadores" className="px-4 pt-10 space-y-8 scroll-mt-28">
                     <p className="font-futura text-xs font-extrabold uppercase tracking-[0.2em] text-[var(--t-accent)]">Patrocinadores y aliados</p>
+
+                    {/* Aliados confirmados del Encuentro 2026 */}
+                    <section className="space-y-3">
+                        <h2 className="font-display text-2xl font-semibold">Aliados 2026</h2>
+                        <div className="grid grid-cols-2 gap-3">
+                            {ALIADOS.map((a) => (
+                                <div key={a.nombre}
+                                    className="sticker flex h-20 items-center justify-center rounded-2xl bg-white p-4">
+                                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                                    <img src={a.logo} alt={a.nombre} className="max-h-full max-w-full object-contain" />
+                                </div>
+                            ))}
+                        </div>
+                    </section>
 
                     {/* Sé patrocinador */}
                     <section className="space-y-4 relative overflow-hidden rounded-2xl p-5">
