@@ -11,9 +11,9 @@ import Link from 'next/link';
 import { Navigation, X, MapPin, Clock } from 'lucide-react';
 import { usePublico, ahoraHidalgo, rango, diaCorto, DIAS, SEDES, type Actividad } from '@/lib/encuentro';
 
-// Coordenadas de cada sede. La del hotel es aproximada (centro de Tula): confirmar.
+// Coordenadas de cada sede (hotel verificado en OpenStreetMap, carretera Jorobas–Tula km 25.8).
 const COORD: Record<string, [number, number]> = {
-    hotel: [20.0535, -99.3420],
+    hotel: [20.0431598, -99.2609751],
     tula: [20.0664861, -99.3358673],
     xoxafi: [20.388324, -99.027607],
     tezontepec: [19.8798145, -98.8192859],
@@ -59,12 +59,21 @@ function MiUbicacion() {
 }
 
 type Parada = { sede: string; dia: string; acts: Actividad[] };
+// Rutas por carretera (calculadas con QGIS + OSRM): public/rutas-encuentro.geojson
+type Tramo = { dia: string; de: string; a: string; km: number; min: number; linea: [number, number][] };
+const duracion = (m: number) => (m >= 60 ? `${Math.floor(m / 60)} h ${m % 60} min` : `${m} min`);
 
 export default function MainMap() {
     const { datos } = usePublico();
     const { dia: hoy, hm } = ahoraHidalgo();
     const [dia, setDia] = useState<string>(DIAS.includes(hoy) ? hoy : 'todos');
     const [sel, setSel] = useState<Parada | null>(null);
+    const [tramos, setTramos] = useState<Tramo[]>([]);
+    useEffect(() => {
+        fetch('/rutas-encuentro.geojson').then((r) => r.json()).then((g) => setTramos(g.features.map(
+            (f: { properties: Omit<Tramo, 'linea'>; geometry: { coordinates: [number, number][] } }) =>
+                ({ ...f.properties, linea: f.geometry.coordinates.map(([x, y]) => [y, x] as [number, number]) })))).catch(() => {});
+    }, []);
 
     // Paradas: una por sede y día, en orden del programa
     const paradas = useMemo(() => {
@@ -95,6 +104,11 @@ export default function MainMap() {
                     attribution='&copy; OpenStreetMap &copy; CARTO' />
                 <Encuadre puntos={puntos} />
                 {(dia === 'todos' ? DIAS : [dia]).map((d) => {
+                    const ts = tramos.filter((t) => t.dia === d);
+                    if (ts.length) return ts.map((t, i) => [
+                        <Polyline key={`${d}-${i}-b`} positions={t.linea} pathOptions={{ color: '#1C2B20', weight: 7, opacity: 0.8 }} />,
+                        <Polyline key={`${d}-${i}`} positions={t.linea} pathOptions={{ color: COLOR_DIA[d], weight: 4, opacity: 1 }} />,
+                    ]);
                     const ps = vis.filter((p) => p.dia === d).map((p) => COORD[p.sede]);
                     return ps.length > 1 ? <Polyline key={d} positions={ps} pathOptions={{ color: COLOR_DIA[d], weight: 5, opacity: 0.9, dashArray: '2 10', lineCap: 'round' }} /> : null;
                 })}
@@ -132,7 +146,10 @@ export default function MainMap() {
                     <button type="button" onClick={() => setSel(null)} className="absolute right-3 top-3 opacity-60" aria-label="Cerrar"><X size={18} /></button>
                     <p className="font-futura text-[11px] font-extrabold uppercase" style={{ color: COLOR_DIA[sel.dia] }}>{diaCorto(sel.dia)}</p>
                     <h3 className="font-display pr-6 text-xl leading-tight">{SEDES[sel.sede]}</h3>
-                    {sel.sede === 'hotel' && <p className="text-[11px] opacity-60">Punto del mapa aproximado.</p>}
+                    {(() => {
+                        const t = tramos.find((x) => x.dia === sel.dia && x.a === sel.sede);
+                        return t ? <p className="text-xs opacity-70">Traslado desde {SEDES[t.de]}: {t.km} km · ~{duracion(t.min)}</p> : null;
+                    })()}
                     <ul className="mt-2 space-y-1.5">
                         {sel.acts.map((a) => (
                             <li key={a.id} className="flex gap-2 text-sm">
@@ -144,7 +161,7 @@ export default function MainMap() {
                     <div className="mt-3 flex gap-2">
                         <a target="_blank" rel="noreferrer"
                             href={sel.acts.find((a) => a.destino_url)?.destino_url
-                                ?? `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(sel.sede === 'hotel' ? 'City Express Tula, Hidalgo' : `${COORD[sel.sede][0]},${COORD[sel.sede][1]}`)}`}
+                                ?? `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(`${COORD[sel.sede][0]},${COORD[sel.sede][1]}`)}`}
                             className="sticker flex flex-1 items-center justify-center gap-1.5 rounded-full bg-brand-green py-2 font-futura text-xs font-extrabold text-ink">
                             <MapPin size={14} /> Cómo llegar
                         </a>
