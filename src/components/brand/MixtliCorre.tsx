@@ -24,9 +24,35 @@ const TAM: Record<Obstaculo, [number, number]> = {
     cactus: [26, 46], maguey: [44, 32], paste: [40, 24], pico: [38, 38], roca: [40, 28], pino: [34, 54], atomo: [50, 50], gota: [28, 40], serpiente: [54, 18],
 };
 const RECORD_KEY = 'mixtli_pesos_record';
+const VISTAS_KEY = 'mixtli_preguntas_vistas';
 const INK = '#1C2B20';
 // Igual que la columna puntos de juego_partidas
 const puntaje = (pesos: number, aciertos: number, metros: number) => pesos + 10 * aciertos + Math.floor(metros / 100);
+
+const barajar = <T,>(a: T[]) => { const b = [...a]; for (let i = b.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [b[i], b[j]] = [b[j], b[i]]; } return b; };
+
+// 5 preguntas por nivel, primero las que este celular no ha visto; si se acaban, ese nivel vuelve a empezar.
+function elegirRonda(): Pregunta[] {
+    let vistas: string[] = [];
+    try { vistas = JSON.parse(localStorage.getItem(VISTAS_KEY) || '[]'); } catch { /* */ }
+    const ronda: Pregunta[] = [];
+    for (const n of NIVELES) {
+        let nuevas = n.preguntas.filter((q) => !vistas.includes(q.p));
+        if (nuevas.length < 5) {
+            vistas = vistas.filter((v) => !n.preguntas.some((q) => q.p === v));
+            nuevas = [...barajar(nuevas), ...barajar(n.preguntas.filter((q) => !nuevas.includes(q)))];
+        } else nuevas = barajar(nuevas);
+        ronda.push(...nuevas.slice(0, 5));
+    }
+    try { localStorage.setItem(VISTAS_KEY, JSON.stringify(vistas)); } catch { /* */ }
+    return ronda;
+}
+function marcarVista(q: Pregunta) {
+    try {
+        const v: string[] = JSON.parse(localStorage.getItem(VISTAS_KEY) || '[]');
+        if (!v.includes(q.p)) localStorage.setItem(VISTAS_KEY, JSON.stringify([...v, q.p]));
+    } catch { /* */ }
+}
 
 function revolver(q: Pregunta) {
     const ops = q.o.map((t, i) => ({ t, ok: i === 0 }));
@@ -165,6 +191,7 @@ export default function MixtliCorre({ children }: { children?: React.ReactNode }
     const [conPreguntas, setConPreguntas] = useState(true);
     const preguntasR = useRef(true);
     const qR = useRef(0);
+    const rondaR = useRef<Pregunta[]>([]);
     const juego = useRef({ salto: () => {}, reiniciar: () => {}, limpiar: () => {}, estado: () => ({ pes: 0, metros: 0 }), terminar: () => {} });
 
     const token = () => { try { return localStorage.getItem(TOKEN_KEY); } catch { return null; } };
@@ -267,7 +294,7 @@ export default function MixtliCorre({ children }: { children?: React.ReactNode }
                     }
                 } else if (jugado >= TRAMO_MS && preguntasR.current) {
                     jugado = 0;
-                    setOps(revolver(NIVELES[Math.floor(qR.current / 5)].preguntas[qR.current % 5]));
+                    const pq = rondaR.current[qR.current]; marcarVista(pq); setOps(revolver(pq));
                     setResp(null); setQ(qR.current); cambiar('pregunta');
                     setBloqueo(true); setTimeout(() => setBloqueo(false), BLOQUEO_MS);
                 }
@@ -325,7 +352,7 @@ export default function MixtliCorre({ children }: { children?: React.ReactNode }
 
     const pesosDelta = (d: number) => (juego.current as unknown as { pesos: (d: number) => void }).pesos(d);
 
-    const empezar = (preguntas = preguntasR.current) => { iniciarPartida(); preguntasR.current = preguntas; setConPreguntas(preguntas); juego.current.reiniciar(); cambiar('nivel'); };
+    const empezar = (preguntas = preguntasR.current) => { iniciarPartida(); rondaR.current = elegirRonda(); preguntasR.current = preguntas; setConPreguntas(preguntas); juego.current.reiniciar(); cambiar('nivel'); };
     const tocar = () => {
         const f = faseR.current;
         if (f === 'jugando') juego.current.salto();
@@ -353,7 +380,7 @@ export default function MixtliCorre({ children }: { children?: React.ReactNode }
     });
 
     const nivel = NIVELES[Math.min(3, Math.floor(q / 5))];
-    const preg = nivel.preguntas[q % 5];
+    const preg = rondaR.current[q] ?? nivel.preguntas[q % 5];
 
     return (
         <div className="relative h-[230px] select-none" style={{ touchAction: 'manipulation' }}

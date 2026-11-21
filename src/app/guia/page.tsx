@@ -11,6 +11,7 @@ import { usePublico, ahoraHidalgo } from '@/lib/encuentro';
 const DIAS = [17, 18, 19, 20, 21];
 const CHECK_KEY = 'guia_checklist';
 const TRIVIA_KEY = 'guia_trivia';
+const VISTAS_KEY = 'guia_trivia_vistas';
 
 function leer<T>(k: string, d: T): T { try { return JSON.parse(localStorage.getItem(k) || '') as T; } catch { return d; } }
 function guardar(k: string, v: unknown) { try { localStorage.setItem(k, JSON.stringify(v)); } catch { /* sin storage */ } }
@@ -31,35 +32,44 @@ function Seccion({ titulo, icono: Icono, abierta, toggle, extra, children }: {
     );
 }
 
-function Trivia({ s, hecha, marcar }: { s: SedeGuia; hecha: boolean; marcar: () => void }) {
-    const ops = useMemo(() => s.trivia.o.map((t, i) => ({ t, ok: i === 0 })).sort((a, b) => a.t.localeCompare(b.t)), [s]);
+function Trivia({ s, vistas, verla, reiniciar, marcar }: {
+    s: SedeGuia; vistas: string[]; verla: (p: string) => void; reiniciar: () => void; marcar: () => void;
+}) {
+    // Muestra primero las preguntas que este celular no ha visto; al acabarse, vuelven a empezar.
+    const [actual, setActual] = useState<string | null>(null);
     const [elegida, setElegida] = useState<string | null>(null);
-    const mostrar = elegida !== null || hecha;
+    const pendientes = s.trivia.filter((q) => !vistas.includes(q.p));
+    const q = s.trivia.find((x) => x.p === actual) ?? pendientes[0] ?? s.trivia[0];
+    const ops = useMemo(() => q.o.map((t, i) => ({ t, ok: i === 0 })).sort((a, b) => a.t.localeCompare(b.t)), [q]);
+    const okElegida = ops.find((o) => o.t === elegida)?.ok;
+    const responder = (o: { t: string; ok: boolean }) => { setActual(q.p); setElegida(o.t); verla(q.p); if (o.ok) marcar(); };
+    const otra = () => { if (pendientes.length === 0 || (pendientes.length === 1 && pendientes[0].p === q.p)) reiniciar(); setActual(null); setElegida(null); };
     return (
         <div className="sticker rounded-2xl bg-ecopil-sun p-4 text-ink">
-            <p className="font-futura text-[10px] font-extrabold uppercase tracking-wider">Reto de Mixtli</p>
-            <p className="mt-1 font-bold leading-snug">{s.trivia.p}</p>
+            <p className="font-futura text-[10px] font-extrabold uppercase tracking-wider">Reto de Mixtli · {s.trivia.length} preguntas</p>
+            <p className="mt-1 font-bold leading-snug">{q.p}</p>
             <div className="mt-2 grid gap-1.5">
                 {ops.map((o) => (
-                    <button key={o.t} type="button" disabled={mostrar}
-                        onClick={() => { setElegida(o.t); if (o.ok) marcar(); }}
+                    <button key={o.t} type="button" disabled={elegida !== null} onClick={() => responder(o)}
                         className={clsx('rounded-xl border-2 border-ink px-3 py-1.5 text-left text-xs font-bold transition-colors',
-                            !mostrar ? 'bg-white/70 active:bg-white' : o.ok ? 'bg-brand-green' : elegida === o.t ? 'bg-ecopil-red/40' : 'bg-white/40 opacity-60')}>
+                            elegida === null ? 'bg-white/70 active:bg-white' : o.ok ? 'bg-brand-green' : elegida === o.t ? 'bg-ecopil-red/40' : 'bg-white/40 opacity-60')}>
                         {o.t}
                     </button>
                 ))}
             </div>
-            {mostrar && (
-                <p className="mt-2 text-xs font-semibold">
-                    {elegida && !ops.find((o) => o.t === elegida)?.ok ? 'Casi. ' : '¡Bien! '}{s.trivia.dato}
-                </p>
+            {elegida !== null && (
+                <>
+                    <p className="mt-2 text-xs font-semibold">{okElegida ? '¡Bien! ' : 'Casi. '}{q.dato}</p>
+                    <button type="button" onClick={otra} className="font-futura mt-2 rounded-full bg-ink px-3 py-1.5 text-[11px] font-extrabold text-white">Otra pregunta</button>
+                </>
             )}
         </div>
     );
 }
 
-function SedeCard({ s, llegar, checks, toggleCheck, triviaHecha, marcarTrivia }: {
-    s: SedeGuia; llegar?: string; checks: string[]; toggleCheck: (item: string) => void; triviaHecha: boolean; marcarTrivia: () => void;
+function SedeCard({ s, llegar, checks, toggleCheck, vistas, verla, reiniciar, marcarTrivia }: {
+    s: SedeGuia; llegar?: string; checks: string[]; toggleCheck: (item: string) => void;
+    vistas: string[]; verla: (p: string) => void; reiniciar: () => void; marcarTrivia: () => void;
 }) {
     const [abierta, setAbierta] = useState<string | null>('haremos');
     const t = (k: string) => setAbierta(abierta === k ? null : k);
@@ -127,7 +137,7 @@ function SedeCard({ s, llegar, checks, toggleCheck, triviaHecha, marcarTrivia }:
                     </Seccion>
                 )}
 
-                <Trivia s={s} hecha={triviaHecha} marcar={marcarTrivia} />
+                <Trivia s={s} vistas={vistas} verla={verla} reiniciar={reiniciar} marcar={marcarTrivia} />
             </div>
         </article>
     );
@@ -139,9 +149,10 @@ export default function GuiaPage() {
     const [dia, setDia] = useState(enEvento ? hoy : 18);
     const [checks, setChecks] = useState<string[]>([]);
     const [trivias, setTrivias] = useState<string[]>([]);
+    const [vistas, setVistas] = useState<string[]>([]);
     const { datos } = usePublico();
     // eslint-disable-next-line react-hooks/set-state-in-effect -- leer localStorage tras hidratar
-    useEffect(() => { setChecks(leer(CHECK_KEY, [])); setTrivias(leer(TRIVIA_KEY, [])); }, []);
+    useEffect(() => { setChecks(leer(CHECK_KEY, [])); setTrivias(leer(TRIVIA_KEY, [])); setVistas(leer(VISTAS_KEY, [])); }, []);
 
     // "Cómo llegar": el enlace que el staff puso en el cronograma, si hay
     const llegar = useMemo(() => {
@@ -152,6 +163,8 @@ export default function GuiaPage() {
 
     const toggleCheck = (k: string) => setChecks((c) => { const n = c.includes(k) ? c.filter((x) => x !== k) : [...c, k]; guardar(CHECK_KEY, n); return n; });
     const marcarTrivia = (slug: string) => setTrivias((t) => { if (t.includes(slug)) return t; const n = [...t, slug]; guardar(TRIVIA_KEY, n); return n; });
+    const verla = (p: string) => setVistas((v) => { if (v.includes(p)) return v; const n = [...v, p]; guardar(VISTAS_KEY, n); return n; });
+    const reiniciar = (s: SedeGuia) => setVistas((v) => { const n = v.filter((p) => !s.trivia.some((q) => q.p === p)); guardar(VISTAS_KEY, n); return n; });
     const sedes = GUIA.filter((s) => s.dias.includes(dia));
 
     return (
@@ -189,7 +202,7 @@ export default function GuiaPage() {
                 <div className="grid grid-cols-1 items-start gap-4 lg:grid-cols-2">
                     {sedes.map((s) => (
                         <SedeCard key={s.slug} s={s} llegar={llegar[s.slug]} checks={checks} toggleCheck={toggleCheck}
-                            triviaHecha={trivias.includes(s.slug)} marcarTrivia={() => marcarTrivia(s.slug)} />
+                            vistas={vistas} verla={verla} reiniciar={() => reiniciar(s)} marcarTrivia={() => marcarTrivia(s.slug)} />
                     ))}
                 </div>
             )}
