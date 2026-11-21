@@ -11,7 +11,7 @@ type Moneda = { x: number; y: number; ok: boolean };
 type Fase = 'listo' | 'jugando' | 'pregunta' | 'nivel' | 'fin' | 'gano';
 
 const H = 230, SUELO = 205, GRAV = 0.0026, SALTO = -0.78, MW = 84, MH = 80, MX = 20;
-const TRAMO = 120; // metros entre preguntas
+const TRAMO_MS = 60_000; // tiempo de juego entre preguntas
 const TAM: Record<Obstaculo, [number, number]> = {
     cactus: [26, 46], maguey: [44, 32], paste: [40, 24], pico: [38, 38], roca: [40, 28], pino: [34, 54], atomo: [50, 50], gota: [28, 40],
 };
@@ -107,10 +107,10 @@ export default function MixtliCorre({ children }: { children?: React.ReactNode }
         const medir = () => { W = cv.clientWidth; cv.width = W * dpr; cv.height = H * dpr; c.setTransform(dpr, 0, 0, dpr, 0, 0); };
         medir(); window.addEventListener('resize', medir);
 
-        let y = SUELO - MH, vy = 0, obs: Obs[] = [], mon: Moneda[] = [], vel = 0.32, dist = 0, sigO = 600, sigM = 300, prev = 0, raf = 0, pes = 0;
+        let y = SUELO - MH, vy = 0, obs: Obs[] = [], mon: Moneda[] = [], vel = 0.32, dist = 0, sigO = 600, sigM = 300, prev = 0, raf = 0, pes = 0, jugado = 0;
         juego.current.salto = () => { if (y >= SUELO - MH - 0.5) vy = SALTO; };
         juego.current.limpiar = () => { obs = []; mon = []; sigO = 500; vel = 0.32 + 0.05 * Math.floor(qR.current / 5); };
-        juego.current.reiniciar = () => { y = SUELO - MH; vy = 0; dist = 0; pes = 0; qR.current = 0; juego.current.limpiar(); setPesos(0); setMetros(0); setQ(0); };
+        juego.current.reiniciar = () => { y = SUELO - MH; vy = 0; dist = 0; pes = 0; jugado = 0; qR.current = 0; juego.current.limpiar(); setPesos(0); setMetros(0); setQ(0); };
         const ajustarPesos = (d: number) => { pes = Math.max(0, pes + d); setPesos(pes); };
         (juego.current as unknown as { pesos: (d: number) => void }).pesos = ajustarPesos;
 
@@ -120,7 +120,7 @@ export default function MixtliCorre({ children }: { children?: React.ReactNode }
             if (f === 'jugando') {
                 vel = Math.min(0.8, vel + dt * 0.00001);
                 const antes = Math.floor(dist / 10);
-                dist += vel * dt;
+                dist += vel * dt; jugado += dt;
                 vy += GRAV * dt; y = Math.min(SUELO - MH, y + vy * dt);
                 sigO -= vel * dt; sigM -= vel * dt;
                 if (sigO <= 0) {
@@ -145,7 +145,8 @@ export default function MixtliCorre({ children }: { children?: React.ReactNode }
                 if (obs.some((o) => mx < o.x + o.w - 4 && mx + mw > o.x + 4 && my + mh > SUELO - o.h + 4)) {
                     cambiar('fin');
                     setRecord((r) => { const n = Math.max(r, pes); localStorage.setItem(RECORD_KEY, String(n)); return n; });
-                } else if (m >= (qR.current + 1) * TRAMO) {
+                } else if (jugado >= TRAMO_MS) {
+                    jugado = 0;
                     setOps(revolver(NIVELES[Math.floor(qR.current / 5)].preguntas[qR.current % 5]));
                     setResp(null); setQ(qR.current); cambiar('pregunta');
                 }
