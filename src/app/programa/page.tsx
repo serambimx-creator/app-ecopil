@@ -7,6 +7,7 @@ import { Clock, MapPin, WifiOff, Megaphone, Lightbulb } from 'lucide-react';
 import Mixtli, { MixtliBubble } from '@/components/brand/Mixtli';
 import { usePublico, ahoraHidalgo, diaCorto, DIAS, DIA_COLOR, SEDES } from '@/lib/encuentro';
 import { PROGRAMA, type Bloque } from '@/data/programa-agentes';
+import Temazcal from '@/components/encuentro/Temazcal';
 
 const diasParaEmpezar = () => Math.ceil((Date.parse(`${DIAS[0]}T19:30:00-06:00`) - Date.now()) / 86400000);
 
@@ -108,6 +109,8 @@ export default function ProgramaPage() {
                         </li>
                     ))}
                 </ol>
+
+                {dia === '2026-12-20' && <Temazcal />}
 
                 {p.tip && (
                     <p className="flex gap-2 rounded-2xl bg-[var(--t-surface-2)] p-3 text-sm text-[var(--t-text)]"><Lightbulb size={18} className="shrink-0 text-ecopil-orange" /> {p.tip}</p>

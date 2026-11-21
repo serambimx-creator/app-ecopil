@@ -1,5 +1,6 @@
 'use client';
 
+import Temazcal from '@/components/encuentro/Temazcal';
 import { Suspense, useEffect, useState } from 'react';
 import QRCode from 'qrcode';
 import Link from 'next/link';
@@ -181,6 +182,8 @@ function MiRegistroContenido() {
                     })}
                 </div>
             )}
+
+            {aprobado && token && <Temazcal token={token} />}
 
             {/* Pasaporte: actividades con asistencia */}
             {aprobado && asis.length > 0 && (

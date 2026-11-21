@@ -45,7 +45,7 @@ export const PROGRAMA: DiaPrograma[] = [
         bloques: [
             { momento: 'Mañana', texto: 'Nos tomamos la foto oficial y viajamos a Acaxochitlán: caminamos al manantial de Cascadas Dos Mundos (Huetziatl) y analizamos la calidad de su agua.' },
             { momento: 'Tarde', texto: 'Comida, clausura y sorteo. Después vamos a Ajolotequio, en Tulancingo, a construir una biopiscina, reforestar y aprender de los ajolotes.' },
-            { momento: 'Noche', texto: 'Temazcal y campamento. Tienen cupo con registro previo: ¡regístrate!' },
+            { momento: 'Noche', texto: 'Temazcal y campamento. Solo hay 20 lugares para el temazcal: apártalo abajo.' },
         ],
         horas: [
             { hora: '07:00', que: 'Desayuno grupo A' }, { hora: '07:30', que: 'Desayuno grupo B' },

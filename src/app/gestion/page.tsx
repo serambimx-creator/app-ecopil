@@ -7,6 +7,7 @@ import Mixtli from '@/components/brand/Mixtli';
 import EditorActividad from '@/components/gestion/EditorActividad';
 import Reporte from '@/components/gestion/Reporte';
 import RankingJuego from '@/components/gestion/RankingJuego';
+import TemazcalLista from '@/components/gestion/TemazcalLista';
 import { supabase } from '@/lib/supabase';
 import { useGestion, ahoraHidalgo, rango, diaCorto, DIAS, DIA_COLOR, SEDES, type ActividadGestion, type Contacto, type EntradaBitacora } from '@/lib/encuentro';
 
@@ -134,6 +135,7 @@ export default function GestionPage() {
 
             {tab === 'directorio' && <Directorio contactos={d.contactos} gestores={d.gestores} busca={busca} setBusca={setBusca} guardar={g.guardarFila} />}
             {tab === 'bitacora' && <Bitacora entradas={d.bitacora} actividades={acts} avisos={d.avisos} guardar={g.guardarFila} borrar={g.borrarFila} />}
+            {tab === 'registros' && <TemazcalLista token={g.token} />}
             {tab === 'registros' && <Registros datos={d} rpc={g.rpc} escaneado={escaneado} limpiar={() => setEscaneado(null)} />}
             {tab === 'reporte' && <Reporte d={d} />}
             {tab === 'juego' && <RankingJuego token={g.token} />}
