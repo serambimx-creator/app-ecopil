@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from 'react';
 import Mixtli from './Mixtli';
 import { RUTA, dibujarFondo } from './paisajes';
 import { NIVELES, type Obstaculo, type Pregunta } from '@/data/juego-mixtli';
+import { ecopil, TOKEN_KEY } from '@/lib/ecopil';
 
 type Obs = { x: number; w: number; h: number; tipo: Obstaculo; giro: number };
 type Moneda = { x: number; y: number; ok: boolean };
@@ -16,6 +17,7 @@ type Fase = 'listo' | 'jugando' | 'pregunta' | 'nivel' | 'fin' | 'gano';
 const H = 230, SUELO = 205, GRAV = 0.0022, SALTO = -0.74, MW = 84, MH = 80, MX = 20;
 const VEL0 = 0.26, VMAX = 0.6; // velocidad inicial y máxima (px/ms)
 const ALAS_MS = 3000; // duración de las alas de mariposa
+const INMUNE_MS = 4000; // la tuna da inmunidad
 const TRAMO_MS = 15_000; // tiempo de juego entre preguntas
 const TRAMO_LIBRE_MS = 60_000; // sin preguntas: 5 tramos = cambio de región
 const TAM: Record<Obstaculo, [number, number]> = {
@@ -109,6 +111,15 @@ function mariposa(c: CanvasRenderingContext2D, x: number, y: number, t: number, 
     c.restore();
 }
 
+function tuna(c: CanvasRenderingContext2D, x: number, y: number) {
+    c.save(); c.translate(x, y); c.strokeStyle = INK; c.lineWidth = 2;
+    c.fillStyle = '#6BB32E'; c.beginPath(); c.ellipse(0, -11, 6, 3, 0, 0, Math.PI * 2); c.fill(); c.stroke();
+    c.fillStyle = '#C2185B'; c.beginPath(); c.ellipse(0, 0, 9, 12, 0, 0, Math.PI * 2); c.fill(); c.stroke();
+    c.fillStyle = '#F9BC3A';
+    for (const [a, b] of [[-4, -4], [3, -2], [-2, 4], [4, 6], [0, 0]]) { c.beginPath(); c.arc(a, b, 1.2, 0, Math.PI * 2); c.fill(); }
+    c.restore();
+}
+
 function moneda(c: CanvasRenderingContext2D, m: Moneda, t: number) {
     const s = Math.abs(Math.cos(t / 250 + m.x / 50));
     c.save(); c.translate(m.x, m.y); c.scale(0.35 + 0.65 * s, 1);
@@ -116,6 +127,20 @@ function moneda(c: CanvasRenderingContext2D, m: Moneda, t: number) {
     c.beginPath(); c.arc(0, 0, 10, 0, Math.PI * 2); c.fill(); c.stroke();
     c.fillStyle = INK; c.font = 'bold 12px sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText('E', 0, 1);
     c.restore();
+}
+
+function Concurso({ jugador, guardado }: { jugador: { nombre: string; mejor: number } | null; guardado: null | 'ok' | 'no' }) {
+    if (!jugador) return (
+        <a href="/registro" onPointerDown={(e) => e.stopPropagation()} className="text-[11px] font-semibold underline">
+            Regístrate para entrar al concurso de regalos
+        </a>
+    );
+    return (
+        <p className="text-[11px] font-semibold">
+            {guardado === 'no' ? 'No se pudo guardar esta partida' : `${jugador.nombre.split(' ')[0]}, tu mejor: E$ ${jugador.mejor}`}
+            {guardado === 'ok' && ' · guardado ✓'}
+        </p>
+    );
 }
 
 export default function MixtliCorre({ children }: { children?: React.ReactNode }) {
@@ -129,11 +154,34 @@ export default function MixtliCorre({ children }: { children?: React.ReactNode }
     const [bloqueo, setBloqueo] = useState(false); // evita responder con el mismo toque del salto
     const BLOQUEO_MS = 900;
     const [record, setRecord] = useState(0);
+    // Concurso: agentes registrados guardan sus partidas en el servidor
+    const [jugador, setJugador] = useState<{ nombre: string; mejor: number } | null>(null);
+    const [guardado, setGuardado] = useState<null | 'ok' | 'no'>(null);
+    const partidaR = useRef<string | null>(null);
+    const aciertosR = useRef(0);
     const faseR = useRef<Fase>('listo');
     const [conPreguntas, setConPreguntas] = useState(true);
     const preguntasR = useRef(true);
     const qR = useRef(0);
-    const juego = useRef({ salto: () => {}, reiniciar: () => {}, limpiar: () => {} });
+    const juego = useRef({ salto: () => {}, reiniciar: () => {}, limpiar: () => {}, estado: () => ({ pes: 0, metros: 0 }), terminar: () => {} });
+
+    const token = () => { try { return localStorage.getItem(TOKEN_KEY); } catch { return null; } };
+    const iniciarPartida = async () => {
+        partidaR.current = null; aciertosR.current = 0; setGuardado(null);
+        const t = token(); if (!t) return;
+        const { data } = await ecopil.rpc('juego_iniciar', { p_token: t });
+        if (data?.partida) { partidaR.current = data.partida; setJugador({ nombre: data.nombre, mejor: data.mejor }); }
+    };
+    juego.current.terminar = () => {
+        const t = token(), pid = partidaR.current; if (!t || !pid) return;
+        partidaR.current = null;
+        const { pes, metros } = juego.current.estado();
+        ecopil.rpc('juego_terminar', { p_token: t, p_partida: pid, p_pesos: pes, p_metros: metros, p_aciertos: aciertosR.current, p_con_preguntas: preguntasR.current })
+            .then(({ data }) => {
+                if (data && 'mejor' in data) { setJugador((j) => j && { ...j, mejor: data.mejor }); setGuardado(data.valida ? 'ok' : 'no'); }
+                else setGuardado('no');
+            });
+    };
 
     const cambiar = (f: Fase) => { faseR.current = f; setFase(f); };
 
@@ -148,7 +196,7 @@ export default function MixtliCorre({ children }: { children?: React.ReactNode }
         const medir = () => { W = cv.clientWidth; cv.width = W * dpr; cv.height = H * dpr; c.setTransform(dpr, 0, 0, dpr, 0, 0); };
         medir(); window.addEventListener('resize', medir);
 
-        let corazones: Corazon[] = [], maris: Mariposa[] = [], alas = 0, giro = 0, giroUsado = false, sigB = 2500;
+        let corazones: Corazon[] = [], maris: Mariposa[] = [], tunas: Mariposa[] = [], inmune = 0, sigT = 5000, alas = 0, giro = 0, giroUsado = false, sigB = 2500;
         let y = SUELO - MH, vy = 0, obs: Obs[] = [], mon: Moneda[] = [], vel = VEL0, dist = 0, sigO = 600, sigM = 300, prev = 0, raf = 0, pes = 0, jugado = 0, paisaje = RUTA[0], paisajeAnt = RUTA[0], fundido = 1;
         juego.current.salto = () => {
             const enSuelo = y >= SUELO - MH - 0.5;
@@ -159,8 +207,9 @@ export default function MixtliCorre({ children }: { children?: React.ReactNode }
                 for (let k = 0; k < 7; k++) corazones.push({ x: MX + MW / 2, y: y + MH / 2, vx: (Math.random() - 0.5) * 0.25, vy: -0.08 - Math.random() * 0.15, vida: 1 });
             }
         };
-        juego.current.limpiar = () => { obs = []; mon = []; maris = []; sigO = 600; vel = VEL0 + 0.04 * Math.floor(qR.current / 5); };
-        juego.current.reiniciar = () => { y = SUELO - MH; vy = 0; alas = 0; corazones = []; dist = 0; pes = 0; jugado = 0; qR.current = 0; juego.current.limpiar(); setPesos(0); setMetros(0); setQ(0); };
+        juego.current.limpiar = () => { obs = []; mon = []; maris = []; tunas = []; sigO = 600; vel = VEL0 + 0.04 * Math.floor(qR.current / 5); };
+        juego.current.reiniciar = () => { y = SUELO - MH; vy = 0; alas = 0; inmune = 0; sigT = 5000; corazones = []; dist = 0; pes = 0; jugado = 0; qR.current = 0; juego.current.limpiar(); setPesos(0); setMetros(0); setQ(0); };
+        juego.current.estado = () => ({ pes, metros: Math.floor(dist / 10) });
         const ajustarPesos = (d: number) => { pes = Math.max(0, pes + d); setPesos(pes); };
         (juego.current as unknown as { pesos: (d: number) => void }).pesos = ajustarPesos;
 
@@ -169,7 +218,7 @@ export default function MixtliCorre({ children }: { children?: React.ReactNode }
             const f = faseR.current, nivel = NIVELES[Math.min(3, Math.floor(qR.current / 5))];
             if (f === 'jugando') {
                 vel = Math.min(VMAX, vel + dt * 0.000006);
-                alas = Math.max(0, alas - dt); giro = Math.max(0, giro - dt / 450);
+                alas = Math.max(0, alas - dt); inmune = Math.max(0, inmune - dt); giro = Math.max(0, giro - dt / 450);
                 const antes = Math.floor(dist / 10);
                 dist += vel * dt; jugado += dt;
                 vy += (alas > 0 ? GRAV * 0.45 : GRAV) * dt; y = Math.max(4, Math.min(SUELO - MH, y + vy * dt));
@@ -188,19 +237,24 @@ export default function MixtliCorre({ children }: { children?: React.ReactNode }
                 }
                 sigB -= vel * dt;
                 if (sigB <= 0) { maris.push({ x: W + 20, y: SUELO - 100 - Math.random() * 40, ok: false }); sigB = 2600 + Math.random() * 2400; }
+                sigT -= vel * dt;
+                if (sigT <= 0) { tunas.push({ x: W + 20, y: SUELO - 70 - Math.random() * 60, ok: false }); sigT = 4200 + Math.random() * 3000; }
+                tunas.forEach((b) => { b.x -= vel * dt; });
                 maris.forEach((b) => { b.x -= vel * dt; });
                 obs.forEach((o) => { o.x -= vel * dt; o.giro += dt * 0.002; });
                 mon.forEach((m) => { m.x -= vel * dt; });
                 obs = obs.filter((o) => o.x + o.w > -10);
                 mon = mon.filter((m) => m.x > -20 && !m.ok);
                 maris = maris.filter((b) => b.x > -20 && !b.ok);
+                tunas = tunas.filter((b) => b.x > -20 && !b.ok);
                 const mx = MX + 24, my = y + 18, mw = MW - 48, mh = MH - 26; // caja de choque generosa
                 maris.forEach((b) => { if (b.x > mx - 14 && b.x < mx + mw + 14 && b.y > my - 18 && b.y < my + mh + 18) { b.ok = true; alas = ALAS_MS; ajustarPesos(2); } });
+                tunas.forEach((b) => { if (b.x > mx - 12 && b.x < mx + mw + 12 && b.y > my - 14 && b.y < my + mh + 14) { b.ok = true; inmune = INMUNE_MS; ajustarPesos(2); } });
                 mon.forEach((m) => { if (m.x > mx - 8 && m.x < mx + mw + 8 && m.y > my - 8 && m.y < my + mh + 8) { m.ok = true; ajustarPesos(1); } });
                 const m = Math.floor(dist / 10);
                 if (m !== antes) setMetros(m);
-                if (obs.some((o) => mx < o.x + o.w - 6 && mx + mw > o.x + 6 && my + mh > SUELO - o.h + 6)) {
-                    cambiar('fin');
+                if (inmune <= 0 && obs.some((o) => mx < o.x + o.w - 6 && mx + mw > o.x + 6 && my + mh > SUELO - o.h + 6)) {
+                    cambiar('fin'); juego.current.terminar();
                     setRecord((r) => { const n = Math.max(r, pes); localStorage.setItem(RECORD_KEY, String(n)); return n; });
                 } else if (jugado >= TRAMO_LIBRE_MS && !preguntasR.current) {
                     // Sin preguntas: solo avanza de región cada 5 minutos
@@ -232,6 +286,7 @@ export default function MixtliCorre({ children }: { children?: React.ReactNode }
             c.stroke();
             mon.forEach((mm) => moneda(c, mm, t));
             obs.forEach((o) => dibujar(c, o, t));
+            tunas.forEach((b) => tuna(c, b.x, b.y + Math.sin(t / 180 + b.x / 30) * 4));
             maris.forEach((b) => mariposa(c, b.x, b.y + Math.sin(t / 200 + b.x / 40) * 6, t, 1));
             if (img.complete) {
                 const cx = MX + MW / 2, cy = y + MH / 2 + (f === 'jugando' && y >= SUELO - MH - 0.5 ? Math.sin(t / 60) * 1.5 : 0);
@@ -245,6 +300,10 @@ export default function MixtliCorre({ children }: { children?: React.ReactNode }
                 }
                 c.save();
                 c.translate(cx, cy); c.scale(-1, 1); c.rotate(giro > 0 ? -(1 - giro) * Math.PI * 2 : vy < 0 ? 0.12 : 0);
+                if (inmune > 0) { // brillo de inmunidad (parpadea al acabarse)
+                    c.globalAlpha = inmune > 1000 || Math.floor(t / 100) % 2 ? 0.85 : 0.35;
+                    c.shadowColor = '#C2185B'; c.shadowBlur = 18;
+                }
                 c.drawImage(img, -MW / 2, -MH / 2 - 4, MW, MH * (763 / 800) + 4);
                 c.restore();
             }
@@ -252,6 +311,9 @@ export default function MixtliCorre({ children }: { children?: React.ReactNode }
             corazones = corazones.filter((h) => h.vida > 0);
             if (alas > 0 && f === 'jugando') {
                 c.fillStyle = INK; c.font = 'bold 11px sans-serif'; c.textAlign = 'right'; c.fillText(`Alas ${Math.ceil(alas / 1000)} s`, W - 6, 44);
+            }
+            if (inmune > 0 && f === 'jugando') {
+                c.fillStyle = '#C2185B'; c.font = 'bold 11px sans-serif'; c.textAlign = 'right'; c.fillText(`Inmune ${Math.ceil(inmune / 1000)} s`, W - 6, alas > 0 ? 58 : 44);
             }
             raf = requestAnimationFrame(frame);
         };
@@ -261,7 +323,7 @@ export default function MixtliCorre({ children }: { children?: React.ReactNode }
 
     const pesosDelta = (d: number) => (juego.current as unknown as { pesos: (d: number) => void }).pesos(d);
 
-    const empezar = (preguntas = preguntasR.current) => { preguntasR.current = preguntas; setConPreguntas(preguntas); juego.current.reiniciar(); cambiar('nivel'); };
+    const empezar = (preguntas = preguntasR.current) => { iniciarPartida(); preguntasR.current = preguntas; setConPreguntas(preguntas); juego.current.reiniciar(); cambiar('nivel'); };
     const tocar = () => {
         const f = faseR.current;
         if (f === 'jugando') juego.current.salto();
@@ -271,12 +333,12 @@ export default function MixtliCorre({ children }: { children?: React.ReactNode }
 
     const responder = (ok: boolean) => {
         if (resp !== null || bloqueo) return;
-        setResp(ok); pesosDelta(ok ? 5 : -10);
+        setResp(ok); pesosDelta(ok ? 5 : -10); if (ok) aciertosR.current += 1;
         setTimeout(() => {
             qR.current += 1;
             if (qR.current >= 20) {
                 setRecord((r) => { const n = Math.max(r, pesos + (ok ? 5 : 0)); localStorage.setItem(RECORD_KEY, String(n)); return n; });
-                cambiar('gano');
+                cambiar('gano'); juego.current.terminar();
             } else if (qR.current % 5 === 0) { juego.current.limpiar(); setQ(qR.current); cambiar('nivel'); }
             else cambiar('jugando');
         }, ok ? 900 : 2200);
@@ -326,7 +388,7 @@ export default function MixtliCorre({ children }: { children?: React.ReactNode }
                         <div className="absolute inset-y-0 left-24 right-0 flex flex-col items-center justify-center gap-1 text-center">
                             <p className="font-futura text-xs font-bold uppercase tracking-wider">{nivel.nombre}</p>
                             <p className="font-display text-3xl">{nivel.lugar}</p>
-                            <p className="text-xs opacity-80">Junta Ecopil pesos para ayudar a más nodos. Toca para saltar; en el aire, toca otra vez para girar. Las mariposas te dan alas.</p>
+                            <p className="text-xs opacity-80">Junta Ecopil pesos para ayudar a más nodos. Toca para saltar; en el aire, toca otra vez para girar. Las mariposas te dan alas y las tunas te hacen inmune.</p>
                         </div>
                     )}
                     {fase === 'pregunta' && (
@@ -352,6 +414,7 @@ export default function MixtliCorre({ children }: { children?: React.ReactNode }
                         <div className="absolute inset-y-0 left-24 right-0 flex flex-col items-center justify-center gap-1 text-center">
                             <p className="font-display text-2xl">Juntaste E$ {pesos}</p>
                             <p className="text-xs opacity-80">Llegaste a {metros} m · toca para intentarlo otra vez</p>
+                            <Concurso jugador={jugador} guardado={guardado} />
                         </div>
                     )}
                     {fase === 'gano' && (
@@ -359,6 +422,7 @@ export default function MixtliCorre({ children }: { children?: React.ReactNode }
                             <p className="font-display text-2xl">¡Cruzaste Hidalgo!</p>
                             <p className="text-sm">Juntaste E$ {pesos} para ayudar a más nodos.</p>
                             <p className="text-xs opacity-80">Toca para jugar de nuevo</p>
+                            <Concurso jugador={jugador} guardado={guardado} />
                         </div>
                     )}
                 </>

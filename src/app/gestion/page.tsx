@@ -2,14 +2,15 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { clsx } from 'clsx';
-import { Loader2, CalendarClock, Phone, MessageCircle, NotebookPen, Users, UserCog, Plus, LogOut, WifiOff, AlertTriangle, Check, Megaphone, Search, BarChart3 } from 'lucide-react';
+import { Loader2, CalendarClock, Phone, MessageCircle, NotebookPen, Users, UserCog, Plus, LogOut, WifiOff, AlertTriangle, Check, Megaphone, Search, BarChart3, Trophy } from 'lucide-react';
 import Mixtli from '@/components/brand/Mixtli';
 import EditorActividad from '@/components/gestion/EditorActividad';
 import Reporte from '@/components/gestion/Reporte';
+import RankingJuego from '@/components/gestion/RankingJuego';
 import { supabase } from '@/lib/supabase';
 import { useGestion, ahoraHidalgo, rango, diaCorto, DIAS, DIA_COLOR, SEDES, type ActividadGestion, type Contacto, type EntradaBitacora } from '@/lib/encuentro';
 
-type Tab = 'hoy' | 'directorio' | 'bitacora' | 'registros' | 'reporte' | 'equipo';
+type Tab = 'hoy' | 'directorio' | 'bitacora' | 'registros' | 'reporte' | 'juego' | 'equipo';
 const inp = 'w-full rounded-xl bg-gray-900 border-2 border-gray-700 px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-brand-green';
 const ESTADO_COLOR: Record<string, string> = {
     pendiente: 'bg-gray-700 text-gray-200', en_proceso: 'bg-ecopil-sun text-ink', listo: 'bg-ecopil-leaf text-ink',
@@ -69,6 +70,7 @@ export default function GestionPage() {
         { k: 'bitacora', label: 'Bitácora', icon: NotebookPen, badge: abiertos },
         { k: 'registros', label: 'Asistentes', icon: Users, badge: pendientesReg },
         { k: 'reporte', label: 'Reporte', icon: BarChart3 },
+        { k: 'juego', label: 'Juego', icon: Trophy },
         ...(d.yo.rol === 'admin' ? [{ k: 'equipo' as Tab, label: 'Equipo', icon: UserCog }] : []),
     ];
 
@@ -134,6 +136,7 @@ export default function GestionPage() {
             {tab === 'bitacora' && <Bitacora entradas={d.bitacora} actividades={acts} avisos={d.avisos} guardar={g.guardarFila} borrar={g.borrarFila} />}
             {tab === 'registros' && <Registros datos={d} rpc={g.rpc} escaneado={escaneado} limpiar={() => setEscaneado(null)} />}
             {tab === 'reporte' && <Reporte d={d} />}
+            {tab === 'juego' && <RankingJuego token={g.token} />}
             {tab === 'equipo' && <Equipo gestores={d.gestores} rpc={g.rpc} />}
 
             {editando && <EditorActividad key={editando} actividad={editAct} onClose={() => setEditando(null)} guardar={g.guardarFila} borrar={g.borrarFila} datos={d} rpc={g.rpc} />}
