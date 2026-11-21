@@ -164,10 +164,10 @@ function ContactCards({ onSwitchView }: { onSwitchView?: (v: ViewType) => void }
 
 // Para sumar un aliado: logo en public/logos y una línea aquí.
 const ALIADOS = [
-    { nombre: 'Reciclum', logo: '/logos/reciclum.svg' },
-    { nombre: 'COESBIOH · Comisión Estatal de Biodiversidad de Hidalgo', logo: '/logos/coesbioh.png' },
-    { nombre: 'Cascadas Dos Mundos', logo: '/logos/huetzitli.png' },
-    { nombre: 'Invictus · Conciencia, ciencia y corazón', logo: '/logos/invictus.png' },
+    { nombre: 'Reciclum', logo: '/logos/reciclum.svg', h: 'h-6' },
+    { nombre: 'COESBIOH · Comisión Estatal de Biodiversidad de Hidalgo', logo: '/logos/coesbioh.png', h: 'h-10' },
+    { nombre: 'Cascadas Dos Mundos', logo: '/logos/huetzitli.png', h: 'h-11' },
+    { nombre: 'Invictus · Conciencia, ciencia y corazón', logo: '/logos/invictus.png', h: 'h-11' },
 ];
 
 const INFO_PRACTICA = [
@@ -243,18 +243,19 @@ export default function LandingPage() {
                     </a>
                 </div>
 
-                {/* Carrusel mini de aliados */}
-                <div className="relative mt-4 -mx-5 overflow-hidden py-1" aria-label="Aliados del Encuentro">
-                    <div className="flex w-max animate-[aliados_22s_linear_infinite] gap-3 hover:[animation-play-state:paused]">
-                        {[...ALIADOS, ...ALIADOS].map((a, i) => (
-                            <div key={i} aria-hidden={i >= ALIADOS.length}
-                                className="flex h-12 w-28 shrink-0 items-center justify-center rounded-xl border-2 border-[var(--t-border)] bg-white px-2">
-                                {/* eslint-disable-next-line @next/next/no-img-element */}
-                                <img src={a.logo} alt={a.nombre} className="max-h-full max-w-full object-contain" />
-                            </div>
-                        ))}
+                {/* Carrusel mini de aliados: logos sueltos, orillas difuminadas */}
+                <div className="mt-5" aria-label="Aliados del Encuentro">
+                    <p className="font-futura mb-1.5 text-[10px] font-extrabold uppercase tracking-[0.18em] text-[var(--t-text-faint)]">Con el apoyo de</p>
+                    <div className="-mx-5 overflow-hidden [mask-image:linear-gradient(90deg,transparent,black_12%,black_88%,transparent)]">
+                        <div className="flex w-max animate-[aliados_28s_linear_infinite] items-center">
+                            {[...ALIADOS, ...ALIADOS].map((a, i) => (
+                                // eslint-disable-next-line @next/next/no-img-element
+                                <img key={i} src={a.logo} alt={i < ALIADOS.length ? a.nombre : ''} aria-hidden={i >= ALIADOS.length}
+                                    className={`mr-10 ${a.h} w-auto max-w-[130px] object-contain`} />
+                            ))}
+                        </div>
                     </div>
-                    <style>{'@keyframes aliados{to{transform:translateX(calc(-50% - 6px))}}'}</style>
+                    <style>{'@keyframes aliados{to{transform:translateX(-50%)}}'}</style>
                 </div>
 
                 <div className="relative mt-2">
