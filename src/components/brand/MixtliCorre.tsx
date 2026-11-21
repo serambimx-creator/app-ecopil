@@ -25,6 +25,8 @@ const TAM: Record<Obstaculo, [number, number]> = {
 };
 const RECORD_KEY = 'mixtli_pesos_record';
 const INK = '#1C2B20';
+// Igual que la columna puntos de juego_partidas
+const puntaje = (pesos: number, aciertos: number, metros: number) => pesos + 10 * aciertos + Math.floor(metros / 100);
 
 function revolver(q: Pregunta) {
     const ops = q.o.map((t, i) => ({ t, ok: i === 0 }));
@@ -137,7 +139,7 @@ function Concurso({ jugador, guardado }: { jugador: { nombre: string; mejor: num
     );
     return (
         <p className="text-[11px] font-semibold">
-            {guardado === 'no' ? 'No se pudo guardar esta partida' : `${jugador.nombre.split(' ')[0]}, tu mejor: E$ ${jugador.mejor}`}
+            {guardado === 'no' ? 'No se pudo guardar esta partida' : `${jugador.nombre.split(' ')[0]}, tu mejor: ${jugador.mejor} pts`}
             {guardado === 'ok' && ' · guardado ✓'}
         </p>
     );
@@ -413,6 +415,7 @@ export default function MixtliCorre({ children }: { children?: React.ReactNode }
                     {fase === 'fin' && (
                         <div className="absolute inset-y-0 left-24 right-0 flex flex-col items-center justify-center gap-1 text-center">
                             <p className="font-display text-2xl">Juntaste E$ {pesos}</p>
+                            <p className="font-futura text-sm font-extrabold">{puntaje(pesos, aciertosR.current, metros)} puntos</p>
                             <p className="text-xs opacity-80">Llegaste a {metros} m · toca para intentarlo otra vez</p>
                             <Concurso jugador={jugador} guardado={guardado} />
                         </div>
@@ -421,6 +424,7 @@ export default function MixtliCorre({ children }: { children?: React.ReactNode }
                         <div className="absolute inset-y-0 left-24 right-0 flex flex-col items-center justify-center gap-1 text-center">
                             <p className="font-display text-2xl">¡Cruzaste Hidalgo!</p>
                             <p className="text-sm">Juntaste E$ {pesos} para ayudar a más nodos.</p>
+                            <p className="font-futura text-sm font-extrabold">{puntaje(pesos, aciertosR.current, metros)} puntos</p>
                             <p className="text-xs opacity-80">Toca para jugar de nuevo</p>
                             <Concurso jugador={jugador} guardado={guardado} />
                         </div>

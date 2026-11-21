@@ -11,6 +11,8 @@ create table if not exists public.juego_partidas (
   metros int,
   aciertos int,
   con_preguntas boolean,
+  -- Puntaje del concurso: Ecopil pesos + 10 por respuesta correcta + 1 por cada 100 m
+  puntos int generated always as (coalesce(pesos, 0) + 10 * coalesce(aciertos, 0) + coalesce(metros, 0) / 100) stored,
   sospechosa boolean not null default false
 );
 create index if not exists juego_partidas_registro on public.juego_partidas (registro_id, inicio desc);
@@ -31,7 +33,7 @@ begin
   end if;
   insert into juego_partidas (registro_id) values (r.id) returning id into pid;
   return jsonb_build_object('partida', pid, 'nombre', r.nombre,
-    'mejor', coalesce((select max(pesos) from juego_partidas where registro_id = r.id and not sospechosa), 0));
+    'mejor', coalesce((select max(puntos) from juego_partidas where registro_id = r.id and not sospechosa), 0));
 end $$;
 
 -- Cierra la partida con su resultado. Devuelve el mejor puntaje válido de la persona.
@@ -53,7 +55,7 @@ begin
        or seg > 3 * 3600;
   update juego_partidas set fin = now(), pesos = p_pesos, metros = p_metros, aciertos = p_aciertos,
     con_preguntas = p_con_preguntas, sospechosa = mala where id = p_partida;
-  return jsonb_build_object('mejor', coalesce((select max(pesos) from juego_partidas where registro_id = rid and not sospechosa), 0),
+  return jsonb_build_object('mejor', coalesce((select max(puntos) from juego_partidas where registro_id = rid and not sospechosa), 0),
     'valida', not mala);
 end $$;
 
@@ -62,15 +64,15 @@ create or replace function public.gestor_juego(p_token text)
 returns jsonb language plpgsql stable security definer set search_path = public as $$
 begin
   if gestor_de_token(p_token) is null then return null; end if;
-  return coalesce((select jsonb_agg(x order by (x->>'pesos')::int desc, x->>'fin') from (
+  return coalesce((select jsonb_agg(x order by (x->>'puntos')::int desc, x->>'fin') from (
     select jsonb_build_object('registro_id', r.id, 'nombre', r.nombre, 'nodo', n.nombre, 'estado', r.estado,
-      'pesos', b.pesos, 'metros', b.metros, 'aciertos', b.aciertos, 'con_preguntas', b.con_preguntas,
+      'puntos', b.puntos, 'pesos', b.pesos, 'metros', b.metros, 'aciertos', b.aciertos, 'con_preguntas', b.con_preguntas,
       'segundos', round(extract(epoch from b.fin - b.inicio)), 'fin', b.fin,
       'partidas', (select count(*) from juego_partidas p where p.registro_id = r.id and p.fin is not null),
       'sospechosas', (select count(*) from juego_partidas p where p.registro_id = r.id and p.sospechosa)) x
     from encuentro_registros r join encuentro_nodos_lista n on n.id = r.nodo_id
     cross join lateral (select * from juego_partidas p where p.registro_id = r.id and p.fin is not null and not p.sospechosa
-      order by p.pesos desc, p.fin limit 1) b) t), '[]'::jsonb);
+      order by p.puntos desc, p.fin limit 1) b) t), '[]'::jsonb);
 end $$;
 
 grant execute on function public.juego_iniciar(text), public.juego_terminar(text, uuid, int, int, int, boolean),

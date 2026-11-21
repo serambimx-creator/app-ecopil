@@ -6,7 +6,7 @@ import { Loader2, RefreshCw, Trophy } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 
 type Fila = {
-    registro_id: string; nombre: string; nodo: string; estado: string; pesos: number; metros: number; aciertos: number;
+    registro_id: string; nombre: string; nodo: string; estado: string; puntos: number; pesos: number; metros: number; aciertos: number;
     con_preguntas: boolean; segundos: number; fin: string; partidas: number; sospechosas: number;
 };
 const min = (s: number) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
@@ -26,7 +26,7 @@ export default function RankingJuego({ token }: { token: string }) {
                 <h2 className="flex items-center gap-2 font-display text-lg text-white"><Trophy size={18} className="text-ecopil-sun" /> Juego de Mixtli</h2>
                 <button type="button" onClick={cargar} className="rounded-full border-2 border-gray-700 p-1.5 text-gray-300" aria-label="Actualizar"><RefreshCw size={14} /></button>
             </div>
-            <p className="text-xs text-gray-400">Mejor partida de cada agente registrado. El servidor mide el tiempo de cada partida y descarta puntajes imposibles; si una persona tiene partidas descartadas aparece marcada para revisarla.</p>
+            <p className="text-xs text-gray-400">Mejor partida de cada agente registrado. Puntos = Ecopil pesos + 10 por respuesta correcta + 1 por cada 100 m. El servidor mide el tiempo de cada partida y descarta puntajes imposibles; si una persona tiene partidas descartadas aparece marcada para revisarla.</p>
             {error && <p className="rounded-xl bg-ecopil-red/20 p-3 text-sm text-ecopil-red">{error}</p>}
             {!filas && !error && <Loader2 className="mx-auto animate-spin text-gray-400" />}
             {filas && !filas.length && <p className="text-sm text-gray-400">Todavía nadie registrado ha jugado.</p>}
@@ -36,12 +36,12 @@ export default function RankingJuego({ token }: { token: string }) {
                     <div className="min-w-0 flex-1">
                         <p className="truncate text-sm font-semibold text-white">{f.nombre} <span className="font-normal text-gray-400">· {f.nodo}</span></p>
                         <p className="text-[11px] text-gray-400">
-                            {f.metros} m · {f.con_preguntas ? `${f.aciertos} aciertos` : 'sin preguntas'} · duró {min(f.segundos)} · {f.partidas} partidas
+                            E$ {f.pesos} · {f.metros} m · {f.con_preguntas ? `${f.aciertos} aciertos` : 'sin preguntas'} · duró {min(f.segundos)} · {f.partidas} partidas
                             {f.estado !== 'aprobado' && <span className="text-ecopil-sun"> · registro {f.estado}</span>}
                             {f.sospechosas > 0 && <span className="text-ecopil-red"> · {f.sospechosas} descartadas</span>}
                         </p>
                     </div>
-                    <span className="font-display text-xl text-ecopil-sun tabular-nums">E$ {f.pesos}</span>
+                    <span className="font-display text-xl text-ecopil-sun tabular-nums">{f.puntos} pts</span>
                 </div>
             ))}
         </div>
