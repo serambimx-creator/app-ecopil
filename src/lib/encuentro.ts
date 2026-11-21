@@ -95,7 +95,7 @@ export const SEDES: Record<string, string> = {
     tula: 'Parque Nacional Tula',
     xoxafi: 'Grutas Xoxafi',
     tezontepec: 'Villa de Tezontepec',
-    chico: 'Mineral del Chico',
+    invictus: 'Invictus · El Huixmi',
     acaxochitlan: 'Acaxochitlán · Cascadas Dos Mundos',
     ajolotequio: 'Tulancingo · Ajolotequio',
 };

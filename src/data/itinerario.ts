@@ -41,13 +41,13 @@ export const ITINERARIO: BloqueDia[] = [
       { hora: '14:00–16:10', titulo: 'Feria ambiental', detalle: '5 talleres · Alexia Cano y Moises Cuenca' },
       { hora: '16:30–18:00', titulo: 'Reforestación con maguey', detalle: 'Wendy Balderas, Isaac Ramos y Mahely Vidal' },
       { hora: '18:30–20:30', titulo: 'Traslado al hotel y cena', esTraslado: true },
-      { hora: '19:40', titulo: 'Información de Villa de Tezontepec y Mineral del Chico', detalle: 'Charla sobre las sedes del día siguiente · Mahely Vidal y Luis Balderas' },
+      { hora: '19:40', titulo: 'Información de Villa de Tezontepec e Invictus (El Huixmi)', detalle: 'Charla sobre las sedes del día siguiente · Mahely Vidal y Luis Balderas' },
       { hora: '20:30–22:00', titulo: 'Capacitación SIG', detalle: 'Luis Balderas y Marcos Espinosa', pendiente: true },
     ],
   },
   {
     dia: '19 DIC',
-    sede: 'Villa de Tezontepec → ENOMEX → Mineral del Chico  ·  Base: Hotel City Express Tula',
+    sede: 'Villa de Tezontepec → ENOMEX → Invictus, El Huixmi  ·  Base: Hotel City Express Tula',
     teaser: 'Restauración, feria en la plaza, murales y piñatas al caer la noche.',
     actividades: [
       { hora: '06:00–07:00', titulo: 'Desayuno en 2 equipos', detalle: 'Grupo B 6:00–6:30 · Grupo A 6:30–7:00 · Hotel Tula' },

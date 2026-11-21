@@ -348,7 +348,7 @@ export default function LandingPage() {
                         <h2 className="font-display text-2xl font-semibold">Accesos rápidos</h2>
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                             <button
-                                onClick={() => router.push('/mapa?mode=recorrido')}
+                                onClick={() => router.push('/mapa')}
                                 className="bg-[var(--t-surface)] border-2 border-[var(--t-border)] rounded-3xl p-4 flex flex-col items-center gap-2 transition-colors hover:border-[var(--t-ink)] active:scale-95"
                             >
                                 <span className="sticker flex h-10 w-10 items-center justify-center rounded-full bg-ecopil-sun text-ink"><Map size={18} /></span>

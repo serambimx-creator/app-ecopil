@@ -61,23 +61,6 @@ const SEDES_DATA = [
     },
   },
   {
-    day: 19,
-    name: 'Mineral del Chico · Rocabosque',
-    icon: TreePine,
-    imageUrl: '/guia/optimized/mineral-del-chico.webp',
-    altText: 'Parque Nacional El Chico con formaciones rocosas',
-    altitud: '2,360 msnm',
-    clima: '2–14°C',
-    climaTipo: 'Templado subhúmedo',
-    historia: 'Pueblo Mágico desde 2011, fundado en 1569 como real minero de plata. Geoparque Mundial UNESCO (Comarca Minera, 2017). El Parque Nacional El Chico tiene 1,420+ especies, 52 en categoría de riesgo NOM-059.',
-    geologia: 'Formaciones de peñas, calderas y domos volcánicos del Eje Neovolcánico. Prismas basálticos entre los más altos del mundo en Santa María Regla (cercano). La Peña del Cuervo: 2,770 msnm. Entre s.XVI-XX se extrajo el 6% de toda la plata mundial.',
-    biologia: 'Bosque de oyamel (Abies religiosa), pino, encino y madroño. Especie notable: Taxus globosa (tejo mexicano, en riesgo). Fauna: salamandras, aves endémicas de bosque mesófilo, murciélagos y mamíferos de montaña.',
-    llevar: {
-      items: ['Chamarra gruesa impermeable', 'Botas impermeables (suelo húmedo de bosque)', 'Hidratación activa'],
-      alerta: 'En diciembre puede haber heladas (-5°C registrado en 2008). Posible niebla matutina densa.',
-    },
-  },
-  {
     day: 20,
     name: 'Acaxochitlán · Cascadas Dos Mundos',
     icon: Waves,

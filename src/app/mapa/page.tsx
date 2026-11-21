@@ -1,7 +1,6 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import { useSearchParams } from 'next/navigation';
 import { Suspense } from 'react';
 
 const MainMap = dynamic(() => import('@/components/maps/MainMap'), {
@@ -10,12 +9,9 @@ const MainMap = dynamic(() => import('@/components/maps/MainMap'), {
 });
 
 function MapContent() {
-    const searchParams = useSearchParams();
-    const defaultMode = searchParams.get('mode') === 'recorrido' ? 'recorrido' as const : undefined;
-
     return (
         <div className="theme-surface h-[calc(100vh-150px)] md:h-[calc(100vh-110px)] w-full mt-3 rounded-3xl overflow-hidden sticker bg-[var(--t-surface)] relative">
-            <MainMap defaultMode={defaultMode} />
+            <MainMap />
         </div>
     );
 }

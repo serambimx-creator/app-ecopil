@@ -28,11 +28,11 @@ export const NIVELES: Nivel[] = [
         ],
     },
     {
-        nombre: 'Nivel 3', lugar: 'Bosque de El Chico', cielo: '#6BB32E', obstaculos: ['pino', 'roca', 'cactus'],
+        nombre: 'Nivel 3', lugar: 'Bosques de Hidalgo', cielo: '#6BB32E', obstaculos: ['pino', 'roca', 'cactus'],
         preguntas: [
-            { p: '¿Qué árbol domina los bosques altos de El Chico?', o: ['Oyamel', 'Ceiba', 'Mezquite'] },
-            { p: 'El Chico es de las áreas protegidas más antiguas de México. ¿Desde cuándo?', o: ['1898', '1990', '2015'] },
-            { p: '¿De qué origen son las Peñas de El Chico?', o: ['Volcánico', 'Coralino', 'Glaciar'] },
+            { p: '¿Qué árbol domina los bosques altos de la Sierra de Pachuca?', o: ['Oyamel', 'Ceiba', 'Mezquite'] },
+            { p: '¿Qué es un área natural protegida?', o: ['Un territorio con reglas para conservar su naturaleza', 'Un parque de diversiones', 'Una zona solo para construir'] },
+            { p: '¿Qué servicio ambiental dan los bosques a las ciudades cercanas?', o: ['Captan agua que recarga los mantos', 'Producen petróleo', 'Generan sal'] },
             { p: 'El cacomixtle, como Mixtli, es pariente del…', o: ['Mapache', 'Gato', 'Zorro'] },
             { p: '¿Qué animal poliniza las flores del agave de noche?', o: ['El murciélago', 'La lechuza', 'El tlacuache'] },
         ],
