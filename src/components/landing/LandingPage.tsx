@@ -171,25 +171,26 @@ const ALIADOS = [
 ];
 
 const INFO_PRACTICA = [
-    { titulo: 'Hospedaje y llegada', icon: MapPin, color: 'bg-ecopil-sun', items: [
+    { titulo: 'Hospedaje y llegada', pose: 'asoma', color: 'bg-ecopil-sun', items: [
         'Llegada el 17 de diciembre. Bienvenida a las 19:30 en el Hotel City Express Tula.',
         'Del 17 al 19 dormimos en el hotel; la noche del 20 acampamos en Ajolotequio (Tulancingo).',
         'El 21 a las 12:00 te llevamos a las terminales para tu regreso.',
     ] },
-    { titulo: 'Qué traer', icon: Briefcase, color: 'bg-ecopil-leaf', items: [
+    { titulo: 'Qué traer', pose: 'pala', color: 'bg-ecopil-leaf', items: [
         'Ropa de capas: en la sierra amanece entre 2 y 5 °C y al mediodía sube a 18 °C.',
         'Chamarra impermeable, botas con agarre y ropa que se pueda ensuciar.',
         'Linterna o lámpara de cabeza para las grutas, botella de agua y protector solar.',
         'Tienda de campaña y cobija para la noche del 20, si tienes.',
     ] },
-    { titulo: 'Dinero y salud', icon: Heart, color: 'bg-ecopil-red', items: [
+    { titulo: 'Dinero y salud', pose: 'lupa', color: 'bg-ecopil-orange', items: [
         'Lleva efectivo: propinas en Xoxafi, compras personales y $30 de entrada al manantial.',
         'Avísanos de alergias o medicamentos en tu registro; tu contacto de emergencia se queda con el staff.',
         'Si te sientes mal en cualquier momento, busca a alguien del staff con playera de #NodoPachuca.',
     ] },
-    { titulo: 'Durante el Encuentro', icon: Clock, color: 'bg-mixtli', items: [
+    { titulo: 'Durante el Encuentro', pose: 'sembrando', color: 'bg-brand-green', items: [
         'Te asignamos Grupo A o B: define tu turno de desayuno.',
-        'En Programa ves qué sigue según la hora, aunque te quedes sin señal.',
+        'En Programa ves el plan de cada día y las horas clave, aunque te quedes sin señal.',
+        'El temazcal del 20 tiene 20 lugares: apártalo en Programa o en Mi registro.',
         'Los avisos del staff aparecen arriba del programa.',
     ] },
 ];
@@ -622,8 +623,10 @@ export default function LandingPage() {
                 <h2 className="font-display text-2xl font-semibold">Antes de salir de casa</h2>
                 <div className="grid gap-3">
                     {INFO_PRACTICA.map((b) => (
-                        <div key={b.titulo} className="rounded-3xl bg-[var(--t-surface)] border-2 border-[var(--t-border)] p-4">
-                            <p className="flex items-center gap-2 font-bold text-[var(--t-text)]"><span className={clsx('sticker flex h-8 w-8 items-center justify-center rounded-full text-ink', b.color)}><b.icon size={15} /></span>{b.titulo}</p>
+                        <div key={b.titulo} className="relative overflow-hidden rounded-3xl bg-[var(--t-surface)] border-2 border-[var(--t-border)] p-4 pr-20">
+                            <span className={clsx('absolute -right-6 -top-6 h-24 w-24 rounded-full opacity-60', b.color)} />
+                            <Mixtli pose={b.pose as 'asoma'} height={64} className="absolute right-2 top-2" />
+                            <p className="relative font-display text-lg font-semibold text-[var(--t-text)]">{b.titulo}</p>
                             <ul className="mt-2 space-y-1 text-sm text-[var(--t-text-secondary)]">
                                 {b.items.map((i) => <li key={i} className="flex gap-2"><Check size={14} className="mt-1 shrink-0 text-brand-green" />{i}</li>)}
                             </ul>
