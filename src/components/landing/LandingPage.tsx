@@ -243,19 +243,14 @@ export default function LandingPage() {
                     </a>
                 </div>
 
-                <div className="relative mt-2 h-[230px]">
-                    <div className="absolute bottom-6 right-4">
-                        <Mixtli pose="pala" height={200} priority animated />
-                    </div>
+                <div className="relative mt-2">
+                    <MixtliCorre>
                     <MixtliBubble className="absolute left-5 top-8 max-w-[170px]">
                         ¡Bienvenidos al <b>7º Encuentro de Nodos</b>! Del 17 al 21 de diciembre, Hidalgo es su casa.
                     </MixtliBubble>
+                    </MixtliCorre>
                 </div>
             </section>
-
-            <div className="mb-4">
-                <MixtliCorre />
-            </div>
 
             {/* ===== NAVEGACIÓN: una sola página, anclas ===== */}
             <nav className="sticky top-[62px] z-30 -mx-4 bg-[var(--t-bg)]/95 px-4 py-3 backdrop-blur">

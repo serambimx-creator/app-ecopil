@@ -3,11 +3,12 @@
 // Minijuego: Mixtli corre por Hidalgo y salta cactus, pastes, picos de minería
 // y átomos gigantes. Toca la pantalla (o espacio) para saltar.
 import { useEffect, useRef, useState } from 'react';
+import Mixtli from './Mixtli';
 
 type Tipo = 'cactus' | 'paste' | 'pico' | 'atomo';
 type Obs = { x: number; w: number; h: number; tipo: Tipo; giro: number };
 
-const H = 190, SUELO = 160, GRAV = 0.0026, SALTO = -0.72, MW = 58, MH = 56;
+const H = 230, SUELO = 205, GRAV = 0.0026, SALTO = -0.78, MW = 84, MH = 80;
 const TAM: Record<Tipo, [number, number]> = { cactus: [26, 46], paste: [40, 24], pico: [38, 38], atomo: [52, 52] };
 const RECORD_KEY = 'mixtli_corre_record';
 
@@ -43,7 +44,7 @@ function dibujar(c: CanvasRenderingContext2D, o: Obs, t: number) {
     }
 }
 
-export default function MixtliCorre() {
+export default function MixtliCorre({ children }: { children?: React.ReactNode }) {
     const ref = useRef<HTMLCanvasElement>(null);
     const [estado, setEstado] = useState<'listo' | 'jugando' | 'fin'>('listo');
     const [puntos, setPuntos] = useState(0);
@@ -119,22 +120,34 @@ export default function MixtliCorre() {
     });
 
     return (
-        <section className="sticker relative select-none overflow-hidden rounded-3xl bg-[var(--t-surface)]"
-            onPointerDown={(e) => { e.preventDefault(); tocar(); }} style={{ touchAction: 'manipulation' }}>
-            <div className="flex items-center justify-between px-4 pt-3 font-futura text-xs font-bold">
-                <span>Mixtli cruza Hidalgo</span>
-                <span className="tabular-nums">{puntos} m · récord {record} m</span>
-            </div>
-            <canvas ref={ref} className="block h-[190px] w-full" aria-label="Juego: Mixtli salta obstáculos" />
-            {estado !== 'jugando' && (
-                <div className="absolute inset-0 flex flex-col items-center justify-center gap-1 bg-[var(--t-surface)]/70 text-center">
-                    <p className="font-display text-2xl">{estado === 'fin' ? `¡Llegaste a ${puntos} m!` : 'Ayuda a Mixtli a cruzar Hidalgo'}</p>
-                    <p className="text-xs opacity-80">Salta cactus, pastes, picos mineros y átomos gigantes</p>
-                    <span className="font-futura mt-2 rounded-full bg-brand-green px-4 py-1.5 text-sm font-extrabold text-ink">
-                        {estado === 'fin' ? 'Otra vez' : 'Toca para jugar'}
-                    </span>
-                </div>
+        <div className="relative h-[230px] select-none" style={{ touchAction: 'manipulation' }}
+            onPointerDown={(e) => { if (estado !== 'listo') { e.preventDefault(); tocar(); } }}>
+            <canvas ref={ref} className={`absolute inset-0 block h-[230px] w-full ${estado === 'listo' ? 'invisible' : ''}`}
+                aria-label="Juego: Mixtli salta obstáculos" />
+            {estado === 'listo' ? (
+                <>
+                    <button type="button" onClick={tocar} aria-label="Jugar con Mixtli" className="absolute bottom-6 right-4">
+                        <Mixtli pose="pala" height={200} priority animated />
+                    </button>
+                    {children}
+                    <button type="button" onClick={tocar}
+                        className="font-futura sticker absolute bottom-4 left-5 rounded-full bg-ecopil-sun px-4 py-2 text-xs font-extrabold text-ink">
+                        Juega: salta con Mixtli
+                    </button>
+                </>
+            ) : (
+                <>
+                    <div className="absolute inset-x-0 top-0 flex justify-between font-futura text-xs font-bold tabular-nums">
+                        <span>{puntos} m</span><span>récord {record} m</span>
+                    </div>
+                    {estado === 'fin' && (
+                        <div className="absolute inset-0 flex flex-col items-center justify-center gap-1 text-center">
+                            <p className="font-display text-2xl">¡Llegaste a {puntos} m!</p>
+                            <p className="text-xs opacity-80">Toca para intentarlo otra vez</p>
+                        </div>
+                    )}
+                </>
             )}
-        </section>
+        </div>
     );
 }
