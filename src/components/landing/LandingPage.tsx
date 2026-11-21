@@ -228,7 +228,7 @@ export default function LandingPage() {
                         <Star size={10} fill="currentColor" /> Encuentro de Nodos 2026
                     </span>
                     <h1 className="font-display text-[34px] font-semibold leading-[1.05] tracking-tight text-[var(--t-text)]">
-                        7º Encuentro Nacional <span className="text-[var(--t-accent)]">Ecopil</span>
+                        7º Encuentro Nacional <span className="text-[var(--t-accent)]">de Nodos</span>
                     </h1>
                     <p className="flex items-center gap-1.5 text-sm font-bold text-[var(--t-text-secondary)]">
                         <MapPin size={15} className="text-ecopil-red" /> Hidalgo &middot; 17–21 dic 2026
@@ -432,9 +432,9 @@ export default function LandingPage() {
                         </div>
                     </section>
 
-                    {/* El Encuentro Nacional Ecopil */}
+                    {/* El Encuentro Nacional de Nodos */}
                     <section className="space-y-6">
-                        <h2 className="font-display text-2xl font-semibold">El Encuentro Nacional Ecopil</h2>
+                        <h2 className="font-display text-2xl font-semibold">El Encuentro Nacional de Nodos</h2>
 
                         <div className="bg-[var(--t-surface)] border border-[var(--t-border)] rounded-2xl p-5">
                             <p className="text-sm text-[var(--t-text-secondary)] leading-relaxed">

@@ -1,11 +1,19 @@
 @import "tailwindcss";
 
+/* Androgyne (títulos, tipografía oficial de Ecopil): se activa al poner el
+   archivo en public/fonts/androgyne.woff2 (u .otf). Mientras, cae a Jost. */
+@font-face {
+  font-family: "Androgyne";
+  src: url("/fonts/androgyne.woff2") format("woff2"), url("/fonts/androgyne.otf") format("opentype");
+  font-display: swap;
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-inter), Arial, sans-serif;
   --font-futura: var(--font-jost), "Century Gothic", sans-serif;
-  --font-display: var(--font-jost), "Century Gothic", sans-serif;
+  --font-display: Androgyne, var(--font-jost), "Century Gothic", sans-serif;
   --font-mono: var(--font-geist-mono);
 
   /* Brand Colors: paleta del logo de Ecopil y de Mixtli */

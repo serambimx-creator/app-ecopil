@@ -16,7 +16,7 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
 export const metadata: Metadata = {
   title: "Encuentro de Nodos 2026 · Ecopil MX",
-  description: "7º Encuentro Nacional Ecopil MX · Hidalgo, 17–21 dic 2026",
+  description: "7º Encuentro Nacional de Nodos · Hidalgo, 17–21 dic 2026",
 };
 
 export const viewport: Viewport = {
