@@ -6,7 +6,8 @@ import { clsx } from 'clsx';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { ITINERARIO, ACTIVIDAD_EXTRA } from '@/data/itinerario';
-import Mixtli, { MixtliBubble, SunHills } from '@/components/brand/Mixtli';
+import Mixtli, { MixtliBubble } from '@/components/brand/Mixtli';
+import MixtliCorre from '@/components/brand/MixtliCorre';
 
 type ViewType = 'miembros' | 'aliados' | 'patrocinadores' | 'info';
 
@@ -243,7 +244,6 @@ export default function LandingPage() {
                 </div>
 
                 <div className="relative mt-2 h-[230px]">
-                    <SunHills className="absolute inset-x-0 bottom-0 h-[170px] w-full" />
                     <div className="absolute bottom-6 right-4">
                         <Mixtli pose="pala" height={200} priority animated />
                     </div>
@@ -252,6 +252,10 @@ export default function LandingPage() {
                     </MixtliBubble>
                 </div>
             </section>
+
+            <div className="mb-4">
+                <MixtliCorre />
+            </div>
 
             {/* ===== NAVEGACIÓN: una sola página, anclas ===== */}
             <nav className="sticky top-[62px] z-30 -mx-4 bg-[var(--t-bg)]/95 px-4 py-3 backdrop-blur">
