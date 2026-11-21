@@ -1,301 +1,200 @@
 'use client';
 
-import { useState } from 'react';
+import { Fragment, useEffect, useMemo, useState } from 'react';
 import Image from 'next/image';
-import { Landmark, Mountain, Trees, TreePine, Waves, Fish, MapPin, Thermometer, Mountain as AltIcon } from 'lucide-react';
 import { clsx } from 'clsx';
+import { ChevronDown, Navigation, Map as MapIcon, Check, Sparkles, Backpack, BookOpen, Wifi, Lightbulb } from 'lucide-react';
 import Mixtli from '@/components/brand/Mixtli';
+import { GUIA, type SedeGuia } from '@/data/guia-sedes';
+import { usePublico, ahoraHidalgo } from '@/lib/encuentro';
 
-type TabType = 'historia' | 'geologia' | 'biologia' | 'llevar';
+const DIAS = [17, 18, 19, 20, 21];
+const CHECK_KEY = 'guia_checklist';
+const TRIVIA_KEY = 'guia_trivia';
 
-const SEDES_DATA = [
-  {
-    day: 18,
-    name: 'Parque Nacional Tula',
-    icon: Landmark,
-    imageUrl: '/guia/optimized/tula.webp',
-    altText: 'Pirámides y atlantes de Tula',
-    altitud: '2,020 msnm',
-    clima: '5–18°C',
-    climaTipo: 'Semiseco templado',
-    historia: 'Capital tolteca Tollan-Xicocotitlan, 700-1150 d.C., ~85,000 habitantes. Fundada por Ce Acatl Topiltzin Quetzalcóatl. Atlantes de basalto de 4.6m únicos en Mesoamérica. Parque Nacional decretado en 1981, 99.5 ha.',
-    geologia: 'Valle del Mezquital sobre calizas y lutitas del Cretácico con intrusiones volcánicas. Río Tula en depósitos aluviales del Cuaternario. Parte del Geoparque Mundial UNESCO (Comarca Minera, 2017).',
-    biologia: 'Matorral xerófilo y mezquital. Flora: mezquite, maguey pulquero, nopales, yuca, acacia. Fauna: conejos, ardillas, correcaminos, coyotes, tlacuaches, víbora hocico de puerco.',
-    llevar: {
-      items: ['Ropa de capas (mañana fría 5°C / tarde cálida 18°C)', 'Protector solar (zona abierta sin sombra)', 'Zapatos cerrados cómodos', 'Agua mínimo 1.5L por persona', 'Sombrero o gorra'],
-      alerta: null,
-    },
-  },
-  {
-    day: 18,
-    name: 'Grutas Xoxafi',
-    icon: Mountain,
-    imageUrl: '/guia/optimized/xoxafi.webp',
-    altText: 'Grutas Xoxafi con formaciones kársticas',
-    altitud: '1,900 msnm',
-    clima: '4–17°C',
-    climaTipo: 'Semiseco',
-    historia: 'Ecoparque en Valle del Mezquital con grutas naturales de más de 500m explorable. Punto estratégico para educación ambiental en zona otomí-hñähñú. Ofrece espeleología, tirolesas y feria ambiental.',
-    geologia: 'Formaciones kársticas en calizas del Cretácico formadas por disolución de carbonato de calcio. Valle del Mezquital es depresión tectónica entre serranías del Eje Neovolcánico.',
-    biologia: 'Interior: 3 especies de murciélagos (Tadarida brasiliensis, Myotis sp.), microfauna especializada. Exterior: matorral crassicaule con cardones, biznagas y fauna de zona árida.',
-    llevar: {
-      items: ['Linterna o headlamp (obligatorio en grutas)', 'Ropa que pueda ensuciarse', 'Botas con agarre', 'Efectivo para propinas y compras personales'],
-      alerta: 'Interior de grutas ~10°C constante — llevar chamarra aunque afuera haga calor.',
-    },
-  },
-  {
-    day: 19,
-    name: 'Villa de Tezontepec',
-    icon: Trees,
-    imageUrl: '/guia/optimized/tezontepec.webp',
-    altText: 'Vista del municipio de Villa de Tezontepec',
-    altitud: '1,800 msnm',
-    clima: '4–18°C',
-    climaTipo: 'Templado seco',
-    historia: 'Municipio del Valle de Tezontepec, zona de tradición agrícola y ganadera. Centro histórico con presidencia municipal del siglo XIX. Zona de influencia otomí con producción de barbacoa y artesanías en piel.',
-    geologia: 'Planicie aluvial del Valle de México con suelos volcánicos derivados de tezontle (roca volcánica escoriácea roja). El nombre Tezontepec deriva del náhuatl: "cerro de tezontle".',
-    biologia: 'Agricultura de temporal, pastizales y zonas de matorral. Actividades de reforestación con especies nativas de la región semiárida hidalguense.',
-    llevar: {
-      items: ['Ropa cómoda para trabajo de reforestación', 'Guantes', 'Calzado resistente', 'Ropa que pueda ensuciarse', 'Protector solar'],
-      alerta: null,
-    },
-  },
-  {
-    day: 20,
-    name: 'Acaxochitlán · Cascadas Dos Mundos',
-    icon: Waves,
-    imageUrl: '/guia/optimized/acaxochitlan.webp',
-    altText: 'Cascadas Dos Mundos en Acaxochitlán',
-    altitud: '2,260 msnm',
-    clima: '5–16°C',
-    climaTipo: 'Templado húmedo',
-    historia: 'Nombre náhuatl "lugar donde abunda el Acaxochitl" (carrizo de flor roja). Comunidades otomíes y tepehuas. Las Cascadas Dos Mundos son gestionadas ecoturísticamente por la comunidad de San Fernando. Municipio con ríos Tecolutla y Cazones.',
-    geologia: 'Transición entre Eje Neovolcánico y Sierra Madre Oriental. Afloramientos de rocas ígneas extrusivas con depósitos fluviales en cañadas. Cascadas formadas por fracturas volcánicas que canalizan agua subterránea a la superficie.',
-    biologia: 'Bosque mesófilo de montaña — uno de los ecosistemas más biodiversos de México. Flora: helechos arborescentes, bromelias, orquídeas, musgos. Corredor de aves migratorias en diciembre. Colinda con Puebla, alta conectividad biológica.',
-    llevar: {
-      items: ['Botas impermeables (sendero con lodo y agua)', 'Impermeable ligero (neblina constante)', 'Proteger equipo electrónico de humedad', 'Botiquín básico', 'Ropa de capas', 'Efectivo: entrada al manantial $30 por persona'],
-      alerta: null,
-    },
-  },
-  {
-    day: 20,
-    alsoDay: 21,
-    name: 'Tulancingo · Ajolotequio',
-    icon: Fish,
-    imageUrl: '/guia/optimized/ajolote.webp',
-    altText: 'Axolote mexicano (Ambystoma mexicanum)',
-    altitud: '2,100 msnm',
-    clima: '6–20°C',
-    climaTipo: 'Templado',
-    historia: '"Tulancingo" del náhuatl "lugar de pequeños tules". Segunda ciudad más importante de Hidalgo. El ajolotequio es un centro de conservación del axolote (Ambystoma mexicanum), anfibio endémico de México en peligro crítico de extinción.',
-    geologia: 'Cuenca de Tulancingo, depresión volcánica rodeada de serranías. Suelos volcánicos fértiles del Eje Neovolcánico. Zona hidrológica importante con manantiales y corrientes que alimentan el sistema Tula-Moctezuma.',
-    biologia: 'El axolote (Ambystoma mexicanum) es un anfibio neoténico — retiene características larvales toda su vida. Capaz de regenerar extremidades, corazón y partes del cerebro. Especie clave para investigación biomédica mundial.',
-    llevar: {
-      items: ['Ropa de trabajo que pueda ensuciarse (tequio: biopiscina, maguey, jagüey)', 'Insumos propios para temazcal y campamento', 'Ropa abrigadora para la noche', 'Actitud de observación y respeto con los animales'],
-      alerta: 'Temazcal y campamento con registro previo. Se duerme en Ajolotequio la noche del 20.',
-    },
-  },
-];
+function leer<T>(k: string, d: T): T { try { return JSON.parse(localStorage.getItem(k) || '') as T; } catch { return d; } }
+function guardar(k: string, v: unknown) { try { localStorage.setItem(k, JSON.stringify(v)); } catch { /* sin storage */ } }
 
-const DAYS = [17, 18, 19, 20, 21];
-
-// Sedes que se visitan en más de un día (p. ej. Ajolotequio: tequio el 20, cierre el 21)
-type Sede = (typeof SEDES_DATA)[number] & { alsoDay?: number; tentative?: boolean };
-
-function ImageWithFallback({
-  url,
-  alt,
-  icon: IconComponent
-}: {
-  url: string;
-  alt: string;
-  icon: React.ComponentType<any>
+function Seccion({ titulo, icono: Icono, abierta, toggle, extra, children }: {
+    titulo: string; icono: typeof Check; abierta: boolean; toggle: () => void; extra?: React.ReactNode; children: React.ReactNode;
 }) {
-  const [error, setError] = useState(false);
-
-  if (error) {
     return (
-      <div className="w-full h-52 bg-[var(--t-accent-tint-bg)] flex items-center justify-center">
-        <IconComponent size={48} className="text-[var(--t-text-faint)]" />
-      </div>
-    );
-  }
-
-  return (
-    <Image
-      src={url}
-      alt={alt}
-      width={800}
-      height={400}
-      onError={() => setError(true)}
-      className="w-full h-52 object-cover"
-    />
-  );
-}
-
-function InfoCard({ label, value, type }: { label: string; value: string; type: 'clima' | 'temp' | 'alt' }) {
-  // Colores del logo de Ecopil: lomas (verde claro), sol (amarillo), tierra (café Mixtli)
-  const styles = {
-    clima: 'bg-ecopil-leaf',
-    temp: 'bg-ecopil-sun',
-    alt: 'bg-mixtli',
-  };
-
-  return (
-    <div className={clsx('sticker rounded-2xl px-3 py-2 text-ink', styles[type])}>
-      <p className="font-futura text-[10px] font-bold uppercase tracking-wider opacity-75">{label}</p>
-      <p className="text-sm font-extrabold mt-0.5 leading-tight">{value}</p>
-    </div>
-  );
-}
-
-function SedeCard({ sede, isActive }: { sede: Sede; isActive: boolean }) {
-  const [activeTab, setActiveTab] = useState<TabType>('historia');
-
-  const tabs: { key: TabType; label: string }[] = [
-    { key: 'historia', label: 'Historia' },
-    { key: 'geologia', label: 'Geología' },
-    { key: 'biologia', label: 'Biología' },
-    { key: 'llevar', label: 'Qué llevar' },
-  ];
-
-  const IconComponent = sede.icon;
-
-  return (
-    <div className={clsx(
-      'bg-[var(--t-surface)] border-2 border-[var(--t-border)] rounded-3xl overflow-hidden transition-all',
-      isActive ? 'opacity-100' : 'hidden'
-    )}>
-      <ImageWithFallback url={sede.imageUrl} alt={sede.altText} icon={IconComponent} />
-
-      <div className="p-5 space-y-4">
-        <div className="flex items-start gap-3">
-        <span className="sticker flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-green text-ink">
-          <IconComponent size={20} />
-        </span>
-        <div className="flex-1">
-          <h3 className="font-display text-xl font-semibold leading-tight text-[var(--t-text)]">{sede.name}</h3>
-          {sede.tentative && (
-            <span className="inline-block mt-1 bg-ecopil-sun/30 text-[var(--t-text)] border border-ecopil-orange text-[10px] font-bold px-2 py-0.5 rounded-full">
-              TENTATIVO
-            </span>
-          )}
+        <div className="rounded-2xl border-2 border-[var(--t-border)] bg-[var(--t-surface)]">
+            <button type="button" onClick={toggle} className="flex w-full items-center gap-2 p-3 text-left">
+                <Icono size={16} className="text-[var(--t-accent)]" />
+                <span className="font-futura flex-1 text-sm font-extrabold">{titulo}</span>
+                {extra}
+                <ChevronDown size={16} className={clsx('text-[var(--t-text-faint)] transition-transform', abierta && 'rotate-180')} />
+            </button>
+            {abierta && <div className="px-3 pb-3 text-sm leading-relaxed text-[var(--t-text-secondary)]">{children}</div>}
         </div>
-      </div>
+    );
+}
 
-      <div className="grid grid-cols-3 gap-2">
-        <InfoCard label="Altitud" value={sede.altitud} type="alt" />
-        <InfoCard label="Temperatura" value={sede.clima} type="temp" />
-        <InfoCard label="Clima" value={sede.climaTipo} type="clima" />
-      </div>
-
-      <div className="flex gap-1 rounded-full bg-[var(--t-surface-2)] p-1 overflow-x-auto">
-        {tabs.map((tab) => (
-          <button
-            key={tab.key}
-            onClick={() => setActiveTab(tab.key)}
-            className={clsx(
-              'font-futura flex-1 shrink-0 whitespace-nowrap rounded-full text-[11px] font-bold px-3 py-1.5 transition-colors',
-              activeTab === tab.key
-                ? 'sticker bg-[var(--t-surface)] text-[var(--t-text)]'
-                : 'border-2 border-transparent text-[var(--t-text-faint)] hover:text-[var(--t-text)]'
-            )}
-          >
-            {tab.label}
-          </button>
-        ))}
-      </div>
-
-      <div className="space-y-3">
-        {activeTab === 'historia' && (
-          <p className="text-sm text-[var(--t-text-secondary)] leading-relaxed">{sede.historia}</p>
-        )}
-        {activeTab === 'geologia' && (
-          <p className="text-sm text-[var(--t-text-secondary)] leading-relaxed">{sede.geologia}</p>
-        )}
-        {activeTab === 'biologia' && (
-          <p className="text-sm text-[var(--t-text-secondary)] leading-relaxed">{sede.biologia}</p>
-        )}
-        {activeTab === 'llevar' && (
-          <div className="space-y-2">
-            <div className="bg-[var(--t-accent-tint-bg)] border-2 border-[var(--t-accent-tint-border)] rounded-2xl p-3 space-y-2">
-              {sede.llevar.items.map((item) => (
-                <div key={item} className="flex items-start gap-2">
-                  <span className="text-[var(--t-accent)] text-xs font-black mt-1">✓</span>
-                  <span className="text-sm text-[var(--t-text-secondary)]">{item}</span>
-                </div>
-              ))}
+function Trivia({ s, hecha, marcar }: { s: SedeGuia; hecha: boolean; marcar: () => void }) {
+    const ops = useMemo(() => s.trivia.o.map((t, i) => ({ t, ok: i === 0 })).sort((a, b) => a.t.localeCompare(b.t)), [s]);
+    const [elegida, setElegida] = useState<string | null>(null);
+    const mostrar = elegida !== null || hecha;
+    return (
+        <div className="sticker rounded-2xl bg-ecopil-sun p-4 text-ink">
+            <p className="font-futura text-[10px] font-extrabold uppercase tracking-wider">Reto de Mixtli</p>
+            <p className="mt-1 font-bold leading-snug">{s.trivia.p}</p>
+            <div className="mt-2 grid gap-1.5">
+                {ops.map((o) => (
+                    <button key={o.t} type="button" disabled={mostrar}
+                        onClick={() => { setElegida(o.t); if (o.ok) marcar(); }}
+                        className={clsx('rounded-xl border-2 border-ink px-3 py-1.5 text-left text-xs font-bold transition-colors',
+                            !mostrar ? 'bg-white/70 active:bg-white' : o.ok ? 'bg-brand-green' : elegida === o.t ? 'bg-ecopil-red/40' : 'bg-white/40 opacity-60')}>
+                        {o.t}
+                    </button>
+                ))}
             </div>
-            {sede.llevar.alerta && (
-              <div className="bg-ecopil-sun/25 border-2 border-ecopil-orange rounded-2xl p-3">
-                <p className="font-futura text-xs text-[var(--t-text)] font-bold uppercase mb-1">⚠ Ojo</p>
-                <p className="text-sm text-[var(--t-text-secondary)]">{sede.llevar.alerta}</p>
-              </div>
+            {mostrar && (
+                <p className="mt-2 text-xs font-semibold">
+                    {elegida && !ops.find((o) => o.t === elegida)?.ok ? 'Casi. ' : '¡Bien! '}{s.trivia.dato}
+                </p>
             )}
-          </div>
-        )}
-      </div>
-      </div>
-    </div>
-  );
+        </div>
+    );
+}
+
+function SedeCard({ s, llegar, checks, toggleCheck, triviaHecha, marcarTrivia }: {
+    s: SedeGuia; llegar?: string; checks: string[]; toggleCheck: (item: string) => void; triviaHecha: boolean; marcarTrivia: () => void;
+}) {
+    const [abierta, setAbierta] = useState<string | null>('haremos');
+    const t = (k: string) => setAbierta(abierta === k ? null : k);
+    const listos = s.llevar.filter((i) => checks.includes(`${s.slug}:${i}`)).length;
+    const ciencia = [['Historia', s.historia], ['Rocas y agua', s.geologia], ['Plantas y animales', s.biologia]].filter(([, v]) => v) as [string, string][];
+    const serv = [['Baños', s.servicios.banos], ['Señal', s.servicios.senal], ['Comida', s.servicios.comida], ['Acceso', s.servicios.acceso]].filter(([, v]) => v) as [string, string][];
+    const mapa = llegar ?? `https://www.google.com/maps/dir/?api=1&destination=${s.coords[0]},${s.coords[1]}`;
+
+    return (
+        <article className="overflow-hidden rounded-3xl border-2 border-[var(--t-border)] bg-[var(--t-surface-2)]">
+            <div className="relative h-48 bg-[var(--t-accent-tint-bg)]">
+                {s.foto ? <Image src={s.foto} alt={s.nombre} fill sizes="(max-width: 1024px) 100vw, 50vw" className="object-cover" />
+                    : s.logo ? <Image src={s.logo} alt={s.nombre} fill sizes="50vw" className="object-contain p-10" /> : null}
+                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-4 pt-10">
+                    <h2 className="font-display text-2xl font-semibold leading-tight text-white">{s.nombre}</h2>
+                    <p className="font-futura text-[11px] font-bold text-white/85">{s.altitud} · {s.temp} · {s.clima}</p>
+                </div>
+            </div>
+
+            <div className="space-y-2.5 p-4">
+                <p className="text-sm leading-relaxed text-[var(--t-text)]">{s.resumen}</p>
+                <div className="flex gap-2">
+                    <a href={mapa} target="_blank" rel="noreferrer" className="sticker inline-flex flex-1 items-center justify-center gap-1.5 rounded-full bg-brand-green px-3 py-2 text-xs font-extrabold text-ink">
+                        <Navigation size={14} /> Cómo llegar
+                    </a>
+                    <a href="/mapa" className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-full border-2 border-[var(--t-border)] bg-[var(--t-surface)] px-3 py-2 text-xs font-extrabold">
+                        <MapIcon size={14} /> Ver en el mapa
+                    </a>
+                </div>
+
+                <Seccion titulo="Qué haremos" icono={Sparkles} abierta={abierta === 'haremos'} toggle={() => t('haremos')}>
+                    <ul className="space-y-1">{s.haremos.map((h) => <li key={h} className="flex gap-2"><span className="text-[var(--t-accent)]">•</span>{h}</li>)}</ul>
+                </Seccion>
+
+                <Seccion titulo="Qué llevar" icono={Backpack} abierta={abierta === 'llevar'} toggle={() => t('llevar')}
+                    extra={<span className={clsx('rounded-full px-2 text-[10px] font-extrabold', listos === s.llevar.length ? 'bg-brand-green text-ink' : 'bg-[var(--t-surface-2)]')}>{listos}/{s.llevar.length}</span>}>
+                    <p className="mb-2 text-xs text-[var(--t-text-muted)]">Palomea lo que ya tienes en la mochila.</p>
+                    <ul className="space-y-1.5">
+                        {s.llevar.map((i) => {
+                            const ok = checks.includes(`${s.slug}:${i}`);
+                            return (
+                                <li key={i}>
+                                    <button type="button" onClick={() => toggleCheck(`${s.slug}:${i}`)} className="flex w-full items-start gap-2 text-left">
+                                        <span className={clsx('mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-md border-2', ok ? 'border-brand-green bg-brand-green text-ink' : 'border-[var(--t-border)]')}>
+                                            {ok && <Check size={13} strokeWidth={3} />}
+                                        </span>
+                                        <span className={clsx(ok && 'line-through opacity-60')}>{i}</span>
+                                    </button>
+                                </li>
+                            );
+                        })}
+                    </ul>
+                    {s.ojo && <p className="mt-3 rounded-xl border-2 border-ecopil-orange bg-ecopil-sun/25 p-2 text-xs font-semibold text-[var(--t-text)]">Ojo: {s.ojo}</p>}
+                </Seccion>
+
+                {serv.length > 0 && (
+                    <Seccion titulo="Servicios" icono={Wifi} abierta={abierta === 'serv'} toggle={() => t('serv')}>
+                        <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1">{serv.map(([k, v]) => <Fragment key={k}><dt className="font-bold">{k}</dt><dd>{v}</dd></Fragment>)}</dl>
+                    </Seccion>
+                )}
+
+                {ciencia.length > 0 && (
+                    <Seccion titulo="Para saber más" icono={BookOpen} abierta={abierta === 'ciencia'} toggle={() => t('ciencia')}>
+                        <div className="space-y-2">{ciencia.map(([k, v]) => <p key={k}><b className="text-[var(--t-text)]">{k}.</b> {v}</p>)}</div>
+                    </Seccion>
+                )}
+
+                <Trivia s={s} hecha={triviaHecha} marcar={marcarTrivia} />
+            </div>
+        </article>
+    );
 }
 
 export default function GuiaPage() {
-  const [activeDay, setActiveDay] = useState(17);
+    const hoy = Number(ahoraHidalgo().dia.slice(8, 10));
+    const enEvento = ahoraHidalgo().dia.startsWith('2026-12') && DIAS.includes(hoy);
+    const [dia, setDia] = useState(enEvento ? hoy : 18);
+    const [checks, setChecks] = useState<string[]>([]);
+    const [trivias, setTrivias] = useState<string[]>([]);
+    const { datos } = usePublico();
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- leer localStorage tras hidratar
+    useEffect(() => { setChecks(leer(CHECK_KEY, [])); setTrivias(leer(TRIVIA_KEY, [])); }, []);
 
-  const sedesForDay = (SEDES_DATA as Sede[]).filter((s) => s.day === activeDay || s.alsoDay === activeDay);
+    // "Cómo llegar": el enlace que el staff puso en el cronograma, si hay
+    const llegar = useMemo(() => {
+        const m: Record<string, string> = {};
+        (datos?.actividades ?? []).forEach((a) => { if (a.sede && a.destino_url && !m[a.sede]) m[a.sede] = a.destino_url; });
+        return m;
+    }, [datos]);
 
-  return (
-    <div className="theme-surface min-h-screen bg-[var(--t-bg)] text-[var(--t-text)] font-sans pt-4">
-      <header className="sticker bg-[var(--t-surface)] rounded-3xl mb-6 p-4 pr-2 flex items-center gap-2">
-        <div className="flex-1">
-          <h1 className="font-display text-3xl font-semibold leading-none">Guía de sedes</h1>
-          <p className="text-[var(--t-text-muted)] text-sm mt-2">Mixtli investigó lo que vas a encontrar en cada lugar: historia, rocas, bichos y qué llevar.</p>
-        </div>
-        <Mixtli pose="lupa" height={96} className="shrink-0" />
-      </header>
+    const toggleCheck = (k: string) => setChecks((c) => { const n = c.includes(k) ? c.filter((x) => x !== k) : [...c, k]; guardar(CHECK_KEY, n); return n; });
+    const marcarTrivia = (slug: string) => setTrivias((t) => { if (t.includes(slug)) return t; const n = [...t, slug]; guardar(TRIVIA_KEY, n); return n; });
+    const sedes = GUIA.filter((s) => s.dias.includes(dia));
 
-      {/* Day Tabs */}
-      <div className="flex gap-2 mb-6 overflow-x-auto snap-x snap-mandatory pb-1">
-        {DAYS.map((day) => (
-          <button
-            key={day}
-            onClick={() => setActiveDay(day)}
-            className={clsx(
-              'font-futura flex-shrink-0 px-5 py-2.5 rounded-full font-bold text-sm uppercase tracking-wider transition-all border-2',
-              activeDay === day
-                ? 'sticker bg-brand-green text-ink'
-                : 'bg-[var(--t-surface)] border-[var(--t-border)] text-[var(--t-text-faint)] hover:text-[var(--t-text)]'
+    return (
+        <div className="theme-surface min-h-screen bg-[var(--t-bg)] pb-28 pt-4 text-[var(--t-text)]">
+            <header className="sticker mb-4 flex items-center gap-2 rounded-3xl bg-[var(--t-surface)] p-4 pr-2">
+                <div className="flex-1">
+                    <h1 className="font-display text-3xl font-semibold leading-none">Guía de sedes</h1>
+                    <p className="mt-2 text-sm text-[var(--t-text-muted)]">Qué haremos en cada lugar, qué llevar y cómo llegar. Resuelve los retos de Mixtli.</p>
+                    <p className="font-futura mt-2 text-xs font-extrabold text-[var(--t-accent)]">Retos resueltos: {trivias.length}/{GUIA.length}</p>
+                </div>
+                <Mixtli pose="lupa" height={96} className="shrink-0" />
+            </header>
+
+            <div className="-mx-4 mb-4 flex gap-2 overflow-x-auto px-4 pb-1">
+                {DIAS.map((d) => (
+                    <button key={d} type="button" onClick={() => setDia(d)}
+                        className={clsx('font-futura shrink-0 rounded-full border-2 px-5 py-2 text-sm font-bold uppercase tracking-wider',
+                            dia === d ? 'sticker bg-brand-green text-ink' : 'border-[var(--t-border)] bg-[var(--t-surface)] text-[var(--t-text-faint)]')}>
+                        {d} dic
+                    </button>
+                ))}
+            </div>
+
+            {dia === 17 ? (
+                <div className="sticker flex items-center gap-3 rounded-3xl bg-ecopil-leaf p-5 text-ink">
+                    <div className="flex-1">
+                        <p className="font-display text-xl font-semibold leading-tight">Día de llegada</p>
+                        <p className="mt-1 text-sm">Bienvenida a las 19:30 en el Hotel City Express Tula, nuestra base hasta el 20. Las sedes de campo empiezan el 18.</p>
+                        <a href={`https://www.google.com/maps/dir/?api=1&destination=20.0431598,-99.2609751`} target="_blank" rel="noreferrer"
+                            className="mt-2 inline-flex items-center gap-1 text-sm font-extrabold underline"><Navigation size={14} /> Cómo llegar al hotel</a>
+                    </div>
+                    <Mixtli pose="asoma" height={90} className="shrink-0" />
+                </div>
+            ) : (
+                <div className="grid grid-cols-1 items-start gap-4 lg:grid-cols-2">
+                    {sedes.map((s) => (
+                        <SedeCard key={s.slug} s={s} llegar={llegar[s.slug]} checks={checks} toggleCheck={toggleCheck}
+                            triviaHecha={trivias.includes(s.slug)} marcarTrivia={() => marcarTrivia(s.slug)} />
+                    ))}
+                </div>
             )}
-          >
-            {day} dic
-          </button>
-        ))}
-      </div>
 
-      {/* 17 dic: solo llegada, no hay sede de campo */}
-      {activeDay === 17 && (
-        <div className="sticker bg-ecopil-leaf text-ink rounded-3xl p-5 flex items-center gap-3">
-          <div className="flex-1">
-            <p className="font-display text-xl font-semibold leading-tight">Día de llegada</p>
-            <p className="text-sm mt-1">Bienvenida oficial a las 19:30 en el Hotel City Express Tula, nuestra base hasta el 20. Las sedes de campo empiezan el 18.</p>
-          </div>
-          <Mixtli pose="asoma" height={90} className="shrink-0" />
+            <p className="mt-6 flex items-start gap-2 text-xs text-[var(--t-text-faint)]"><Lightbulb size={14} className="shrink-0" /> Tu lista y tus retos se guardan en este celular.</p>
         </div>
-      )}
-
-      {/* Sedes for active day */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-start">
-        {sedesForDay.map((sede, idx) => (
-          <SedeCard key={sede.name} sede={sede} isActive={true} />
-        ))}
-      </div>
-
-      <footer className="mt-8 py-6 text-center border-t-2 border-[var(--t-border)]">
-        <p className="text-xs text-[var(--t-text-faint)]">
-          © 2026 Ecopil México A.C. · Información geográfica y biológica para educación ambiental
-        </p>
-      </footer>
-    </div>
-  );
+    );
 }
