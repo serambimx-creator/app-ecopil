@@ -245,7 +245,7 @@ export default function LandingPage() {
 
                 <div className="relative mt-2">
                     <MixtliCorre>
-                    <MixtliBubble className="absolute left-5 top-8 max-w-[170px]">
+                    <MixtliBubble className="absolute left-5 top-1 max-w-[170px]">
                         ¡Bienvenidos al <b>7º Encuentro de Nodos</b>! Del 17 al 21 de diciembre, Hidalgo es su casa.
                     </MixtliBubble>
                     </MixtliCorre>

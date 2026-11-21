@@ -91,6 +91,8 @@ export default function MixtliCorre({ children }: { children?: React.ReactNode }
     const [resp, setResp] = useState<null | boolean>(null);
     const [record, setRecord] = useState(0);
     const faseR = useRef<Fase>('listo');
+    const [conPreguntas, setConPreguntas] = useState(true);
+    const preguntasR = useRef(true);
     const qR = useRef(0);
     const juego = useRef({ salto: () => {}, reiniciar: () => {}, limpiar: () => {} });
 
@@ -145,6 +147,13 @@ export default function MixtliCorre({ children }: { children?: React.ReactNode }
                 if (obs.some((o) => mx < o.x + o.w - 4 && mx + mw > o.x + 4 && my + mh > SUELO - o.h + 4)) {
                     cambiar('fin');
                     setRecord((r) => { const n = Math.max(r, pes); localStorage.setItem(RECORD_KEY, String(n)); return n; });
+                } else if (jugado >= TRAMO_MS && !preguntasR.current) {
+                    // Sin preguntas: solo avanza de región cada 5 minutos
+                    jugado = 0;
+                    if (qR.current < 19) {
+                        qR.current += 1; setQ(qR.current);
+                        if (qR.current % 5 === 0) { juego.current.limpiar(); cambiar('nivel'); }
+                    }
                 } else if (jugado >= TRAMO_MS) {
                     jugado = 0;
                     setOps(revolver(NIVELES[Math.floor(qR.current / 5)].preguntas[qR.current % 5]));
@@ -176,7 +185,7 @@ export default function MixtliCorre({ children }: { children?: React.ReactNode }
 
     const pesosDelta = (d: number) => (juego.current as unknown as { pesos: (d: number) => void }).pesos(d);
 
-    const empezar = () => { juego.current.reiniciar(); cambiar('nivel'); };
+    const empezar = (preguntas = preguntasR.current) => { preguntasR.current = preguntas; setConPreguntas(preguntas); juego.current.reiniciar(); cambiar('nivel'); };
     const tocar = () => {
         const f = faseR.current;
         if (f === 'jugando') juego.current.salto();
@@ -213,14 +222,20 @@ export default function MixtliCorre({ children }: { children?: React.ReactNode }
                 aria-label="Juego: Mixtli salta obstáculos y junta Ecopil pesos" />
             {fase === 'listo' ? (
                 <>
-                    <button type="button" onClick={empezar} aria-label="Jugar con Mixtli" className="absolute bottom-6 right-4">
+                    <button type="button" onClick={() => empezar(true)} aria-label="Jugar con Mixtli" className="absolute bottom-6 right-4">
                         <Mixtli pose="pala" height={200} priority animated />
                     </button>
                     {children}
-                    <button type="button" onClick={empezar}
-                        className="font-futura sticker absolute bottom-4 left-5 rounded-full bg-ecopil-sun px-4 py-2 text-xs font-extrabold text-ink">
-                        Juega: salta con Mixtli
-                    </button>
+                    <div className="absolute bottom-4 left-5 flex flex-col items-start gap-2">
+                        <button type="button" onClick={() => empezar(true)}
+                            className="font-futura sticker rounded-full bg-ecopil-sun px-4 py-2 text-xs font-extrabold text-ink">
+                            Juega con preguntas
+                        </button>
+                        <button type="button" onClick={() => empezar(false)}
+                            className="font-futura sticker rounded-full bg-[var(--t-surface)] px-4 py-1.5 text-xs font-bold">
+                            Solo correr
+                        </button>
+                    </div>
                 </>
             ) : (
                 <>
@@ -229,7 +244,7 @@ export default function MixtliCorre({ children }: { children?: React.ReactNode }
                         <span className="rounded-full bg-ecopil-sun px-2 py-0.5 text-ink">E$ {pesos}</span>
                     </div>
                     <div className="absolute left-0 top-5 font-futura text-[11px] opacity-70 tabular-nums">
-                        {metros} m · pregunta {Math.min(20, q + 1)}/20 · récord E$ {record}
+                        {metros} m{conPreguntas ? ` · pregunta ${Math.min(20, q + 1)}/20` : ''} · récord E$ {record}
                     </div>
                     {fase === 'nivel' && (
                         <div className="absolute inset-y-0 left-24 right-0 flex flex-col items-center justify-center gap-1 text-center">
