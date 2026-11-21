@@ -9,13 +9,17 @@ import { NIVELES, type Obstaculo, type Pregunta } from '@/data/juego-mixtli';
 
 type Obs = { x: number; w: number; h: number; tipo: Obstaculo; giro: number };
 type Moneda = { x: number; y: number; ok: boolean };
+type Corazon = { x: number; y: number; vx: number; vy: number; vida: number };
+type Mariposa = { x: number; y: number; ok: boolean };
 type Fase = 'listo' | 'jugando' | 'pregunta' | 'nivel' | 'fin' | 'gano';
 
-const H = 230, SUELO = 205, GRAV = 0.0026, SALTO = -0.78, MW = 84, MH = 80, MX = 20;
-const TRAMO_MS = 30_000; // tiempo de juego entre preguntas
+const H = 230, SUELO = 205, GRAV = 0.0022, SALTO = -0.74, MW = 84, MH = 80, MX = 20;
+const VEL0 = 0.26, VMAX = 0.6; // velocidad inicial y máxima (px/ms)
+const ALAS_MS = 7000; // duración de las alas de mariposa
+const TRAMO_MS = 15_000; // tiempo de juego entre preguntas
 const TRAMO_LIBRE_MS = 60_000; // sin preguntas: 5 tramos = cambio de región
 const TAM: Record<Obstaculo, [number, number]> = {
-    cactus: [26, 46], maguey: [44, 32], paste: [40, 24], pico: [38, 38], roca: [40, 28], pino: [34, 54], atomo: [50, 50], gota: [28, 40],
+    cactus: [26, 46], maguey: [44, 32], paste: [40, 24], pico: [38, 38], roca: [40, 28], pino: [34, 54], atomo: [50, 50], gota: [28, 40], serpiente: [54, 18],
 };
 const RECORD_KEY = 'mixtli_pesos_record';
 const INK = '#1C2B20';
@@ -58,6 +62,17 @@ function dibujar(c: CanvasRenderingContext2D, o: Obs, t: number) {
             c.fillStyle = '#2F7D4A';
             for (let k = 0; k < 3; k++) { const ty = y + k * 13; c.beginPath(); c.moveTo(x + o.w / 2, ty); c.lineTo(x + o.w - k, ty + 22); c.lineTo(x + k, ty + 22); c.closePath(); c.fill(); c.stroke(); }
             break;
+        case 'serpiente': {
+            // cuerpo ondulado
+            c.strokeStyle = INK; c.lineWidth = 9; c.beginPath();
+            for (let k = 0; k <= 12; k++) { const px = x + (o.w * k) / 12, py = SUELO - 6 - Math.sin(k * 0.9 + t / 120) * 4; if (k) c.lineTo(px, py); else c.moveTo(px, py); }
+            c.stroke(); c.strokeStyle = '#7BAE3A'; c.lineWidth = 5; c.stroke();
+            c.fillStyle = '#7BAE3A'; c.strokeStyle = INK; c.lineWidth = 2.5;
+            c.beginPath(); c.ellipse(x - 2, SUELO - 10, 8, 6, 0, 0, Math.PI * 2); c.fill(); c.stroke();
+            c.fillStyle = INK; c.beginPath(); c.arc(x - 5, SUELO - 12, 1.6, 0, Math.PI * 2); c.fill();
+            c.strokeStyle = '#E8434F'; c.lineWidth = 1.5; c.beginPath(); c.moveTo(x - 10, SUELO - 9); c.lineTo(x - 15, SUELO - 8); c.stroke();
+            break;
+        }
         case 'gota':
             c.fillStyle = '#5DADE2';
             c.beginPath(); c.moveTo(x + o.w / 2, y); c.bezierCurveTo(x + o.w + 4, y + o.h * 0.6, x + o.w, SUELO, x + o.w / 2, SUELO);
@@ -72,6 +87,26 @@ function dibujar(c: CanvasRenderingContext2D, o: Obs, t: number) {
             for (let k = 0; k < 3; k++) { const a = t / 300 + (k * 2 * Math.PI) / 3; c.beginPath(); c.arc(cx + Math.cos(a) * r * 0.8, cy + Math.sin(a) * r * 0.26, 3.5, 0, Math.PI * 2); c.fill(); }
         }
     }
+}
+
+function corazon(c: CanvasRenderingContext2D, x: number, y: number, r: number, alfa: number) {
+    c.save(); c.globalAlpha = alfa; c.fillStyle = '#E8434F';
+    c.beginPath(); c.moveTo(x, y + r * 0.9);
+    c.bezierCurveTo(x - r * 1.4, y - r * 0.2, x - r * 0.6, y - r * 1.3, x, y - r * 0.4);
+    c.bezierCurveTo(x + r * 0.6, y - r * 1.3, x + r * 1.4, y - r * 0.2, x, y + r * 0.9);
+    c.fill(); c.restore();
+}
+
+function mariposa(c: CanvasRenderingContext2D, x: number, y: number, t: number, esc: number) {
+    const a = Math.abs(Math.sin(t / 90)) * 0.8 + 0.2;
+    c.save(); c.translate(x, y); c.scale(esc, esc);
+    c.fillStyle = '#EE8139'; c.strokeStyle = INK; c.lineWidth = 1.5;
+    for (const s of [-1, 1]) {
+        c.beginPath(); c.ellipse(s * 7 * a, -4, 8 * a, 7, s * 0.4, 0, Math.PI * 2); c.fill(); c.stroke();
+        c.beginPath(); c.ellipse(s * 5 * a, 5, 5 * a, 5, -s * 0.4, 0, Math.PI * 2); c.fill(); c.stroke();
+    }
+    c.fillStyle = INK; c.fillRect(-1.2, -8, 2.4, 16);
+    c.restore();
 }
 
 function moneda(c: CanvasRenderingContext2D, m: Moneda, t: number) {
@@ -111,10 +146,19 @@ export default function MixtliCorre({ children }: { children?: React.ReactNode }
         const medir = () => { W = cv.clientWidth; cv.width = W * dpr; cv.height = H * dpr; c.setTransform(dpr, 0, 0, dpr, 0, 0); };
         medir(); window.addEventListener('resize', medir);
 
-        let y = SUELO - MH, vy = 0, obs: Obs[] = [], mon: Moneda[] = [], vel = 0.32, dist = 0, sigO = 600, sigM = 300, prev = 0, raf = 0, pes = 0, jugado = 0, paisaje = RUTA[0], paisajeAnt = RUTA[0], fundido = 1;
-        juego.current.salto = () => { if (y >= SUELO - MH - 0.5) vy = SALTO; };
-        juego.current.limpiar = () => { obs = []; mon = []; sigO = 500; vel = 0.32 + 0.05 * Math.floor(qR.current / 5); };
-        juego.current.reiniciar = () => { y = SUELO - MH; vy = 0; dist = 0; pes = 0; jugado = 0; qR.current = 0; juego.current.limpiar(); setPesos(0); setMetros(0); setQ(0); };
+        let corazones: Corazon[] = [], maris: Mariposa[] = [], alas = 0, giro = 0, giroUsado = false, sigB = 2500;
+        let y = SUELO - MH, vy = 0, obs: Obs[] = [], mon: Moneda[] = [], vel = VEL0, dist = 0, sigO = 600, sigM = 300, prev = 0, raf = 0, pes = 0, jugado = 0, paisaje = RUTA[0], paisajeAnt = RUTA[0], fundido = 1;
+        juego.current.salto = () => {
+            const enSuelo = y >= SUELO - MH - 0.5;
+            if (alas > 0) { vy = -0.42; return; } // con alas: cada toque aletea
+            if (enSuelo) { vy = SALTO; giroUsado = false; return; }
+            if (!giroUsado) { // en el aire: giro con corazones y un pequeño impulso
+                giroUsado = true; giro = 1; vy = Math.min(vy, -0.32);
+                for (let k = 0; k < 7; k++) corazones.push({ x: MX + MW / 2, y: y + MH / 2, vx: (Math.random() - 0.5) * 0.25, vy: -0.08 - Math.random() * 0.15, vida: 1 });
+            }
+        };
+        juego.current.limpiar = () => { obs = []; mon = []; maris = []; sigO = 600; vel = VEL0 + 0.04 * Math.floor(qR.current / 5); };
+        juego.current.reiniciar = () => { y = SUELO - MH; vy = 0; alas = 0; corazones = []; dist = 0; pes = 0; jugado = 0; qR.current = 0; juego.current.limpiar(); setPesos(0); setMetros(0); setQ(0); };
         const ajustarPesos = (d: number) => { pes = Math.max(0, pes + d); setPesos(pes); };
         (juego.current as unknown as { pesos: (d: number) => void }).pesos = ajustarPesos;
 
@@ -122,31 +166,38 @@ export default function MixtliCorre({ children }: { children?: React.ReactNode }
             const dt = Math.min(32, prev ? t - prev : 16); prev = t;
             const f = faseR.current, nivel = NIVELES[Math.min(3, Math.floor(qR.current / 5))];
             if (f === 'jugando') {
-                vel = Math.min(0.8, vel + dt * 0.00001);
+                vel = Math.min(VMAX, vel + dt * 0.000006);
+                alas = Math.max(0, alas - dt); giro = Math.max(0, giro - dt / 450);
                 const antes = Math.floor(dist / 10);
                 dist += vel * dt; jugado += dt;
-                vy += GRAV * dt; y = Math.min(SUELO - MH, y + vy * dt);
+                vy += (alas > 0 ? GRAV * 0.45 : GRAV) * dt; y = Math.max(4, Math.min(SUELO - MH, y + vy * dt));
+                if (y >= SUELO - MH) vy = 0;
                 sigO -= vel * dt; sigM -= vel * dt;
                 if (sigO <= 0) {
                     const tipo = nivel.obstaculos[Math.floor(Math.random() * nivel.obstaculos.length)];
                     const [w, h] = TAM[tipo];
                     obs.push({ x: W + 10, w, h, tipo, giro: Math.random() * 3 });
-                    sigO = 260 + Math.random() * 320 + vel * 200;
+                    sigO = 340 + Math.random() * 360 + vel * 260;
                 }
                 if (sigM <= 0) {
                     const alto = Math.random() < 0.5;
                     for (let k = 0; k < 3; k++) mon.push({ x: W + 20 + k * 26, y: alto ? SUELO - 120 : SUELO - 22, ok: false });
                     sigM = 380 + Math.random() * 400;
                 }
+                sigB -= vel * dt;
+                if (sigB <= 0) { maris.push({ x: W + 20, y: SUELO - 100 - Math.random() * 40, ok: false }); sigB = 2600 + Math.random() * 2400; }
+                maris.forEach((b) => { b.x -= vel * dt; });
                 obs.forEach((o) => { o.x -= vel * dt; o.giro += dt * 0.002; });
                 mon.forEach((m) => { m.x -= vel * dt; });
                 obs = obs.filter((o) => o.x + o.w > -10);
                 mon = mon.filter((m) => m.x > -20 && !m.ok);
-                const mx = MX + 18, my = y + 12, mw = MW - 36, mh = MH - 16;
+                maris = maris.filter((b) => b.x > -20 && !b.ok);
+                const mx = MX + 24, my = y + 18, mw = MW - 48, mh = MH - 26; // caja de choque generosa
+                maris.forEach((b) => { if (b.x > mx - 14 && b.x < mx + mw + 14 && b.y > my - 18 && b.y < my + mh + 18) { b.ok = true; alas = ALAS_MS; ajustarPesos(2); } });
                 mon.forEach((m) => { if (m.x > mx - 8 && m.x < mx + mw + 8 && m.y > my - 8 && m.y < my + mh + 8) { m.ok = true; ajustarPesos(1); } });
                 const m = Math.floor(dist / 10);
                 if (m !== antes) setMetros(m);
-                if (obs.some((o) => mx < o.x + o.w - 4 && mx + mw > o.x + 4 && my + mh > SUELO - o.h + 4)) {
+                if (obs.some((o) => mx < o.x + o.w - 6 && mx + mw > o.x + 6 && my + mh > SUELO - o.h + 6)) {
                     cambiar('fin');
                     setRecord((r) => { const n = Math.max(r, pes); localStorage.setItem(RECORD_KEY, String(n)); return n; });
                 } else if (jugado >= TRAMO_LIBRE_MS && !preguntasR.current) {
@@ -178,12 +229,26 @@ export default function MixtliCorre({ children }: { children?: React.ReactNode }
             c.stroke();
             mon.forEach((mm) => moneda(c, mm, t));
             obs.forEach((o) => dibujar(c, o, t));
+            maris.forEach((b) => mariposa(c, b.x, b.y + Math.sin(t / 200 + b.x / 40) * 6, t, 1));
             if (img.complete) {
+                const cx = MX + MW / 2, cy = y + MH / 2 + (f === 'jugando' && y >= SUELO - MH - 0.5 ? Math.sin(t / 60) * 1.5 : 0);
+                if (alas > 0 && (alas > 1500 || Math.floor(t / 120) % 2)) { // alas (parpadean al acabarse)
+                    const a = Math.sin(t / 70) * 0.5;
+                    for (const s of [-1, 1]) {
+                        c.save(); c.translate(cx - 6, cy - 6); c.rotate(s * (0.5 + a)); c.globalAlpha = 0.9;
+                        c.fillStyle = s < 0 ? '#F9BC3A' : '#EE8139'; c.strokeStyle = INK; c.lineWidth = 2;
+                        c.beginPath(); c.ellipse(-22, 0, 24, 13, 0, 0, Math.PI * 2); c.fill(); c.stroke(); c.restore();
+                    }
+                }
                 c.save();
-                const bob = f === 'jugando' && y >= SUELO - MH - 0.5 ? Math.sin(t / 60) * 1.5 : 0;
-                c.translate(MX + MW / 2, y + MH / 2 + bob); c.scale(-1, 1); c.rotate(vy < 0 ? 0.12 : 0);
+                c.translate(cx, cy); c.scale(-1, 1); c.rotate(giro > 0 ? -(1 - giro) * Math.PI * 2 : vy < 0 ? 0.12 : 0);
                 c.drawImage(img, -MW / 2, -MH / 2 - 4, MW, MH * (763 / 800) + 4);
                 c.restore();
+            }
+            corazones.forEach((h) => { h.x += h.vx * dt; h.y += h.vy * dt; h.vida -= dt / 900; corazon(c, h.x, h.y, 7, Math.max(0, h.vida)); });
+            corazones = corazones.filter((h) => h.vida > 0);
+            if (alas > 0 && f === 'jugando') {
+                c.fillStyle = INK; c.font = 'bold 11px sans-serif'; c.textAlign = 'right'; c.fillText(`Alas ${Math.ceil(alas / 1000)} s`, W - 6, 44);
             }
             raf = requestAnimationFrame(frame);
         };
@@ -258,7 +323,7 @@ export default function MixtliCorre({ children }: { children?: React.ReactNode }
                         <div className="absolute inset-y-0 left-24 right-0 flex flex-col items-center justify-center gap-1 text-center">
                             <p className="font-futura text-xs font-bold uppercase tracking-wider">{nivel.nombre}</p>
                             <p className="font-display text-3xl">{nivel.lugar}</p>
-                            <p className="text-xs opacity-80">Junta Ecopil pesos para ayudar a más nodos. Toca para saltar.</p>
+                            <p className="text-xs opacity-80">Junta Ecopil pesos para ayudar a más nodos. Toca para saltar; en el aire, toca otra vez para girar. Las mariposas te dan alas.</p>
                         </div>
                     )}
                     {fase === 'pregunta' && (

@@ -2,13 +2,13 @@
 // La respuesta correcta es siempre la primera opción (el juego las revuelve).
 // Equipo: revisen y ajusten las preguntas a lo que se verá en el Encuentro.
 
-export type Obstaculo = 'cactus' | 'maguey' | 'paste' | 'pico' | 'roca' | 'pino' | 'atomo' | 'gota';
+export type Obstaculo = 'cactus' | 'maguey' | 'paste' | 'pico' | 'roca' | 'pino' | 'atomo' | 'gota' | 'serpiente';
 export type Pregunta = { p: string; o: [string, string, string]; dato?: string };
 export type Nivel = { nombre: string; lugar: string; cielo: string; obstaculos: Obstaculo[]; preguntas: Pregunta[] };
 
 export const NIVELES: Nivel[] = [
     {
-        nombre: 'Nivel 1', lugar: 'Valle del Mezquital', cielo: '#F9BC3A', obstaculos: ['cactus', 'maguey', 'paste'],
+        nombre: 'Nivel 1', lugar: 'Valle del Mezquital', cielo: '#F9BC3A', obstaculos: ['cactus', 'maguey', 'paste', 'serpiente'],
         preguntas: [
             { p: '¿Qué representan los Atlantes de Tula?', o: ['Guerreros toltecas', 'Reyes mexicas', 'Dioses mayas'] },
             { p: '¿Qué pueblo originario habita el Valle del Mezquital?', o: ['Hñähñu (otomí)', 'Maya', 'Rarámuri'] },
@@ -28,7 +28,7 @@ export const NIVELES: Nivel[] = [
         ],
     },
     {
-        nombre: 'Nivel 3', lugar: 'Bosques de Hidalgo', cielo: '#6BB32E', obstaculos: ['pino', 'roca', 'cactus'],
+        nombre: 'Nivel 3', lugar: 'Bosques de Hidalgo', cielo: '#6BB32E', obstaculos: ['pino', 'roca', 'serpiente', 'cactus'],
         preguntas: [
             { p: '¿Qué árbol domina los bosques altos de la Sierra de Pachuca?', o: ['Oyamel', 'Ceiba', 'Mezquite'] },
             { p: '¿Qué es un área natural protegida?', o: ['Un territorio con reglas para conservar su naturaleza', 'Un parque de diversiones', 'Una zona solo para construir'] },
