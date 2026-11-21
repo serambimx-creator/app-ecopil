@@ -166,6 +166,7 @@ const ALIADOS = [
     { nombre: 'Reciclum', logo: '/logos/reciclum.svg' },
     { nombre: 'COESBIOH · Comisión Estatal de Biodiversidad de Hidalgo', logo: '/logos/coesbioh.png' },
     { nombre: 'Cascadas Dos Mundos', logo: '/logos/huetzitli.png' },
+    { nombre: 'Invictus · Conciencia, ciencia y corazón', logo: '/logos/invictus.png' },
 ];
 
 const INFO_PRACTICA = [
