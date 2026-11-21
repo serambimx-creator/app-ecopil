@@ -1,5 +1,6 @@
 'use client';
 
+import { comprimirFoto, FOTO_PERFIL } from '@/lib/comprimir';
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -50,8 +51,9 @@ export default function RegistroPage() {
         try { setTokenGuardado(localStorage.getItem(TOKEN_KEY)); } catch { /* sin storage */ }
     }, []);
 
-    const elegirFoto = (file: File | undefined) => {
-        if (!file) return;
+    const elegirFoto = async (original: File | undefined) => {
+        if (!original) return;
+        const file = await comprimirFoto(original, FOTO_PERFIL); // ~512 px, unos 50 KB
         if (file.size > 5 * 1024 * 1024) return setError('La foto debe pesar menos de 5 MB.');
         setError('');
         setFoto(file);

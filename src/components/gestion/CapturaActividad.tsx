@@ -6,6 +6,7 @@ import { useMemo, useState } from 'react';
 import { clsx } from 'clsx';
 import { Check, Plus, X, Camera, Loader2, Users, Search } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
+import { comprimirFoto, FOTO_EVIDENCIA } from '@/lib/comprimir';
 import { INDICADORES, nombreIndicador, type DatosGestion, type ActividadGestion } from '@/lib/encuentro';
 
 type Rpc = (fn: string, a: Record<string, unknown>) => Promise<unknown>;
@@ -37,8 +38,9 @@ export default function CapturaActividad({ act, datos, rpc, guardar, borrar }: {
         setOcupado(false);
     };
 
-    const subirFoto = (file: File) => run(async () => {
-        const ruta = `evidencias/${crypto.randomUUID()}.${file.name.split('.').pop() || 'jpg'}`;
+    const subirFoto = (original: File) => run(async () => {
+        const file = await comprimirFoto(original, FOTO_EVIDENCIA); // ~1600 px, unos 300 KB
+        const ruta = `evidencias/${crypto.randomUUID()}.${file.type === 'image/jpeg' ? 'jpg' : file.name.split('.').pop() || 'jpg'}`;
         const { error: e } = await supabase.storage.from('encuentro-fotos').upload(ruta, file, { contentType: file.type });
         if (e) throw new Error(e.message);
         const url = supabase.storage.from('encuentro-fotos').getPublicUrl(ruta).data.publicUrl;
