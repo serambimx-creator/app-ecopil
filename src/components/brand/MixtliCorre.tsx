@@ -18,7 +18,7 @@ const H = 230, SUELO = 205, GRAV = 0.0022, SALTO = -0.74, MW = 84, MH = 80, MX =
 const VEL0 = 0.26, VMAX = 0.6; // velocidad inicial y máxima (px/ms)
 const ALAS_MS = 3000; // duración de las alas de mariposa
 const INMUNE_MS = 4000; // la tuna da inmunidad
-const VIDAS_MAX = 3; // cada tuna da una vida; al chocar se gasta una
+const VIDAS_MAX = 2; // cada tuna da una vida; al chocar se gasta una
 const GRACIA_MS = 1500; // inmunidad breve después de perder una vida
 const TRAMO_MS = 15_000; // tiempo de juego entre preguntas
 const TRAMO_LIBRE_MS = 60_000; // sin preguntas: 5 tramos = cambio de región
