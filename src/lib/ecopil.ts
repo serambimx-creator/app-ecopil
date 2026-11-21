@@ -29,6 +29,8 @@ export interface MiRegistro {
     estado: EstadoRegistro
     grupo: 'A' | 'B' | null
     confirmado_en?: string | null
+    asistencias?: { titulo: string; dia: string }[]
+    encuesta?: { calificacion: number | null; lo_mejor: string | null; mejorar: string | null; compromiso: string | null; volveria: boolean | null } | null
 }
 
 // Enlace personal del agente; también se guarda en el celular para no perderlo.

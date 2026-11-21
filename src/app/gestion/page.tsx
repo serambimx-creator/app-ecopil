@@ -2,13 +2,14 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { clsx } from 'clsx';
-import { Loader2, CalendarClock, Phone, MessageCircle, NotebookPen, Users, UserCog, Plus, LogOut, WifiOff, AlertTriangle, Check, Megaphone, Search } from 'lucide-react';
+import { Loader2, CalendarClock, Phone, MessageCircle, NotebookPen, Users, UserCog, Plus, LogOut, WifiOff, AlertTriangle, Check, Megaphone, Search, BarChart3 } from 'lucide-react';
 import Mixtli from '@/components/brand/Mixtli';
 import EditorActividad from '@/components/gestion/EditorActividad';
+import Reporte from '@/components/gestion/Reporte';
 import { supabase } from '@/lib/supabase';
 import { useGestion, ahoraHidalgo, rango, diaCorto, DIAS, DIA_COLOR, SEDES, type ActividadGestion, type Contacto, type EntradaBitacora } from '@/lib/encuentro';
 
-type Tab = 'hoy' | 'directorio' | 'bitacora' | 'registros' | 'equipo';
+type Tab = 'hoy' | 'directorio' | 'bitacora' | 'registros' | 'reporte' | 'equipo';
 const inp = 'w-full rounded-xl bg-gray-900 border-2 border-gray-700 px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-brand-green';
 const ESTADO_COLOR: Record<string, string> = {
     pendiente: 'bg-gray-700 text-gray-200', en_proceso: 'bg-ecopil-sun text-ink', listo: 'bg-ecopil-leaf text-ink',
@@ -67,6 +68,7 @@ export default function GestionPage() {
         { k: 'directorio', label: 'Directorio', icon: Phone },
         { k: 'bitacora', label: 'Bitácora', icon: NotebookPen, badge: abiertos },
         { k: 'registros', label: 'Asistentes', icon: Users, badge: pendientesReg },
+        { k: 'reporte', label: 'Reporte', icon: BarChart3 },
         ...(d.yo.rol === 'admin' ? [{ k: 'equipo' as Tab, label: 'Equipo', icon: UserCog }] : []),
     ];
 
@@ -131,9 +133,10 @@ export default function GestionPage() {
             {tab === 'directorio' && <Directorio contactos={d.contactos} gestores={d.gestores} busca={busca} setBusca={setBusca} guardar={g.guardarFila} />}
             {tab === 'bitacora' && <Bitacora entradas={d.bitacora} actividades={acts} avisos={d.avisos} guardar={g.guardarFila} borrar={g.borrarFila} />}
             {tab === 'registros' && <Registros datos={d} rpc={g.rpc} escaneado={escaneado} limpiar={() => setEscaneado(null)} />}
+            {tab === 'reporte' && <Reporte d={d} />}
             {tab === 'equipo' && <Equipo gestores={d.gestores} rpc={g.rpc} />}
 
-            {editando && <EditorActividad key={editando} actividad={editAct} onClose={() => setEditando(null)} guardar={g.guardarFila} borrar={g.borrarFila} />}
+            {editando && <EditorActividad key={editando} actividad={editAct} onClose={() => setEditando(null)} guardar={g.guardarFila} borrar={g.borrarFila} datos={d} rpc={g.rpc} />}
         </div>
     );
 }
@@ -266,12 +269,33 @@ function Registros({ datos, rpc, escaneado, limpiar }: {
     const lista = escaneado ? datos.registros.filter((r) => r.email.toLowerCase() === escaneado) : datos.registros.filter((r) => r.estado === filtro);
     const confirmados = datos.registros.filter((r) => r.confirmado_en).length;
     const revisar = (id: string, estado: string | null, grupo: string | null) => rpc('gestor_revisar_registro', { p_id: id, p_estado: estado, p_grupo: grupo });
+    // Al escanear un gafete: pasar lista en la actividad que va según la hora
+    const ahora = ahoraHidalgo();
+    const delDia = datos.actividades.filter((a) => a.dia === (DIAS.includes(ahora.dia) ? ahora.dia : DIAS[1]) && a.tipo !== 'traslado');
+    const actual = [...delDia].reverse().find((a) => a.inicio && a.inicio.slice(0, 5) <= ahora.hm) ?? delDia[0];
+    const [actId, setActId] = useState<string | undefined>(undefined);
+    const enAct = actId ?? actual?.id;
+    const presente = (rid: string) => (datos.asistencias ?? []).some((x) => x.actividad_id === enAct && x.registro_id === rid);
     return (
         <section className="space-y-3">
             {escaneado && (
                 <button onClick={limpiar} className="w-full rounded-2xl bg-brand-green/15 border-2 border-brand-green p-3 text-sm font-bold text-brand-green">
                     {lista.length ? 'Gafete escaneado ✓' : 'Ese gafete no está en los registros'} · ver todos
                 </button>
+            )}
+            {escaneado && lista[0]?.estado === 'aprobado' && delDia.length > 0 && (
+                <div className="rounded-2xl border-2 border-gray-800 bg-gray-900 p-3 space-y-2">
+                    <p className="text-[10px] font-extrabold uppercase tracking-wider text-gray-500">Pasar lista en</p>
+                    <select className={inp} value={enAct} onChange={(e) => setActId(e.target.value)}>
+                        {delDia.map((a) => <option key={a.id} value={a.id}>{rango(a)} · {a.titulo}</option>)}
+                    </select>
+                    {presente(lista[0].id) ? (
+                        <p className="text-center text-sm font-bold text-brand-green">Asistencia registrada ✓</p>
+                    ) : (
+                        <button onClick={() => rpc('gestor_asistencia', { p_actividad: enAct, p_registro: lista[0].id, p_presente: true })}
+                            className="font-futura sticker w-full rounded-full bg-brand-green py-2.5 text-sm font-extrabold text-ink">Marcar asistencia</button>
+                    )}
+                </div>
             )}
             <p className="text-sm text-gray-400">{datos.registros.filter((r) => r.estado === 'aprobado').length} aprobados · {confirmados} confirmaron asistencia</p>
             <div className="flex gap-2">

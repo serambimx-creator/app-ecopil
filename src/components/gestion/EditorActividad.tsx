@@ -3,7 +3,8 @@
 import { useState } from 'react';
 import { clsx } from 'clsx';
 import { X, Plus, Trash2, Check, Loader2 } from 'lucide-react';
-import { SEDES, DIAS, diaCorto, type ActividadGestion } from '@/lib/encuentro';
+import { SEDES, DIAS, diaCorto, type ActividadGestion, type DatosGestion } from '@/lib/encuentro';
+import CapturaActividad from './CapturaActividad';
 
 type Guardar = (tabla: string, fila: Record<string, unknown>) => Promise<unknown>;
 type Borrar = (tabla: string, id: string) => Promise<void>;
@@ -17,8 +18,9 @@ const TIPOS = ['actividad', 'comida', 'traslado', 'taller', 'logistica', 'prepar
 const inp = 'w-full rounded-xl bg-gray-900 border-2 border-gray-700 px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-brand-green';
 const lbl = 'block text-[10px] font-extrabold uppercase tracking-wider text-gray-500 mb-1';
 
-export default function EditorActividad({ actividad, onClose, guardar, borrar }: {
+export default function EditorActividad({ actividad, onClose, guardar, borrar, datos, rpc }: {
     actividad: Partial<ActividadGestion> | null; onClose: () => void; guardar: Guardar; borrar: Borrar;
+    datos: DatosGestion; rpc: (fn: string, a: Record<string, unknown>) => Promise<unknown>;
 }) {
     const nueva = !actividad?.id;
     const [f, setF] = useState<Partial<ActividadGestion>>(actividad ?? { dia: DIAS[1], tipo: 'actividad', publica: true, estado: 'pendiente' });
@@ -132,6 +134,7 @@ export default function EditorActividad({ actividad, onClose, guardar, borrar }:
                         </div>
                     </div>
                 )}
+                {f.id && <CapturaActividad act={{ ...f, id: f.id }} datos={datos} rpc={rpc} guardar={guardar} borrar={borrar} />}
                 {!nueva && actividad.actualizado_por_nombre && (
                     <p className="text-[11px] text-gray-600">Último cambio: {actividad.actualizado_por_nombre}</p>
                 )}

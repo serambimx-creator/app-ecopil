@@ -79,6 +79,16 @@ export interface Gestor { id: string; nombre: string; telefono: string | null; r
 
 export interface DatosPublicos { actividades: Actividad[]; avisos: Aviso[]; generado: string }
 
+export interface Asistencia { actividad_id: string; registro_id: string }
+export interface Indicador {
+    id: string; actividad_id: string | null; dia: string | null; clave: string; valor: number;
+    unidad: string | null; nota: string | null; autor: string | null; created_at: string;
+}
+export interface Evidencia { id: string; actividad_id: string | null; foto_url: string; nota: string | null; created_at: string }
+export interface RespuestaEncuesta {
+    calificacion: number | null; lo_mejor: string | null; mejorar: string | null; compromiso: string | null; volveria: boolean | null; created_at: string;
+}
+
 export interface DatosGestion {
     yo: Gestor;
     actividades: ActividadGestion[];
@@ -87,8 +97,27 @@ export interface DatosGestion {
     avisos: Aviso[];
     gestores: Gestor[];
     registros: RegistroGestion[];
+    // Indicadores del reporte (opcionales hasta que se corra indicadores.sql)
+    asistencias?: Asistencia[];
+    indicadores?: Indicador[];
+    evidencias?: Evidencia[];
+    encuesta?: RespuestaEncuesta[];
     generado: string;
 }
+
+// Indicadores que se capturan por actividad. "otro" deja escribir el nombre.
+export const INDICADORES: { clave: string; nombre: string; unidad: string }[] = [
+    { clave: 'arboles_plantados', nombre: 'Árboles plantados', unidad: 'piezas' },
+    { clave: 'magueyes_plantados', nombre: 'Magueyes plantados', unidad: 'piezas' },
+    { clave: 'superficie_intervenida', nombre: 'Superficie intervenida', unidad: 'm²' },
+    { clave: 'residuos_recolectados', nombre: 'Residuos recolectados', unidad: 'kg' },
+    { clave: 'participantes_comunidad', nombre: 'Personas de la comunidad', unidad: 'personas' },
+    { clave: 'comidas_servidas', nombre: 'Comidas servidas', unidad: 'raciones' },
+    { clave: 'otro', nombre: 'Otro', unidad: '' },
+];
+// Los "otros" se guardan como clave 'otro:<nombre>'
+export const nombreIndicador = (clave: string) =>
+    clave.startsWith('otro:') ? clave.slice(5) : (INDICADORES.find((x) => x.clave === clave)?.nombre ?? clave);
 
 export const SEDES: Record<string, string> = {
     hotel: 'Hotel City Express Tula',
