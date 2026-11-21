@@ -164,6 +164,7 @@ function ContactCards({ onSwitchView }: { onSwitchView?: (v: ViewType) => void }
 // Para sumar un aliado: logo en public/logos y una línea aquí.
 const ALIADOS = [
     { nombre: 'Reciclum', logo: '/logos/reciclum.svg' },
+    { nombre: 'COESBIOH · Comisión Estatal de Biodiversidad de Hidalgo', logo: '/logos/coesbioh.png' },
 ];
 
 const INFO_PRACTICA = [
