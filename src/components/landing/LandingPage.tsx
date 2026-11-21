@@ -1,15 +1,14 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { ArrowRight, Star, MapPin, Users, Handshake, Building2, Map, MessageCircle, FileText, Phone, Mail, Award, Check, ChevronRight, Clock, Droplets, GraduationCap, TreePine, Briefcase, Globe, Heart } from 'lucide-react';
+import { ArrowRight, Star, MapPin, Users, Handshake, Building2, Map, FileText, Phone, Mail, Award, Check, ChevronRight, Clock, Droplets, GraduationCap, TreePine, Briefcase, Globe, Heart } from 'lucide-react';
 import { clsx } from 'clsx';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import AlliesCarousel from '@/components/public/AlliesCarousel';
 import { ITINERARIO, ACTIVIDAD_EXTRA } from '@/data/itinerario';
 import Mixtli, { MixtliBubble, SunHills } from '@/components/brand/Mixtli';
 
-type ViewType = 'miembros' | 'aliados' | 'patrocinadores';
+type ViewType = 'miembros' | 'aliados' | 'patrocinadores' | 'info';
 
 
 const EVIDENCE_IMAGES = [
@@ -162,18 +161,38 @@ function ContactCards({ onSwitchView }: { onSwitchView?: (v: ViewType) => void }
     );
 }
 
+const INFO_PRACTICA = [
+    { titulo: 'Hospedaje y llegada', icon: MapPin, color: 'bg-ecopil-sun', items: [
+        'Llegada el 17 de diciembre. Bienvenida a las 19:30 en el Hotel City Express Tula.',
+        'Del 17 al 19 dormimos en el hotel; la noche del 20 acampamos en Ajolotequio (Tulancingo).',
+        'El 21 a las 12:00 te llevamos a las terminales para tu regreso.',
+    ] },
+    { titulo: 'Qué traer', icon: Briefcase, color: 'bg-ecopil-leaf', items: [
+        'Ropa de capas: en la sierra amanece entre 2 y 5 °C y al mediodía sube a 18 °C.',
+        'Chamarra impermeable, botas con agarre y ropa que se pueda ensuciar.',
+        'Linterna o lámpara de cabeza para las grutas, botella de agua y protector solar.',
+        'Tienda de campaña y cobija para la noche del 20, si tienes.',
+    ] },
+    { titulo: 'Dinero y salud', icon: Heart, color: 'bg-ecopil-red', items: [
+        'Lleva efectivo: propinas en Xoxafi, compras personales y $30 de entrada al manantial.',
+        'Avísanos de alergias o medicamentos en tu registro; tu contacto de emergencia se queda con el staff.',
+        'Si te sientes mal en cualquier momento, busca a alguien del staff con playera de #NodoPachuca.',
+    ] },
+    { titulo: 'Durante el Encuentro', icon: Clock, color: 'bg-mixtli', items: [
+        'Te asignamos Grupo A o B: define tu turno de desayuno.',
+        'En Programa ves qué sigue según la hora, aunque te quedes sin señal.',
+        'Los avisos del staff aparecen arriba del programa.',
+    ] },
+];
+
 export default function LandingPage() {
     const router = useRouter();
-    const [activeView, setActiveView] = useState<ViewType>('miembros');
     const [expandedDay, setExpandedDay] = useState<string | null>(null);
     const [donationAmount, setDonationAmount] = useState(500);
     const galeriaRef = useRef<HTMLDivElement>(null);
 
     const handleGaleriaClick = () => {
-        setActiveView('aliados');
-        setTimeout(() => {
-            galeriaRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }, 100);
+        galeriaRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     };
 
     const handleLogin = () => {
@@ -183,11 +202,13 @@ export default function LandingPage() {
     };
 
 
-    const tabs: { key: ViewType; icon: typeof Users; label: string }[] = [
-        { key: 'miembros', icon: Users, label: 'Miembros' },
-        { key: 'aliados', icon: Handshake, label: 'Aliados' },
-        { key: 'patrocinadores', icon: Building2, label: 'Patrocinar' },
+    const tabs: { key: string; icon: typeof Users; label: string }[] = [
+        { key: 'miembros', icon: Users, label: 'Encuentro' },
+        { key: 'aliados', icon: Handshake, label: 'Ecopil' },
+        { key: 'info', icon: FileText, label: 'Info' },
+        { key: 'patrocinadores', icon: Building2, label: 'Apoya' },
     ];
+    const ir = (id: string) => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
     return (
         <div className="theme-surface min-h-screen bg-[var(--t-bg)] text-[var(--t-text)] font-sans">
@@ -224,30 +245,23 @@ export default function LandingPage() {
                 </div>
             </section>
 
-            {/* ===== TAB BAR ===== */}
+            {/* ===== NAVEGACIÓN: una sola página, anclas ===== */}
             <nav className="sticky top-[62px] z-30 -mx-4 bg-[var(--t-bg)]/95 px-4 py-3 backdrop-blur">
                 <div className="flex gap-1 rounded-full bg-[var(--t-surface-2)] p-1">
                     {tabs.map((tab) => (
-                        <button
-                            key={tab.key}
-                            onClick={() => setActiveView(tab.key)}
-                            className={clsx(
-                                "font-futura flex-1 flex items-center justify-center gap-1.5 rounded-full px-2 py-2 text-[11px] font-extrabold leading-tight transition-all",
-                                activeView === tab.key
-                                    ? "sticker bg-[var(--t-surface)] text-[var(--t-text)]"
-                                    : "border-2 border-transparent text-[var(--t-text-faint)] hover:text-[var(--t-text)]"
-                            )}
-                        >
+                        <a key={tab.key} href={`#${tab.key}`}
+                            className="font-futura flex-1 flex items-center justify-center gap-1.5 rounded-full px-2 py-2 text-[11px] font-extrabold leading-tight text-[var(--t-text-muted)] hover:text-[var(--t-text)]">
                             <tab.icon size={14} className="shrink-0" />
                             {tab.label}
-                        </button>
+                        </a>
                     ))}
                 </div>
             </nav>
 
             {/* ===== VIEW: MIEMBROS ===== */}
-            {activeView === 'miembros' && (
-                <div className="px-4 pt-6 space-y-8">
+            {(
+                <div id="miembros" className="px-4 pt-10 space-y-8 scroll-mt-28">
+                    <p className="font-futura text-xs font-extrabold uppercase tracking-[0.2em] text-[var(--t-accent)]">El Encuentro</p>
 
                     {/* Stats */}
                     <div className="grid grid-cols-3 gap-3">
@@ -315,7 +329,7 @@ export default function LandingPage() {
                         </div>
 
                         <button
-                            onClick={() => router.push('/agenda')}
+                            onClick={() => router.push('/programa')}
                             className="w-full text-center text-xs font-bold text-[var(--t-accent)] hover:underline py-1"
                         >
                             Ver la agenda completa →
@@ -343,11 +357,11 @@ export default function LandingPage() {
                             </button>
 
                             <button
-                                onClick={() => router.push('/chat')}
+                                onClick={() => router.push('/programa')}
                                 className="bg-[var(--t-surface)] border-2 border-[var(--t-border)] rounded-3xl p-4 flex flex-col items-center gap-2 transition-colors hover:border-[var(--t-ink)] active:scale-95"
                             >
-                                <span className="sticker flex h-10 w-10 items-center justify-center rounded-full bg-ecopil-leaf text-ink"><MessageCircle size={18} /></span>
-                                <span className="text-xs font-bold text-[var(--t-text-secondary)]">Chat del equipo</span>
+                                <span className="sticker flex h-10 w-10 items-center justify-center rounded-full bg-ecopil-leaf text-ink"><Clock size={18} /></span>
+                                <span className="text-xs font-bold text-[var(--t-text-secondary)]">Programa por hora</span>
                             </button>
 
                             <button
@@ -362,7 +376,7 @@ export default function LandingPage() {
 
                     {/* Banner CTA: Mixtli se asoma */}
                     <button
-                        onClick={() => setActiveView('patrocinadores')}
+                        onClick={() => ir('patrocinadores')}
                         className="sticker relative w-full overflow-hidden rounded-3xl bg-ecopil-leaf p-5 pr-28 text-left text-ink"
                     >
                         <p className="font-display text-lg font-semibold leading-tight">
@@ -377,8 +391,9 @@ export default function LandingPage() {
             )}
 
             {/* ===== VIEW: ALIADOS ===== */}
-            {activeView === 'aliados' && (
-                <div className="px-4 pt-6 space-y-8">
+            {(
+                <div id="aliados" className="px-4 pt-10 space-y-8 scroll-mt-28">
+                    <p className="font-futura text-xs font-extrabold uppercase tracking-[0.2em] text-[var(--t-accent)]">Qué es Ecopil</p>
 
                     {/* Stats */}
                     <div className="grid grid-cols-3 gap-3">
@@ -568,15 +583,10 @@ export default function LandingPage() {
                         </div>
                     </section>
 
-                    {/* Allies Carousel */}
-                    <AlliesCarousel />
-
-                    {/* Contacto */}
-                    <ContactCards />
 
                     {/* CTA */}
                     <button
-                        onClick={() => setActiveView('patrocinadores')}
+                        onClick={() => ir('patrocinadores')}
                         className="font-futura sticker w-full bg-brand-green text-ink h-12 rounded-full text-sm font-extrabold flex items-center justify-center gap-2 transition-transform active:translate-x-[2px] active:translate-y-[2px] active:shadow-none"
                     >
                         Quiero ser aliado o patrocinador <ArrowRight size={16} />
@@ -584,9 +594,29 @@ export default function LandingPage() {
                 </div>
             )}
 
+            {/* ===== INFO PRÁCTICA ===== */}
+            <div id="info" className="px-4 pt-10 space-y-5 scroll-mt-28">
+                <p className="font-futura text-xs font-extrabold uppercase tracking-[0.2em] text-[var(--t-accent)]">Info práctica</p>
+                <h2 className="font-display text-2xl font-semibold">Antes de salir de casa</h2>
+                <div className="grid gap-3">
+                    {INFO_PRACTICA.map((b) => (
+                        <div key={b.titulo} className="rounded-3xl bg-[var(--t-surface)] border-2 border-[var(--t-border)] p-4">
+                            <p className="flex items-center gap-2 font-bold text-[var(--t-text)]"><span className={clsx('sticker flex h-8 w-8 items-center justify-center rounded-full text-ink', b.color)}><b.icon size={15} /></span>{b.titulo}</p>
+                            <ul className="mt-2 space-y-1 text-sm text-[var(--t-text-secondary)]">
+                                {b.items.map((i) => <li key={i} className="flex gap-2"><Check size={14} className="mt-1 shrink-0 text-brand-green" />{i}</li>)}
+                            </ul>
+                        </div>
+                    ))}
+                </div>
+                <button onClick={() => router.push('/registro')} className="font-futura sticker w-full bg-brand-green text-ink h-12 rounded-full text-sm font-extrabold flex items-center justify-center gap-2">
+                    Registrarme al Encuentro <ArrowRight size={16} />
+                </button>
+            </div>
+
             {/* ===== VIEW: PATROCINADORES ===== */}
-            {activeView === 'patrocinadores' && (
-                <div className="px-4 pt-6 space-y-8">
+            {(
+                <div id="patrocinadores" className="px-4 pt-10 space-y-8 scroll-mt-28">
+                    <p className="font-futura text-xs font-extrabold uppercase tracking-[0.2em] text-[var(--t-accent)]">Patrocinadores y aliados</p>
 
                     {/* Sé patrocinador */}
                     <section className="space-y-4 relative overflow-hidden rounded-2xl p-5">
@@ -639,7 +669,7 @@ export default function LandingPage() {
                             Quiero ser patrocinador <ArrowRight size={16} />
                         </a>
                         <button
-                            onClick={() => setActiveView('aliados')}
+                            onClick={() => ir('aliados')}
                             className="w-full h-12 rounded-2xl text-sm font-bold border border-[var(--t-border)] text-[var(--t-text-secondary)] flex items-center justify-center gap-2 hover:bg-[var(--t-overlay-5)] transition-colors active:scale-95"
                         >
                             Ver info de Ecopil primero
@@ -701,6 +731,8 @@ export default function LandingPage() {
                     <ContactCards />
                 </div>
             )}
+
+            <p className="px-4 pt-8 text-center text-xs text-[var(--t-text-faint)]">¿Eres del staff? <a href="/gestion" className="font-bold underline">Panel de gestores</a></p>
 
             {/* ===== FOOTER ===== */}
             <footer className="mt-12 -mx-4 border-t-2 border-[var(--t-border)] bg-[var(--t-surface-2)] px-6 pt-6 pb-8 text-center">
