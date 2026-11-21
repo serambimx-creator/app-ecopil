@@ -100,8 +100,8 @@ export default function MainMap() {
         <div className="relative h-full w-full">
             <style>{'@keyframes ping{75%,100%{transform:scale(1.8);opacity:0}}'}</style>
             <MapContainer center={[20.15, -98.9]} zoom={9} className="h-full w-full" zoomControl={false}>
-                <TileLayer url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
-                    attribution='&copy; OpenStreetMap &copy; CARTO' />
+                <TileLayer url="https://tile.openstreetmap.org/{z}/{x}/{y}.png" maxZoom={19}
+                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>' />
                 <Encuadre puntos={puntos} />
                 {(dia === 'todos' ? DIAS : [dia]).map((d) => {
                     const ts = tramos.filter((t) => t.dia === d);
