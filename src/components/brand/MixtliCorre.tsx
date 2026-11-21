@@ -15,7 +15,7 @@ type Fase = 'listo' | 'jugando' | 'pregunta' | 'nivel' | 'fin' | 'gano';
 
 const H = 230, SUELO = 205, GRAV = 0.0022, SALTO = -0.74, MW = 84, MH = 80, MX = 20;
 const VEL0 = 0.26, VMAX = 0.6; // velocidad inicial y máxima (px/ms)
-const ALAS_MS = 7000; // duración de las alas de mariposa
+const ALAS_MS = 3000; // duración de las alas de mariposa
 const TRAMO_MS = 15_000; // tiempo de juego entre preguntas
 const TRAMO_LIBRE_MS = 60_000; // sin preguntas: 5 tramos = cambio de región
 const TAM: Record<Obstaculo, [number, number]> = {
@@ -232,7 +232,7 @@ export default function MixtliCorre({ children }: { children?: React.ReactNode }
             maris.forEach((b) => mariposa(c, b.x, b.y + Math.sin(t / 200 + b.x / 40) * 6, t, 1));
             if (img.complete) {
                 const cx = MX + MW / 2, cy = y + MH / 2 + (f === 'jugando' && y >= SUELO - MH - 0.5 ? Math.sin(t / 60) * 1.5 : 0);
-                if (alas > 0 && (alas > 1500 || Math.floor(t / 120) % 2)) { // alas (parpadean al acabarse)
+                if (alas > 0 && (alas > 1000 || Math.floor(t / 120) % 2)) { // alas (parpadean al acabarse)
                     const a = Math.sin(t / 70) * 0.5;
                     for (const s of [-1, 1]) {
                         c.save(); c.translate(cx - 6, cy - 6); c.rotate(s * (0.5 + a)); c.globalAlpha = 0.9;
