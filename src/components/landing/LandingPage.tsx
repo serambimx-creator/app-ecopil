@@ -243,6 +243,20 @@ export default function LandingPage() {
                     </a>
                 </div>
 
+                {/* Carrusel mini de aliados */}
+                <div className="relative mt-4 -mx-5 overflow-hidden py-1" aria-label="Aliados del Encuentro">
+                    <div className="flex w-max animate-[aliados_22s_linear_infinite] gap-3 hover:[animation-play-state:paused]">
+                        {[...ALIADOS, ...ALIADOS].map((a, i) => (
+                            <div key={i} aria-hidden={i >= ALIADOS.length}
+                                className="flex h-12 w-28 shrink-0 items-center justify-center rounded-xl border-2 border-[var(--t-border)] bg-white px-2">
+                                {/* eslint-disable-next-line @next/next/no-img-element */}
+                                <img src={a.logo} alt={a.nombre} className="max-h-full max-w-full object-contain" />
+                            </div>
+                        ))}
+                    </div>
+                    <style>{'@keyframes aliados{to{transform:translateX(calc(-50% - 6px))}}'}</style>
+                </div>
+
                 <div className="relative mt-2">
                     <MixtliCorre>
                     <MixtliBubble className="absolute left-5 top-1 max-w-[170px]">
