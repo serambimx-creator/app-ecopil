@@ -3,6 +3,7 @@
 // Resumen de indicadores del Encuentro y descargas CSV para armar el reporte.
 import { useMemo } from 'react';
 import { Download } from 'lucide-react';
+import { useInfoRegistros } from '@/lib/infoRegistros';
 import { nombreIndicador, diaCorto, rango, SEDES, type DatosGestion } from '@/lib/encuentro';
 
 type Fila = Record<string, string | number | boolean | null | undefined>;
@@ -24,7 +25,8 @@ const Dato = ({ n, t }: { n: string | number; t: string }) => (
     </div>
 );
 
-export default function Reporte({ d }: { d: DatosGestion }) {
+export default function Reporte({ d, token }: { d: DatosGestion; token: string }) {
+    const { info } = useInfoRegistros(token, d.registros);
     const asis = useMemo(() => d.asistencias ?? [], [d.asistencias]);
     const inds = useMemo(() => d.indicadores ?? [], [d.indicadores]);
     const enc = useMemo(() => d.encuesta ?? [], [d.encuesta]);
@@ -50,7 +52,8 @@ export default function Reporte({ d }: { d: DatosGestion }) {
 
     const descargas: [string, () => Fila[]][] = [
         ['registros', () => reg.map((r) => ({ nombre: r.nombre, nodo: r.nodo, ciudad: r.ciudad, estado: r.estado, grupo: r.grupo, confirmo: !!r.confirmado_en,
-            actividades_asistidas: asis.filter((a) => a.registro_id === r.id).length, registrado: r.created_at }))],
+            actividades_asistidas: asis.filter((a) => a.registro_id === r.id).length, registrado: r.created_at,
+            carta_folio: info?.[r.id]?.folio ?? '', temazcal: info?.[r.id]?.extras?.temazcal ?? '', acampada: info?.[r.id]?.extras?.acampada ?? '', pajareada: info?.[r.id]?.extras?.pajareada ?? '' }))],
         ['asistencia', () => asis.map((a) => { const x = actById.get(a.actividad_id); const r = regById.get(a.registro_id);
             return { dia: x?.dia, hora: x ? rango(x) : '', actividad: x?.titulo, sede: x?.sede ? SEDES[x.sede] : '', persona: r?.nombre, nodo: r?.nodo }; })],
         ['indicadores', () => inds.map((i) => { const x = i.actividad_id ? actById.get(i.actividad_id) : undefined;
@@ -70,6 +73,12 @@ export default function Reporte({ d }: { d: DatosGestion }) {
                 <Dato n={aprobados.length} t={`Aprobados · ${reg.filter((r) => r.confirmado_en).length} confirmaron`} />
                 <Dato n={new Set(aprobados.map((r) => r.nodo)).size} t="Nodos representados" />
                 <Dato n={asistieron} t="Personas con asistencia registrada" />
+                {info && <>
+                    <Dato n={aprobados.filter((r) => info[r.id]?.folio).length} t="Aprobados con carta compromiso" />
+                    <Dato n={aprobados.filter((r) => info[r.id]?.extras?.temazcal).length} t="Aprobados que van al temazcal" />
+                    <Dato n={aprobados.filter((r) => info[r.id]?.extras?.acampada).length} t="Aprobados que acampan en Ajolotequio" />
+                    <Dato n={aprobados.filter((r) => info[r.id]?.extras?.pajareada).length} t="Aprobados que van a la pajareada" />
+                </>}
             </div>
 
             <div className="space-y-2">

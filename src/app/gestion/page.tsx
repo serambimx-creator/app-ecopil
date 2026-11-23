@@ -11,6 +11,7 @@ import TemazcalLista from '@/components/gestion/TemazcalLista';
 import { bajarComprobante } from '@/components/encuentro/CartaCompromiso';
 import type { Comprobante } from '@/lib/comprobanteCarta';
 import { supabase } from '@/lib/supabase';
+import { useInfoRegistros } from '@/lib/infoRegistros';
 import { useGestion, ahoraHidalgo, rango, diaCorto, DIAS, DIA_COLOR, SEDES, type ActividadGestion, type Contacto, type EntradaBitacora } from '@/lib/encuentro';
 
 type Tab = 'hoy' | 'directorio' | 'bitacora' | 'registros' | 'reporte' | 'juego' | 'equipo';
@@ -139,7 +140,7 @@ export default function GestionPage() {
             {tab === 'bitacora' && <Bitacora entradas={d.bitacora} actividades={acts} avisos={d.avisos} guardar={g.guardarFila} borrar={g.borrarFila} />}
             {tab === 'registros' && <TemazcalLista token={g.token} />}
             {tab === 'registros' && <Registros datos={d} rpc={g.rpc} token={g.token} escaneado={escaneado} limpiar={() => setEscaneado(null)} />}
-            {tab === 'reporte' && <Reporte d={d} />}
+            {tab === 'reporte' && <Reporte d={d} token={g.token} />}
             {tab === 'juego' && <RankingJuego token={g.token} />}
             {tab === 'equipo' && <Equipo gestores={d.gestores} rpc={g.rpc} />}
 
@@ -274,14 +275,11 @@ function Registros({ datos, rpc, token, escaneado, limpiar }: {
 }) {
     const [filtro, setFiltro] = useState<'pendiente' | 'aprobado' | 'rechazado'>('pendiente');
     // Carta compromiso: sin carta aceptada no se puede aprobar (la base también lo impide).
-    type InfoCarta = { folio: number | null; es_menor: boolean | null; acepta_imagen: boolean | null; ficha: Record<string, string | null> | null };
-    const [cartas, setCartas] = useState<Record<string, InfoCarta> | null>(null);
+    const { info: cartas, recargar: cargarCartas } = useInfoRegistros(token, datos.registros);
     const [errorReg, setErrorReg] = useState('');
-    const cargarCartas = () => supabase.rpc('gestor_cartas', { p_token: token }).then(({ data, error }) => {
-        if (error) return setCartas(null);
-        setCartas(Object.fromEntries(((data as (InfoCarta & { registro_id: string })[]) ?? []).map((c) => [c.registro_id, c])));
-    });
-    useEffect(() => { cargarCartas(); }, [token, datos.registros.length]); // eslint-disable-line react-hooks/exhaustive-deps
+    const activos = datos.registros.filter((r) => r.estado !== 'rechazado');
+    const cuantos = (k: 'temazcal' | 'acampada' | 'pajareada') => activos.filter((r) => cartas?.[r.id]?.extras?.[k]).length;
+    const sinExtras = activos.filter((r) => cartas && !cartas[r.id]?.extras).length;
     const verCarta = async (id: string) => {
         const { data } = await supabase.rpc('gestor_carta_comprobante', { p_token: token, p_registro: id });
         if (data) await bajarComprobante(data as Comprobante);
@@ -322,6 +320,7 @@ function Registros({ datos, rpc, token, escaneado, limpiar }: {
                 </div>
             )}
             <p className="text-sm text-gray-400">{datos.registros.filter((r) => r.estado === 'aprobado').length} aprobados · {confirmados} confirmaron asistencia{cartas ? ` · ${datos.registros.filter((r) => cartas[r.id]?.folio).length} con carta` : ''}</p>
+            {cartas && <p className="text-xs text-gray-400">Extras: Temazcal {cuantos('temazcal')} · Acampada {cuantos('acampada')} · Pajareada {cuantos('pajareada')}{sinExtras ? ` · ${sinExtras} sin responder` : ''}</p>}
             {errorReg && <p className="rounded-2xl border-2 border-status-red bg-status-red/10 p-2 text-sm font-bold text-status-red">{errorReg}</p>}
             <div className="flex gap-2">
                 {(['pendiente', 'aprobado', 'rechazado'] as const).map((f) => (
@@ -350,6 +349,9 @@ function Registros({ datos, rpc, token, escaneado, limpiar }: {
                             {cartas && (cartas[r.id]?.folio
                                 ? <button onClick={() => verCarta(r.id)} className="rounded-full bg-brand-green/20 px-2 text-[10px] font-extrabold text-brand-green">Carta #{cartas[r.id].folio}{cartas[r.id].es_menor ? ' · menor' : ''} ↓</button>
                                 : <span className="rounded-full bg-status-red/20 px-2 text-[10px] font-extrabold text-status-red">Sin carta</span>)}
+                            {cartas?.[r.id]?.extras && (['temazcal', 'acampada', 'pajareada'] as const).filter((k) => cartas[r.id].extras![k]).map((k) => (
+                                <span key={k} className="rounded-full bg-gray-700 px-2 text-[10px] font-extrabold text-gray-200">{k === 'temazcal' ? 'Temazcal' : k === 'acampada' ? 'Acampa' : 'Pajareada'}</span>
+                            ))}
                             {cartas?.[r.id]?.folio && !cartas[r.id].acepta_imagen && <span className="rounded-full bg-ecopil-sun px-2 text-[10px] font-extrabold text-ink">No fotos</span>}
                         </div>
                     </div>

@@ -266,17 +266,73 @@ returns jsonb language sql stable security definer set search_path = public as $
   select to_jsonb(f) - 'registro_id' from encuentro_fichas_medicas f join encuentro_registros r on r.id = f.registro_id where r.token = p_token;
 $$;
 
+-- ---------- Actividades extra opcionales: temazcal, acampada y pajareada ----------
+create table if not exists public.encuentro_extras (
+  registro_id uuid primary key references public.encuentro_registros(id) on delete cascade,
+  temazcal boolean not null,
+  acampada boolean not null,
+  pajareada boolean not null,
+  updated_at timestamptz not null default now()
+);
+alter table public.encuentro_extras enable row level security;
+revoke all on public.encuentro_extras from anon, authenticated;
+
+-- Quien dijo que sí al temazcal entra a la lista (cupo 20) en cuanto está aprobado, por orden de llegada.
+create or replace function public.encuentro_sync_temazcal(p_registro uuid)
+returns void language plpgsql security definer set search_path = public as $$
+begin
+  perform pg_advisory_xact_lock(hashtext('temazcal_lista'));
+  if exists (select 1 from encuentro_registros r join encuentro_extras e on e.registro_id = r.id
+             where r.id = p_registro and r.estado = 'aprobado' and e.temazcal)
+     and (select count(*) from temazcal_lista) < 20 then
+    insert into temazcal_lista (registro_id) values (p_registro) on conflict do nothing;
+  end if;
+end $$;
+revoke execute on function public.encuentro_sync_temazcal(uuid) from public, anon, authenticated;
+
+create or replace function public.encuentro_extras_al_aprobar() returns trigger
+language plpgsql security definer set search_path = public as $$
+begin
+  if new.estado = 'aprobado' and old.estado is distinct from 'aprobado' then perform encuentro_sync_temazcal(new.id); end if;
+  return new;
+end $$;
+drop trigger if exists encuentro_extras_al_aprobar on public.encuentro_registros;
+create trigger encuentro_extras_al_aprobar after update of estado on public.encuentro_registros
+  for each row execute function public.encuentro_extras_al_aprobar();
+
+create or replace function public.encuentro_guardar_extras(p_token text, p_temazcal boolean, p_acampada boolean, p_pajareada boolean)
+returns jsonb language plpgsql security definer set search_path = public as $$
+declare rid uuid;
+begin
+  select id into rid from encuentro_registros where token = p_token and estado <> 'rechazado';
+  if rid is null then raise exception 'Enlace no válido.'; end if;
+  if p_temazcal is null or p_acampada is null or p_pajareada is null then raise exception 'Responde sí o no a cada actividad extra.'; end if;
+  insert into encuentro_extras (registro_id, temazcal, acampada, pajareada) values (rid, p_temazcal, p_acampada, p_pajareada)
+  on conflict (registro_id) do update set temazcal = excluded.temazcal, acampada = excluded.acampada, pajareada = excluded.pajareada, updated_at = now();
+  if p_temazcal then perform encuentro_sync_temazcal(rid); else delete from temazcal_lista where registro_id = rid; end if;
+  return encuentro_mis_extras(p_token);
+end $$;
+
+create or replace function public.encuentro_mis_extras(p_token text)
+returns jsonb language sql stable security definer set search_path = public as $$
+  select jsonb_build_object('temazcal', e.temazcal, 'acampada', e.acampada, 'pajareada', e.pajareada,
+    'temazcal_lugar', exists (select 1 from temazcal_lista t where t.registro_id = r.id))
+  from encuentro_registros r join encuentro_extras e on e.registro_id = r.id where r.token = p_token;
+$$;
+
 -- Staff: carta (folio, menor, imagen) y ficha médica por asistente
 create or replace function public.gestor_cartas(p_token text)
 returns jsonb language plpgsql stable security definer set search_path = public as $$
 begin
   if gestor_de_token(p_token) is null then raise exception 'Sesión vencida. Vuelve a entrar.'; end if;
   return coalesce((select jsonb_agg(jsonb_build_object('registro_id', r.id, 'folio', a.folio, 'aceptada_en', a.aceptada_en,
-      'es_menor', a.es_menor, 'acepta_imagen', a.acepta_imagen, 'ficha', to_jsonb(f) - 'registro_id'))
+      'es_menor', a.es_menor, 'acepta_imagen', a.acepta_imagen, 'ficha', to_jsonb(f) - 'registro_id',
+      'extras', to_jsonb(e) - 'registro_id'))
     from encuentro_registros r
     left join lateral (select * from encuentro_aceptaciones x where x.registro_id = r.id order by folio desc limit 1) a on true
     left join encuentro_fichas_medicas f on f.registro_id = r.id
-    where a.folio is not null or f.registro_id is not null), '[]'::jsonb);
+    left join encuentro_extras e on e.registro_id = r.id
+    where a.folio is not null or f.registro_id is not null or e.registro_id is not null), '[]'::jsonb);
 end $$;
 
 create or replace function public.gestor_carta_comprobante(p_token text, p_registro uuid)
@@ -299,7 +355,8 @@ revoke execute on function public.encuentro_carta_json(public.encuentro_aceptaci
 grant execute on function public.encuentro_carta(), public.encuentro_mi_carta(text),
   public.encuentro_firmar_carta(text, text, text, text, boolean, boolean, boolean, boolean, text, text, text),
   public.gestor_cartas(text), public.gestor_carta_comprobante(text, uuid),
-  public.encuentro_guardar_ficha(text, boolean, text, text, text, text, text, text), public.encuentro_mi_ficha(text) to anon, authenticated;
+  public.encuentro_guardar_ficha(text, boolean, text, text, text, text, text, text), public.encuentro_mi_ficha(text),
+  public.encuentro_guardar_extras(text, boolean, boolean, boolean), public.encuentro_mis_extras(text) to anon, authenticated;
 
 -- ---------- Acceso: solo agentes validados (o gestores) ven programa, guía y mapa ----------
 -- Estado de acceso para la app: 'gestor', 'aprobado', 'pendiente', 'rechazado' o null (sin registro).
@@ -320,3 +377,15 @@ end $$;
 
 revoke execute on function public.encuentro_publico() from public, anon, authenticated;
 grant execute on function public.encuentro_acceso(text, text), public.encuentro_publico2(text, text) to anon, authenticated;
+
+-- Si el agente aparta o libera su lugar del temazcal desde la tarjeta del programa, se refleja en sus extras.
+create or replace function public.encuentro_temazcal_a_extras() returns trigger
+language plpgsql security definer set search_path = public as $$
+begin
+  update encuentro_extras set temazcal = (tg_op = 'INSERT'), updated_at = now()
+   where registro_id = coalesce(new.registro_id, old.registro_id) and temazcal is distinct from (tg_op = 'INSERT');
+  return null;
+end $$;
+drop trigger if exists encuentro_temazcal_a_extras on public.temazcal_lista;
+create trigger encuentro_temazcal_a_extras after insert or delete on public.temazcal_lista
+  for each row execute function public.encuentro_temazcal_a_extras();

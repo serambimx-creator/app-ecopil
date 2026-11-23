@@ -2,6 +2,7 @@
 
 import Temazcal from '@/components/encuentro/Temazcal';
 import CartaCompromiso from '@/components/encuentro/CartaCompromiso';
+import TarjetaExtras from '@/components/encuentro/Extras';
 import { Suspense, useEffect, useState } from 'react';
 import QRCode from 'qrcode';
 import Link from 'next/link';
@@ -140,6 +141,7 @@ function MiRegistroContenido() {
                 </div>
             )}
             {registro.estado !== 'rechazado' && token && <CartaCompromiso token={token} nombre={registro.nombre} />}
+            {registro.estado !== 'rechazado' && token && <TarjetaExtras token={token} aprobado={aprobado} />}
             {registro.estado === 'rechazado' && (
                 <div className="sticker rounded-3xl bg-[var(--t-surface)] p-4 text-sm text-[var(--t-text-secondary)]">
                     Tu registro no fue aprobado. Si crees que es un error, escribe al staff del Encuentro.
