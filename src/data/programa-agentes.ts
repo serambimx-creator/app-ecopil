@@ -45,13 +45,13 @@ export const PROGRAMA: DiaPrograma[] = [
         bloques: [
             { momento: 'Mañana', texto: 'Nos tomamos la foto oficial y viajamos a Acaxochitlán: caminamos al manantial de Cascadas Dos Mundos (Huetziatl) y analizamos la calidad de su agua.' },
             { momento: 'Tarde', texto: 'Comida, clausura y sorteo. Después vamos a Ajolotequio, en Los Romeros (Tulancingo), a construir una biopiscina, reforestar y aprender de los ajolotes.' },
-            { momento: 'Noche', texto: 'Temazcal y campamento. Solo hay 20 lugares para el temazcal: apártalo abajo.' },
+            { momento: 'Noche', texto: 'Actividad extra (opcional): temazcal y campamento en Ajolotequio. Solo hay 20 lugares para el temazcal: apártalo abajo.' },
         ],
         horas: [
             { hora: '07:00', que: 'Desayuno grupo A' }, { hora: '07:30', que: 'Desayuno grupo B' },
             { hora: '08:00', que: 'Foto oficial en el hotel' }, { hora: '08:30', que: 'Salida del hotel' },
         ],
-        tip: 'Lleva $30 por persona para la entrada al manantial de Acaxochitlán. Hace frío, pero se puede nadar: habrá 10 minutos para quien se anime. Y hoy dormimos en Ajolotequio: lleva lo necesario para acampar.',
+        tip: 'Lleva $30 por persona para la entrada al manantial de Acaxochitlán. Hace frío, pero se puede nadar: habrá 10 minutos para quien se anime. Si te quedas al campamento en Ajolotequio, lleva lo necesario para acampar.',
     },
     {
         dia: '2026-12-21', titulo: 'Cierre en Ajolotequio', sedes: ['ajolotequio'],

@@ -192,7 +192,7 @@ const ALIADOS = [
 const INFO_PRACTICA = [
     { titulo: 'Hospedaje y llegada', pose: 'asoma', color: 'bg-ecopil-sun', items: [
         'Llegada el 17 de diciembre. Bienvenida a las 19:30 en el Hotel City Express Tula.',
-        'Del 17 al 19 dormimos en el hotel; la noche del 20 acampamos en Ajolotequio, Los Romeros (Tulancingo).',
+        'Del 17 al 19 dormimos en el hotel; la noche del 20 hay campamento opcional en Ajolotequio, Los Romeros (Tulancingo), con registro previo.',
         'El 21 a las 12:00 te llevamos a las terminales para tu regreso.',
     ] },
     { titulo: 'Qué traer', pose: 'pala', color: 'bg-ecopil-leaf', items: [

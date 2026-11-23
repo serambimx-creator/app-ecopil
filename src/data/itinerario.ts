@@ -84,7 +84,7 @@ export const ITINERARIO: BloqueDia[] = [
         titulo: 'Tequio en Ajolotequio',
         detalle: 'Creación de biopiscina (Isaac), reforestación con maguey (Mahely), desazolve de jagüey (Alexia) y organización de herramientas (Marcos y Chepe)',
       },
-      { hora: '', titulo: 'Temazcal y campamento', detalle: 'Previo registro · Lleva tus insumos' },
+      { hora: '', titulo: 'Temazcal y campamento (actividad extra, opcional)', detalle: 'Previo registro · Lleva tus insumos' },
     ],
   },
   {
@@ -101,7 +101,7 @@ export const ITINERARIO: BloqueDia[] = [
 ];
 
 export const ACTIVIDAD_EXTRA = {
-  titulo: 'Recorrido en 10 cascadas',
+  titulo: 'Temazcal y campamento en Ajolotequio',
   descripcion:
-    'Para quien desee quedarse después del encuentro. Actividad opcional fuera del itinerario oficial.',
+    'La noche del 20 en Ajolotequio, Los Romeros, para quien quiera quedarse. Actividad opcional con registro previo: el temazcal tiene 20 lugares.',
 };
