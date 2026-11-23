@@ -92,6 +92,7 @@ export const ITINERARIO: BloqueDia[] = [
     sede: 'Ajolotequio, Los Romeros (Tulancingo)  ·  Cierre de integración',
     teaser: 'Temazcal al amanecer y despedida antes de volver a casa.',
     actividades: [
+      { hora: '', titulo: 'Pajareada (actividad extra, opcional)', detalle: 'Para quien se quedó al campamento' },
       { hora: '08:00–09:30', titulo: 'Temazcal' },
       { hora: '09:30–10:30', titulo: 'Desayuno' },
       { hora: '10:30–12:00', titulo: 'Cierre de integración' },
@@ -100,8 +101,15 @@ export const ITINERARIO: BloqueDia[] = [
   },
 ];
 
-export const ACTIVIDAD_EXTRA = {
-  titulo: 'Temazcal y campamento en Ajolotequio',
-  descripcion:
-    'La noche del 20 en Ajolotequio, Los Romeros, para quien quiera quedarse. Actividad opcional con registro previo: el temazcal tiene 20 lugares.',
-};
+export const ACTIVIDADES_EXTRA = [
+  {
+    titulo: 'Temazcal y campamento en Ajolotequio',
+    descripcion:
+      'La noche del 20 en Ajolotequio, Los Romeros, para quien quiera quedarse. Actividad opcional con registro previo: el temazcal tiene 20 lugares.',
+  },
+  {
+    titulo: 'Pajareada',
+    descripcion:
+      'El 21 por la mañana en Ajolotequio, para quien se quedó al campamento. Actividad opcional: trae binoculares si tienes.',
+  },
+];

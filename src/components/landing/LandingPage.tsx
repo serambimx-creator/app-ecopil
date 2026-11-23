@@ -5,7 +5,7 @@ import { ArrowRight, Star, MapPin, Users, Handshake, Building2, Map, FileText, P
 import { clsx } from 'clsx';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { ITINERARIO, ACTIVIDAD_EXTRA } from '@/data/itinerario';
+import { ITINERARIO, ACTIVIDADES_EXTRA } from '@/data/itinerario';
 import Mixtli, { MixtliBubble } from '@/components/brand/Mixtli';
 import MixtliCorre from '@/components/brand/MixtliCorre';
 
@@ -355,20 +355,22 @@ export default function LandingPage() {
                             Cinco días para conectar, aprender y dejar huella — ¡te esperamos!
                         </p>
 
-                        <div className="border-2 border-dashed border-[var(--t-border)] rounded-3xl p-4">
+                        {ACTIVIDADES_EXTRA.map((extra) => (
+                        <div key={extra.titulo} className="border-2 border-dashed border-[var(--t-border)] rounded-3xl p-4">
                             <div className="flex items-start gap-3">
                                 <div className="w-7 h-7 rounded-full bg-ecopil-sun/30 border-2 border-dashed border-ecopil-orange flex items-center justify-center shrink-0">
                                     <span className="text-xs font-bold text-[var(--t-text-muted)]">+</span>
                                 </div>
                                 <div>
-                                    <p className="text-sm font-bold text-[var(--t-text-secondary)]">{ACTIVIDAD_EXTRA.titulo}</p>
+                                    <p className="text-sm font-bold text-[var(--t-text-secondary)]">{extra.titulo}</p>
                                     <span className="text-[9px] font-bold text-[var(--t-text-faint)] uppercase tracking-widest">
                                         Actividad extra · Opcional
                                     </span>
-                                    <p className="text-xs text-[var(--t-text-faint)] mt-1">{ACTIVIDAD_EXTRA.descripcion}</p>
+                                    <p className="text-xs text-[var(--t-text-faint)] mt-1">{extra.descripcion}</p>
                                 </div>
                             </div>
                         </div>
+                        ))}
 
                         <button
                             onClick={() => router.push('/programa')}

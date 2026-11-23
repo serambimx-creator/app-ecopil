@@ -56,6 +56,7 @@ export const PROGRAMA: DiaPrograma[] = [
     {
         dia: '2026-12-21', titulo: 'Cierre en Ajolotequio', sedes: ['ajolotequio'],
         bloques: [
+            { momento: 'Temprano', texto: 'Actividad extra (opcional): pajareada en Ajolotequio para quien se quedó al campamento. Trae binoculares si tienes.' },
             { momento: 'Mañana', texto: 'Cierre de integración para despedirnos y llevarnos los acuerdos a cada nodo. Este día no hay temazcal ni desayuno, pero si te quedas podemos caminar y buscar un lugar para desayunar :)' },
         ],
         horas: [{ hora: '12:00', que: 'Salida a las terminales' }],
