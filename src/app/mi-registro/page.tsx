@@ -1,6 +1,7 @@
 'use client';
 
 import Temazcal from '@/components/encuentro/Temazcal';
+import CartaCompromiso from '@/components/encuentro/CartaCompromiso';
 import { Suspense, useEffect, useState } from 'react';
 import QRCode from 'qrcode';
 import Link from 'next/link';
@@ -115,7 +116,7 @@ function MiRegistroContenido() {
 
     return (
         <div className="space-y-4 text-[var(--t-text)]">
-            {nuevo && <MixtliBubble className="text-sm">¡Listo! Guarda este enlace: es tu acceso a tu perfil del Encuentro.</MixtliBubble>}
+            {nuevo && <MixtliBubble className="text-sm">¡Listo! Guarda este enlace: es tu acceso a tu perfil del Encuentro. Falta un paso: acepta tu carta compromiso aquí abajo.</MixtliBubble>}
 
             {/* Encabezado */}
             <div className="flex items-center gap-4">
@@ -132,9 +133,10 @@ function MiRegistroContenido() {
 
             {registro.estado === 'pendiente' && (
                 <div className="sticker rounded-3xl bg-[var(--t-surface)] p-4 text-sm text-[var(--t-text-secondary)]">
-                    Recibimos tu registro. El staff de Pachuca–Tulancingo lo revisa; aquí verás cuando quede aprobado.
+                    Recibimos tu registro. El staff de Pachuca–Tulancingo lo valida en cuanto aceptes tu carta compromiso; aquí verás cuando quede aprobado.
                 </div>
             )}
+            {registro.estado !== 'rechazado' && token && <CartaCompromiso token={token} nombre={registro.nombre} />}
             {registro.estado === 'rechazado' && (
                 <div className="sticker rounded-3xl bg-[var(--t-surface)] p-4 text-sm text-[var(--t-text-secondary)]">
                     Tu registro no fue aprobado. Si crees que es un error, escribe al staff del Encuentro.
