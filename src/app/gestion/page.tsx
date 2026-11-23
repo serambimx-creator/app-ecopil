@@ -274,11 +274,12 @@ function Registros({ datos, rpc, token, escaneado, limpiar }: {
 }) {
     const [filtro, setFiltro] = useState<'pendiente' | 'aprobado' | 'rechazado'>('pendiente');
     // Carta compromiso: sin carta aceptada no se puede aprobar (la base también lo impide).
-    const [cartas, setCartas] = useState<Record<string, { folio: number; es_menor: boolean }> | null>(null);
+    type InfoCarta = { folio: number | null; es_menor: boolean | null; acepta_imagen: boolean | null; ficha: Record<string, string | null> | null };
+    const [cartas, setCartas] = useState<Record<string, InfoCarta> | null>(null);
     const [errorReg, setErrorReg] = useState('');
     const cargarCartas = () => supabase.rpc('gestor_cartas', { p_token: token }).then(({ data, error }) => {
         if (error) return setCartas(null);
-        setCartas(Object.fromEntries(((data as { registro_id: string; folio: number; es_menor: boolean }[]) ?? []).map((c) => [c.registro_id, c])));
+        setCartas(Object.fromEntries(((data as (InfoCarta & { registro_id: string })[]) ?? []).map((c) => [c.registro_id, c])));
     });
     useEffect(() => { cargarCartas(); }, [token, datos.registros.length]); // eslint-disable-line react-hooks/exhaustive-deps
     const verCarta = async (id: string) => {
@@ -320,7 +321,7 @@ function Registros({ datos, rpc, token, escaneado, limpiar }: {
                     )}
                 </div>
             )}
-            <p className="text-sm text-gray-400">{datos.registros.filter((r) => r.estado === 'aprobado').length} aprobados · {confirmados} confirmaron asistencia{cartas ? ` · ${datos.registros.filter((r) => cartas[r.id]).length} con carta` : ''}</p>
+            <p className="text-sm text-gray-400">{datos.registros.filter((r) => r.estado === 'aprobado').length} aprobados · {confirmados} confirmaron asistencia{cartas ? ` · ${datos.registros.filter((r) => cartas[r.id]?.folio).length} con carta` : ''}</p>
             {errorReg && <p className="rounded-2xl border-2 border-status-red bg-status-red/10 p-2 text-sm font-bold text-status-red">{errorReg}</p>}
             <div className="flex gap-2">
                 {(['pendiente', 'aprobado', 'rechazado'] as const).map((f) => (
@@ -338,21 +339,27 @@ function Registros({ datos, rpc, token, escaneado, limpiar }: {
                             <p className="font-bold text-white truncate">{r.nombre}</p>
                             <p className="text-xs text-gray-400">{r.nodo} · <a href={`tel:${tel(r.telefono)}`}>{r.telefono}</a></p>
                             <p className="text-xs text-gray-500">Emergencia: {r.emergencia_nombre} {r.emergencia_telefono}</p>
+                            {cartas?.[r.id]?.ficha && (() => {
+                                const fm = cartas[r.id].ficha!;
+                                const t = [fm.alergias && `Alergias: ${fm.alergias}`, fm.padecimientos && `Padece: ${fm.padecimientos}`, fm.medicamentos && `Toma: ${fm.medicamentos}`, fm.tipo_sangre && `Sangre ${fm.tipo_sangre}`, fm.seguro && `Seguro: ${fm.seguro}`, fm.notas].filter(Boolean).join(' · ');
+                                return t ? <p className="text-xs font-semibold text-status-red">⚕ {t}</p> : null;
+                            })()}
                         </div>
                         <div className="flex flex-col items-end gap-1 self-start">
                             {r.confirmado_en && <span className="rounded-full bg-ecopil-leaf px-2 text-[10px] font-extrabold text-ink">Confirmó</span>}
-                            {cartas && (cartas[r.id]
+                            {cartas && (cartas[r.id]?.folio
                                 ? <button onClick={() => verCarta(r.id)} className="rounded-full bg-brand-green/20 px-2 text-[10px] font-extrabold text-brand-green">Carta #{cartas[r.id].folio}{cartas[r.id].es_menor ? ' · menor' : ''} ↓</button>
                                 : <span className="rounded-full bg-status-red/20 px-2 text-[10px] font-extrabold text-status-red">Sin carta</span>)}
+                            {cartas?.[r.id]?.folio && !cartas[r.id].acepta_imagen && <span className="rounded-full bg-ecopil-sun px-2 text-[10px] font-extrabold text-ink">No fotos</span>}
                         </div>
                     </div>
                     <div className="flex gap-2">
-                        {r.estado !== 'rechazado' && !(r.estado === 'pendiente' && cartas && !cartas[r.id]) && (['A', 'B'] as const).map((gr) => (
+                        {r.estado !== 'rechazado' && !(r.estado === 'pendiente' && cartas && !cartas[r.id]?.folio) && (['A', 'B'] as const).map((gr) => (
                             <button key={gr} onClick={() => revisar(r.id, r.estado === 'pendiente' ? 'aprobado' : null, gr)}
                                 className={clsx('w-10 h-10 rounded-full text-sm font-extrabold border-2', r.grupo === gr ? 'sticker bg-ecopil-sun text-ink' : 'border-gray-600 text-gray-300')}>{gr}</button>
                         ))}
                         <div className="flex-1" />
-                        {r.estado !== 'aprobado' && (cartas && !cartas[r.id]
+                        {r.estado !== 'aprobado' && (cartas && !cartas[r.id]?.folio
                             ? <span className="self-center text-[11px] font-bold text-gray-500">Falta carta para aprobar</span>
                             : <button onClick={() => revisar(r.id, 'aprobado', null)} className="rounded-full bg-brand-green px-4 text-xs font-extrabold text-ink">Aprobar</button>)}
                         {r.estado !== 'rechazado' && <button onClick={() => revisar(r.id, 'rechazado', null)} className="rounded-full border-2 border-gray-600 px-3 text-xs font-bold text-gray-300">Rechazar</button>}

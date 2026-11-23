@@ -15,6 +15,7 @@ export interface Comprobante {
     nombre_escrito: string;
     acepta_deslinde: boolean;
     acepta_imagen: boolean;
+    acepta_privacidad?: boolean;
     es_menor: boolean;
     tutor_nombre: string | null;
     tutor_parentesco: string | null;
@@ -59,7 +60,7 @@ function Doc({ c }: { c: Comprobante }) {
                     <Text style={{ fontFamily: 'Helvetica-Bold', marginBottom: 6 }}>Firma electrónica y evidencia</Text>
                     <Fila k="Nombre escrito" v={c.nombre_escrito} />
                     {c.es_menor && <Fila k="Acepta por la persona menor" v={`${c.tutor_nombre} (${c.tutor_parentesco})`} />}
-                    <Fila k="Casillas marcadas" v={`Acepto la carta: ${c.acepta_deslinde ? 'sí' : 'no'} · Autorizo uso de imagen: ${c.acepta_imagen ? 'sí' : 'no'}`} />
+                    <Fila k="Casillas marcadas" v={`Aviso de privacidad: ${c.acepta_privacidad ? 'leído' : 'no'} · Reglamento y riesgos: ${c.acepta_deslinde ? 'acepto' : 'no'} · Uso de imagen: ${c.acepta_imagen ? 'sí autorizo' : 'no autorizo'}`} />
                     <Fila k="Fecha y hora (servidor)" v={`${c.fecha_texto} · ${c.aceptada_en}`} />
                     <Fila k="Dirección IP" v={c.ip ?? 'no disponible'} />
                     <Fila k="Navegador (user agent)" v={c.user_agent ?? 'no disponible'} />
