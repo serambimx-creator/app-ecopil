@@ -102,7 +102,7 @@ export const GUIA: SedeGuia[] = [
         geologia: 'Cuenca rodeada de serranías volcánicas con suelos fértiles y manantiales.',
         biologia: 'El ajolote es un anfibio que conserva su forma de larva toda la vida y puede regenerar extremidades, partes del corazón y del cerebro.',
         llevar: ['Ropa de trabajo que se pueda ensuciar', 'Lo necesario para acampar', 'Ropa abrigadora para la noche', 'Respeto: observa a los animales sin sacarlos del agua'],
-        ojo: 'La noche del 20 dormimos en Ajolotequio; el temazcal tiene 20 lugares: apártalo en Mi registro o en el Programa. El 21 no hay desayuno: si te quedas, buscamos juntos dónde desayunar.',
+        ojo: 'El campamento de la noche del 20 es opcional; el temazcal tiene 20 lugares: apártalo en Mi registro o en el Programa. El 21 hay temazcal a las 8:00, desayuno a las 9:30 y cierre de integración a las 10:30.',
         servicios: {},
         trivia: [
             { p: '¿Qué puede regenerar un ajolote?', o: ['Patas, partes del corazón y del cerebro', 'Solo la cola', 'Nada, como nosotros'], dato: 'Por eso el ajolote se estudia en laboratorios de todo el mundo, aunque en vida silvestre está en peligro crítico.' },
