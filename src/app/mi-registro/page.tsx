@@ -1,6 +1,8 @@
 'use client';
 
 import Temazcal from '@/components/encuentro/Temazcal';
+import CartaCompromiso from '@/components/encuentro/CartaCompromiso';
+import TarjetaExtras from '@/components/encuentro/Extras';
 import { Suspense, useEffect, useState } from 'react';
 import QRCode from 'qrcode';
 import Link from 'next/link';
@@ -9,6 +11,7 @@ import { clsx } from 'clsx';
 import { Loader2, Check, Clock, XCircle, Copy, Share2, CalendarDays, Map, BookOpen, Star, ChevronDown } from 'lucide-react';
 import { ecopil, TOKEN_KEY, type MiRegistro } from '@/lib/ecopil';
 import { ahoraHidalgo, diaCorto } from '@/lib/encuentro';
+import { useAcceso } from '@/context/AccesoContext';
 import Mixtli, { MixtliBubble } from '@/components/brand/Mixtli';
 
 const ESTADO = {
@@ -67,6 +70,7 @@ function MiRegistroContenido() {
     const [qr, setQr] = useState('');
     const [verEncuesta, setVerEncuesta] = useState(false);
     const nuevo = params.get('nuevo') === '1';
+    const { recargar: recargarAcceso } = useAcceso();
 
     const cargar = async (t: string) => {
         const r3 = await ecopil.rpc('encuentro_mi_registro3', { p_token: t });
@@ -88,9 +92,10 @@ function MiRegistroContenido() {
             else t = localStorage.getItem(TOKEN_KEY);
         } catch { /* sin storage */ }
         setToken(t);
+        recargarAcceso();
         if (!t) { setRegistro(null); return; }
         cargar(t);
-    }, [params]);
+    }, [params, recargarAcceso]);
 
     const enlace = token ? `${typeof window !== 'undefined' ? window.location.origin : ''}/mi-registro?t=${token}` : '';
     const copiar = async () => { try { await navigator.clipboard.writeText(enlace); setCopiado(true); } catch { /* sin portapapeles */ } };
@@ -115,7 +120,7 @@ function MiRegistroContenido() {
 
     return (
         <div className="space-y-4 text-[var(--t-text)]">
-            {nuevo && <MixtliBubble className="text-sm">¡Listo! Guarda este enlace: es tu acceso a tu perfil del Encuentro.</MixtliBubble>}
+            {nuevo && <MixtliBubble className="text-sm">¡Listo! Guarda este enlace: es tu acceso a tu perfil del Encuentro. Falta un paso: acepta tu carta compromiso aquí abajo.</MixtliBubble>}
 
             {/* Encabezado */}
             <div className="flex items-center gap-4">
@@ -132,9 +137,11 @@ function MiRegistroContenido() {
 
             {registro.estado === 'pendiente' && (
                 <div className="sticker rounded-3xl bg-[var(--t-surface)] p-4 text-sm text-[var(--t-text-secondary)]">
-                    Recibimos tu registro. El staff de Pachuca–Tulancingo lo revisa; aquí verás cuando quede aprobado.
+                    Recibimos tu registro. El staff de Pachuca–Tulancingo lo valida en cuanto aceptes tu carta compromiso; aquí verás cuando quede aprobado.
                 </div>
             )}
+            {registro.estado !== 'rechazado' && token && <CartaCompromiso token={token} nombre={registro.nombre} />}
+            {registro.estado !== 'rechazado' && token && <TarjetaExtras token={token} aprobado={aprobado} />}
             {registro.estado === 'rechazado' && (
                 <div className="sticker rounded-3xl bg-[var(--t-surface)] p-4 text-sm text-[var(--t-text-secondary)]">
                     Tu registro no fue aprobado. Si crees que es un error, escribe al staff del Encuentro.
@@ -157,7 +164,7 @@ function MiRegistroContenido() {
                 <div className="sticker relative overflow-hidden rounded-[28px] bg-brand-green p-5 text-ink">
                     <div className="flex items-start justify-between gap-3">
                         <div>
-                            <p className="font-futura text-[10px] font-extrabold uppercase tracking-[0.2em]">Gafete · Encuentro Nacional 2026</p>
+                            <p className="font-futura text-[10px] font-extrabold uppercase tracking-[0.2em]">Gafete · 7º Encuentro Nacional 2026</p>
                             <p className="font-display mt-1 text-2xl font-semibold leading-tight">{registro.nombre}</p>
                             <p className="text-sm font-bold">Nodo {registro.nodo}{registro.grupo ? ` · Grupo ${registro.grupo}` : ''}</p>
                             {registro.confirmado_en && <p className="mt-2 inline-flex items-center gap-1 rounded-full bg-white/60 px-2 py-0.5 text-[11px] font-extrabold"><Check size={12} /> Asistencia confirmada</p>}
@@ -219,7 +226,7 @@ function MiRegistroContenido() {
                     <button onClick={copiar} className="font-futura sticker flex-1 bg-ecopil-sun text-ink font-extrabold py-2.5 rounded-full text-sm flex items-center justify-center gap-1.5">
                         <Copy size={14} /> {copiado ? 'Copiado' : 'Copiar'}
                     </button>
-                    <a href={`https://wa.me/?text=${encodeURIComponent(`Mi registro al Encuentro Nacional de Innovación Social y Liderazgo Ambiental 2026: ${enlace}`)}`} target="_blank" rel="noreferrer"
+                    <a href={`https://wa.me/?text=${encodeURIComponent(`Mi registro al 7º Encuentro Nacional de Innovación Social y Liderazgo Ambiental 2026: ${enlace}`)}`} target="_blank" rel="noreferrer"
                         className="flex-1 border-2 border-[var(--t-border)] rounded-full py-2.5 text-sm font-bold text-[var(--t-text-muted)] flex items-center justify-center gap-1.5">
                         <Share2 size={14} /> WhatsApp
                     </a>

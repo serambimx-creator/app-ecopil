@@ -8,7 +8,10 @@ import EditorActividad from '@/components/gestion/EditorActividad';
 import Reporte from '@/components/gestion/Reporte';
 import RankingJuego from '@/components/gestion/RankingJuego';
 import TemazcalLista from '@/components/gestion/TemazcalLista';
+import { bajarComprobante } from '@/components/encuentro/CartaCompromiso';
+import type { Comprobante } from '@/lib/comprobanteCarta';
 import { supabase } from '@/lib/supabase';
+import { useInfoRegistros } from '@/lib/infoRegistros';
 import { useGestion, ahoraHidalgo, rango, diaCorto, DIAS, DIA_COLOR, SEDES, type ActividadGestion, type Contacto, type EntradaBitacora } from '@/lib/encuentro';
 
 type Tab = 'hoy' | 'directorio' | 'bitacora' | 'registros' | 'reporte' | 'juego' | 'equipo';
@@ -136,8 +139,8 @@ export default function GestionPage() {
             {tab === 'directorio' && <Directorio contactos={d.contactos} gestores={d.gestores} busca={busca} setBusca={setBusca} guardar={g.guardarFila} />}
             {tab === 'bitacora' && <Bitacora entradas={d.bitacora} actividades={acts} avisos={d.avisos} guardar={g.guardarFila} borrar={g.borrarFila} />}
             {tab === 'registros' && <TemazcalLista token={g.token} />}
-            {tab === 'registros' && <Registros datos={d} rpc={g.rpc} escaneado={escaneado} limpiar={() => setEscaneado(null)} />}
-            {tab === 'reporte' && <Reporte d={d} />}
+            {tab === 'registros' && <Registros datos={d} rpc={g.rpc} token={g.token} escaneado={escaneado} limpiar={() => setEscaneado(null)} />}
+            {tab === 'reporte' && <Reporte d={d} token={g.token} />}
             {tab === 'juego' && <RankingJuego token={g.token} />}
             {tab === 'equipo' && <Equipo gestores={d.gestores} rpc={g.rpc} />}
 
@@ -266,14 +269,28 @@ function Bitacora({ entradas, actividades, avisos, guardar, borrar }: {
     );
 }
 
-function Registros({ datos, rpc, escaneado, limpiar }: {
+function Registros({ datos, rpc, token, escaneado, limpiar }: {
     datos: NonNullable<ReturnType<typeof useGestion>['datos']>; rpc: (fn: string, a: Record<string, unknown>) => Promise<unknown>;
-    escaneado: string | null; limpiar: () => void;
+    token: string; escaneado: string | null; limpiar: () => void;
 }) {
     const [filtro, setFiltro] = useState<'pendiente' | 'aprobado' | 'rechazado'>('pendiente');
+    // Carta compromiso: sin carta aceptada no se puede aprobar (la base también lo impide).
+    const { info: cartas, recargar: cargarCartas } = useInfoRegistros(token, datos.registros);
+    const [errorReg, setErrorReg] = useState('');
+    const activos = datos.registros.filter((r) => r.estado !== 'rechazado');
+    const cuantos = (k: 'temazcal' | 'acampada' | 'pajareada') => activos.filter((r) => cartas?.[r.id]?.extras?.[k]).length;
+    const sinExtras = activos.filter((r) => cartas && !cartas[r.id]?.extras).length;
+    const verCarta = async (id: string) => {
+        const { data } = await supabase.rpc('gestor_carta_comprobante', { p_token: token, p_registro: id });
+        if (data) await bajarComprobante(data as Comprobante);
+    };
     const lista = escaneado ? datos.registros.filter((r) => r.email.toLowerCase() === escaneado) : datos.registros.filter((r) => r.estado === filtro);
     const confirmados = datos.registros.filter((r) => r.confirmado_en).length;
-    const revisar = (id: string, estado: string | null, grupo: string | null) => rpc('gestor_revisar_registro', { p_id: id, p_estado: estado, p_grupo: grupo });
+    const revisar = async (id: string, estado: string | null, grupo: string | null) => {
+        setErrorReg('');
+        try { await rpc('gestor_revisar_registro', { p_id: id, p_estado: estado, p_grupo: grupo }); }
+        catch (e) { setErrorReg((e as Error).message); cargarCartas(); }
+    };
     // Al escanear un gafete: pasar lista en la actividad que va según la hora
     const ahora = ahoraHidalgo();
     const delDia = datos.actividades.filter((a) => a.dia === (DIAS.includes(ahora.dia) ? ahora.dia : DIAS[1]) && a.tipo !== 'traslado');
@@ -302,7 +319,9 @@ function Registros({ datos, rpc, escaneado, limpiar }: {
                     )}
                 </div>
             )}
-            <p className="text-sm text-gray-400">{datos.registros.filter((r) => r.estado === 'aprobado').length} aprobados · {confirmados} confirmaron asistencia</p>
+            <p className="text-sm text-gray-400">{datos.registros.filter((r) => r.estado === 'aprobado').length} aprobados · {confirmados} confirmaron asistencia{cartas ? ` · ${datos.registros.filter((r) => cartas[r.id]?.folio).length} con carta` : ''}</p>
+            {cartas && <p className="text-xs text-gray-400">Extras: Temazcal {cuantos('temazcal')} · Acampada {cuantos('acampada')} · Pajareada {cuantos('pajareada')}{sinExtras ? ` · ${sinExtras} sin responder` : ''}</p>}
+            {errorReg && <p className="rounded-2xl border-2 border-status-red bg-status-red/10 p-2 text-sm font-bold text-status-red">{errorReg}</p>}
             <div className="flex gap-2">
                 {(['pendiente', 'aprobado', 'rechazado'] as const).map((f) => (
                     <button key={f} onClick={() => setFiltro(f)} className={clsx('flex-1 rounded-full py-2 text-xs font-extrabold border-2', filtro === f ? 'sticker bg-ecopil-sun text-ink' : 'border-gray-700 text-gray-400')}>
@@ -319,16 +338,32 @@ function Registros({ datos, rpc, escaneado, limpiar }: {
                             <p className="font-bold text-white truncate">{r.nombre}</p>
                             <p className="text-xs text-gray-400">{r.nodo} · <a href={`tel:${tel(r.telefono)}`}>{r.telefono}</a></p>
                             <p className="text-xs text-gray-500">Emergencia: {r.emergencia_nombre} {r.emergencia_telefono}</p>
+                            {cartas?.[r.id]?.ficha && (() => {
+                                const fm = cartas[r.id].ficha!;
+                                const t = [fm.alergias && `Alergias: ${fm.alergias}`, fm.padecimientos && `Padece: ${fm.padecimientos}`, fm.medicamentos && `Toma: ${fm.medicamentos}`, fm.tipo_sangre && `Sangre ${fm.tipo_sangre}`, fm.seguro && `Seguro: ${fm.seguro}`, fm.notas].filter(Boolean).join(' · ');
+                                return t ? <p className="text-xs font-semibold text-status-red">⚕ {t}</p> : null;
+                            })()}
                         </div>
-                        {r.confirmado_en && <span className="self-start rounded-full bg-ecopil-leaf px-2 text-[10px] font-extrabold text-ink">Confirmó</span>}
+                        <div className="flex flex-col items-end gap-1 self-start">
+                            {r.confirmado_en && <span className="rounded-full bg-ecopil-leaf px-2 text-[10px] font-extrabold text-ink">Confirmó</span>}
+                            {cartas && (cartas[r.id]?.folio
+                                ? <button onClick={() => verCarta(r.id)} className="rounded-full bg-brand-green/20 px-2 text-[10px] font-extrabold text-brand-green">Carta #{cartas[r.id].folio}{cartas[r.id].es_menor ? ' · menor' : ''} ↓</button>
+                                : <span className="rounded-full bg-status-red/20 px-2 text-[10px] font-extrabold text-status-red">Sin carta</span>)}
+                            {cartas?.[r.id]?.extras && (['temazcal', 'acampada', 'pajareada'] as const).filter((k) => cartas[r.id].extras![k]).map((k) => (
+                                <span key={k} className="rounded-full bg-gray-700 px-2 text-[10px] font-extrabold text-gray-200">{k === 'temazcal' ? 'Temazcal' : k === 'acampada' ? 'Acampa' : 'Pajareada'}</span>
+                            ))}
+                            {cartas?.[r.id]?.folio && !cartas[r.id].acepta_imagen && <span className="rounded-full bg-ecopil-sun px-2 text-[10px] font-extrabold text-ink">No fotos</span>}
+                        </div>
                     </div>
                     <div className="flex gap-2">
-                        {r.estado !== 'rechazado' && (['A', 'B'] as const).map((gr) => (
+                        {r.estado !== 'rechazado' && !(r.estado === 'pendiente' && cartas && !cartas[r.id]?.folio) && (['A', 'B'] as const).map((gr) => (
                             <button key={gr} onClick={() => revisar(r.id, r.estado === 'pendiente' ? 'aprobado' : null, gr)}
                                 className={clsx('w-10 h-10 rounded-full text-sm font-extrabold border-2', r.grupo === gr ? 'sticker bg-ecopil-sun text-ink' : 'border-gray-600 text-gray-300')}>{gr}</button>
                         ))}
                         <div className="flex-1" />
-                        {r.estado !== 'aprobado' && <button onClick={() => revisar(r.id, 'aprobado', null)} className="rounded-full bg-brand-green px-4 text-xs font-extrabold text-ink">Aprobar</button>}
+                        {r.estado !== 'aprobado' && (cartas && !cartas[r.id]?.folio
+                            ? <span className="self-center text-[11px] font-bold text-gray-500">Falta carta para aprobar</span>
+                            : <button onClick={() => revisar(r.id, 'aprobado', null)} className="rounded-full bg-brand-green px-4 text-xs font-extrabold text-ink">Aprobar</button>)}
                         {r.estado !== 'rechazado' && <button onClick={() => revisar(r.id, 'rechazado', null)} className="rounded-full border-2 border-gray-600 px-3 text-xs font-bold text-gray-300">Rechazar</button>}
                     </div>
                 </div>

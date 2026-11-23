@@ -6,6 +6,7 @@ import Header from "@/components/layout/Header";
 
 import { AuthProvider } from "@/context/AuthContext";
 import { ThemeProvider } from "@/context/ThemeContext";
+import { AccesoProvider } from "@/context/AccesoContext";
 import RegistrarSW from "@/components/pwa/RegistrarSW";
 
 // Tipografía oficial de Ecopil: Androgyne (títulos), Futura y Helvetica.
@@ -16,8 +17,8 @@ const jost = localFont({ src: "./jost.woff2", weight: "100 900", variable: "--fo
 const inter = localFont({ src: "./inter.woff2", weight: "100 900", variable: "--font-inter" });
 
 export const metadata: Metadata = {
-  title: "Encuentro Nacional de Innovación Social y Liderazgo Ambiental 2026 · Ecopil MX",
-  description: "Encuentro Nacional de Innovación Social y Liderazgo Ambiental · Hidalgo, 17–21 dic 2026",
+  title: "7º Encuentro Nacional de Innovación Social y Liderazgo Ambiental 2026 · Ecopil MX",
+  description: "7º Encuentro Nacional de Innovación Social y Liderazgo Ambiental · Hidalgo, 17–21 dic 2026",
 };
 
 export const viewport: Viewport = {
@@ -40,12 +41,14 @@ export default function RootLayout({
       >
         <ThemeProvider>
           <AuthProvider>
+          <AccesoProvider>
             <Header />
             <main className="px-4">
               {children}
             </main>
             <BottomNav />
             <RegistrarSW />
+          </AccesoProvider>
           </AuthProvider>
         </ThemeProvider>
       </body>

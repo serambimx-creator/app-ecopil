@@ -6,10 +6,13 @@ import { Home, Calendar, BookOpen, Map, User, ClipboardList } from 'lucide-react
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { clsx } from 'clsx';
+import { useAcceso, puedeVerTodo } from '@/context/AccesoContext';
 
 export default function BottomNav() {
     const pathname = usePathname();
     const { user } = useAuth();
+    const { acceso } = useAcceso();
+    const todo = puedeVerTodo(acceso);
     const [isMounted, setIsMounted] = useState(false);
     const isLightPage = (pathname === '/' && !user) || pathname === '/login' || pathname === '/registro' || pathname === '/mi-registro' || pathname === '/programa' || pathname === '/guia' || pathname === '/mapa';
 
@@ -18,15 +21,18 @@ export default function BottomNav() {
     }, []);
 
     // Asistentes y público: mismas pestañas. El panel de gestores vive en /gestion.
+    // Sin registro o sin validar: solo Inicio y Registro / Mi registro.
     const navItems = useMemo(() => [
         { name: 'Inicio', href: '/', icon: Home },
-        { name: 'Programa', href: '/programa', icon: Calendar },
-        { name: 'Guía', href: '/guia', icon: BookOpen },
-        { name: 'Mapa', href: '/mapa', icon: Map },
+        ...(todo ? [
+            { name: 'Programa', href: '/programa', icon: Calendar },
+            { name: 'Guía', href: '/guia', icon: BookOpen },
+            { name: 'Mapa', href: '/mapa', icon: Map },
+        ] : []),
         pathname === '/gestion'
             ? { name: 'Gestión', href: '/gestion', icon: ClipboardList }
-            : { name: 'Mi registro', href: '/mi-registro', icon: User },
-    ], [pathname]);
+            : acceso ? { name: 'Mi registro', href: '/mi-registro', icon: User } : { name: 'Registro', href: '/registro', icon: User },
+    ], [pathname, todo, acceso]);
 
     if (!isMounted) return null;
 

@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { supabase } from './supabase';
+import { tokensAcceso } from '@/context/AccesoContext';
 
 export type TipoActividad = 'actividad' | 'comida' | 'traslado' | 'taller' | 'logistica' | 'preparacion';
 export type EstadoActividad = 'pendiente' | 'en_proceso' | 'listo' | 'en_curso' | 'hecho' | 'cancelado';
@@ -159,8 +160,10 @@ export function usePublico() {
     const [sinConexion, setSinConexion] = useState(false);
 
     const cargar = useCallback(async () => {
-        const { data, error } = await supabase.rpc('encuentro_publico');
-        if (error || !data) { setSinConexion(true); return; }
+        const { agente, gestor } = tokensAcceso();
+        const { data, error } = await supabase.rpc('encuentro_publico2', { p_token: agente, p_gestor: gestor });
+        if (error) { setSinConexion(true); return; }
+        if (!data) { setDatos(null); try { localStorage.removeItem('encuentro_publico'); } catch { /* */ } return; } // sin acceso
         setSinConexion(false);
         setDatos(data as DatosPublicos);
         guardar('encuentro_publico', data);

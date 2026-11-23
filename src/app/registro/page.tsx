@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import { Mail, ArrowRight, Loader2, AlertTriangle, Camera, Phone, MapPin, HeartPulse, User } from 'lucide-react';
 import { ecopil, TOKEN_KEY, type Nodo } from '@/lib/ecopil';
 import Mixtli from '@/components/brand/Mixtli';
+import { SelectorExtras, EXTRAS_VACIO, extrasCompletos, guardarExtras, type Extras } from '@/components/encuentro/Extras';
 
 interface Form {
     email: string;
@@ -42,6 +43,7 @@ export default function RegistroPage() {
     const [foto, setFoto] = useState<File | null>(null);
     const [fotoUrl, setFotoUrl] = useState('');
     const [tokenGuardado, setTokenGuardado] = useState<string | null>(null);
+    const [extras, setExtras] = useState<Extras>(EXTRAS_VACIO);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const fileRef = useRef<HTMLInputElement>(null);
@@ -64,6 +66,7 @@ export default function RegistroPage() {
         e.preventDefault();
         if (!foto) return setError('Agrega una foto de perfil: el staff la usa para reconocerte.');
         if (!form.nodo_id) return setError('Elige tu nodo.');
+        if (!extrasCompletos(extras)) return setError('Responde sí o no a cada actividad extra.');
         setLoading(true);
         setError('');
         try {
@@ -84,6 +87,7 @@ export default function RegistroPage() {
             });
             if (error) throw error;
             try { localStorage.setItem(TOKEN_KEY, token as string); } catch { /* sin storage */ }
+            await guardarExtras(token as string, extras); // si falla, Mi registro vuelve a pedirlo
             router.push(`/mi-registro?t=${token}&nuevo=1`);
         } catch (err) {
             setError(`No se pudo guardar tu registro: ${err instanceof Error ? err.message : (err as { message?: string }).message ?? String(err)}`);
@@ -153,6 +157,12 @@ export default function RegistroPage() {
                         <Campo label="Teléfono" icon={Phone}>
                             <input required type="tel" value={form.emergencia_telefono} onChange={set('emergencia_telefono')} className={inputCls} />
                         </Campo>
+                    </div>
+
+                    <div className="pt-2 border-t-2 border-dashed border-[var(--t-border)] space-y-3">
+                        <p className="text-xs font-extrabold uppercase tracking-wider text-[var(--t-text-faint)] pt-3">Actividades extra (opcionales)</p>
+                        <p className="text-xs text-[var(--t-text-muted)]">Confirma si irás. Puedes cambiarlo después en Mi registro.</p>
+                        <SelectorExtras v={extras} set={setExtras} />
                     </div>
 
                     <button type="submit" disabled={loading} className={btnCls}>

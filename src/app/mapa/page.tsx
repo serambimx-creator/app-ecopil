@@ -1,5 +1,6 @@
 'use client';
 
+import SoloValidados from '@/components/layout/SoloValidados';
 import dynamic from 'next/dynamic';
 import { Suspense } from 'react';
 
@@ -16,10 +17,14 @@ function MapContent() {
     );
 }
 
-export default function Page() {
+function PageContenido() {
     return (
         <Suspense fallback={<div className="w-full h-full flex items-center justify-center text-[var(--t-text-faint)]">Cargando mapa...</div>}>
             <MapContent />
         </Suspense>
     );
+}
+
+export default function Page() {
+    return <SoloValidados><PageContenido /></SoloValidados>;
 }

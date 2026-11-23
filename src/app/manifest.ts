@@ -2,9 +2,9 @@ import type { MetadataRoute } from 'next';
 
 export default function manifest(): MetadataRoute.Manifest {
     return {
-        name: 'Encuentro Nacional de Innovación Social y Liderazgo Ambiental 2026',
+        name: '7º Encuentro Nacional de Innovación Social y Liderazgo Ambiental 2026',
         short_name: 'Encuentro',
-        description: 'Programa, sedes y registro del Encuentro Nacional de Innovación Social y Liderazgo Ambiental, Hidalgo 17–21 dic.',
+        description: 'Programa, sedes y registro del 7º Encuentro Nacional de Innovación Social y Liderazgo Ambiental, Hidalgo 17–21 dic.',
         start_url: '/programa',
         display: 'standalone',
         background_color: '#FBF6EA',
