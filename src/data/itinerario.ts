@@ -84,16 +84,15 @@ export const ITINERARIO: BloqueDia[] = [
         titulo: 'Tequio en Ajolotequio',
         detalle: 'Creación de biopiscina (Isaac), reforestación con maguey (Mahely), desazolve de jagüey (Alexia) y organización de herramientas (Marcos y Chepe)',
       },
-      { hora: '', titulo: 'Temazcal y campamento (actividad extra, opcional)', detalle: 'Previo registro · Lleva tus insumos' },
+      { hora: '18:00–21:00', titulo: 'Temazcal y campamento (actividad extra, opcional)', detalle: 'Previo registro · Temazcal con 20 lugares · Lleva tus insumos' },
     ],
   },
   {
     dia: '21 DIC',
     sede: 'Ajolotequio, Los Romeros (Tulancingo)  ·  Cierre de integración',
-    teaser: 'Temazcal al amanecer y despedida antes de volver a casa.',
+    teaser: 'Pajareada al amanecer y despedida antes de volver a casa.',
     actividades: [
       { hora: '', titulo: 'Pajareada (actividad extra, opcional)', detalle: 'Para quien se quedó al campamento' },
-      { hora: '08:00–09:30', titulo: 'Temazcal' },
       { hora: '09:30–10:30', titulo: 'Desayuno' },
       { hora: '10:30–12:00', titulo: 'Cierre de integración' },
       { hora: '12:00', titulo: 'Salida a terminales', esTraslado: true },

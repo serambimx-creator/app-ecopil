@@ -45,7 +45,7 @@ export const PROGRAMA: DiaPrograma[] = [
         bloques: [
             { momento: 'Mañana', texto: 'Nos tomamos la foto oficial y viajamos a Acaxochitlán: caminamos al manantial de Cascadas Dos Mundos (Huetziatl) y analizamos la calidad de su agua.' },
             { momento: 'Tarde', texto: 'Comida, clausura y sorteo. Después vamos a Ajolotequio, en Los Romeros (Tulancingo), a construir una biopiscina, reforestar y aprender de los ajolotes.' },
-            { momento: 'Noche', texto: 'Actividad extra (opcional): temazcal y campamento en Ajolotequio. Solo hay 20 lugares para el temazcal: apártalo abajo.' },
+            { momento: 'Noche', texto: 'Actividad extra (opcional): temazcal a las 18:00 y campamento en Ajolotequio. Solo hay 20 lugares para el temazcal: apártalo abajo.' },
         ],
         horas: [
             { hora: '07:00', que: 'Desayuno grupo A' }, { hora: '07:30', que: 'Desayuno grupo B' },
@@ -57,8 +57,8 @@ export const PROGRAMA: DiaPrograma[] = [
         dia: '2026-12-21', titulo: 'Cierre en Ajolotequio', sedes: ['ajolotequio'],
         bloques: [
             { momento: 'Mañana', texto: 'Actividad extra (opcional): pajareada en Ajolotequio para quien se quedó al campamento. Trae binoculares si tienes.' },
-            { momento: 'Mañana', texto: 'Temazcal a las 8:00, desayuno a las 9:30 y cierre de integración a las 10:30 para despedirnos y llevarnos los acuerdos a cada nodo.' },
+            { momento: 'Mañana', texto: 'Desayuno a las 9:30 y cierre de integración a las 10:30 para despedirnos y llevarnos los acuerdos a cada nodo.' },
         ],
-        horas: [{ hora: '08:00', que: 'Temazcal' }, { hora: '09:30', que: 'Desayuno' }, { hora: '10:30', que: 'Cierre de integración' }, { hora: '12:00', que: 'Salida a las terminales' }],
+        horas: [{ hora: '09:30', que: 'Desayuno' }, { hora: '10:30', que: 'Cierre de integración' }, { hora: '12:00', que: 'Salida a las terminales' }],
     },
 ];
