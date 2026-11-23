@@ -44,3 +44,5 @@ DumpStack.log
 # raw guide images (optimized WebP versions are in /public/guia/optimized/)
 public/guia/*.jpg
 public/guia/*.png
+# Repo aparte (ecopil-jornadas), no es parte de esta app
+/ecopil-jornadas/

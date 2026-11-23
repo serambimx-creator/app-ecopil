@@ -94,9 +94,9 @@ export const GUIA: SedeGuia[] = [
         ],
     },
     {
-        slug: 'ajolotequio', nombre: 'Tulancingo · Ajolotequio', dias: [20, 21], foto: '/guia/optimized/ajolote.webp',
+        slug: 'ajolotequio', nombre: 'Los Romeros, Tulancingo · Ajolotequio', dias: [20, 21], foto: '/guia/optimized/ajolote.webp',
         coords: [20.0843785, -98.3692634], altitud: '2,100 msnm', temp: '6–20 °C', clima: 'Templado',
-        resumen: 'Espacio de conservación del ajolote en Tulancingo. Aquí hacemos tequio, aprendemos de los ajolotes, nos damos un temazcal, acampamos y cerramos el Encuentro.',
+        resumen: 'Espacio de conservación del ajolote en Los Romeros, Tulancingo. Aquí hacemos tequio, aprendemos de los ajolotes, nos damos un temazcal, acampamos y cerramos el Encuentro.',
         haremos: ['Construir una biopiscina', 'Reforestar y aprender de los ajolotes', 'Temazcal (20 lugares, apártalo) y campamento', 'Cierre de integración el 21'],
         historia: '"Tulancingo" viene del náhuatl: "lugar de pequeños tules". Es la segunda ciudad más grande de Hidalgo.',
         geologia: 'Cuenca rodeada de serranías volcánicas con suelos fértiles y manantiales.',

@@ -126,7 +126,7 @@ export const SEDES: Record<string, string> = {
     tezontepec: 'Villa de Tezontepec',
     invictus: 'Invictus · El Huixmi',
     acaxochitlan: 'Acaxochitlán · Cascadas Dos Mundos',
-    ajolotequio: 'Tulancingo · Ajolotequio',
+    ajolotequio: 'Los Romeros, Tulancingo · Ajolotequio',
 };
 
 export const DIAS = ['2026-12-17', '2026-12-18', '2026-12-19', '2026-12-20', '2026-12-21'];

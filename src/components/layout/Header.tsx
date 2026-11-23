@@ -19,7 +19,7 @@ export default function Header() {
 
     // Display the event name on the landing page instead of Panel Principal
     const getTitle = () => {
-        if (!isAuthenticated && pathname === '/') return 'Encuentro de Nodos';
+        if (!isAuthenticated && pathname === '/') return 'Encuentro Nacional';
         switch (pathname) {
             case '/': return 'Panel Principal';
             case '/agenda': return 'Agenda 2026';
@@ -31,7 +31,7 @@ export default function Header() {
             case '/mapa': return 'Mapa de sedes';
             case '/guia': return 'Guía de sedes';
             case '/perfil': return 'Mi Perfil';
-            default: return 'Encuentro de Nodos';
+            default: return 'Encuentro Nacional';
         }
     };
 

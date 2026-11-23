@@ -157,7 +157,7 @@ function MiRegistroContenido() {
                 <div className="sticker relative overflow-hidden rounded-[28px] bg-brand-green p-5 text-ink">
                     <div className="flex items-start justify-between gap-3">
                         <div>
-                            <p className="font-futura text-[10px] font-extrabold uppercase tracking-[0.2em]">Gafete · 7º Encuentro de Nodos</p>
+                            <p className="font-futura text-[10px] font-extrabold uppercase tracking-[0.2em]">Gafete · Encuentro Nacional 2026</p>
                             <p className="font-display mt-1 text-2xl font-semibold leading-tight">{registro.nombre}</p>
                             <p className="text-sm font-bold">Nodo {registro.nodo}{registro.grupo ? ` · Grupo ${registro.grupo}` : ''}</p>
                             {registro.confirmado_en && <p className="mt-2 inline-flex items-center gap-1 rounded-full bg-white/60 px-2 py-0.5 text-[11px] font-extrabold"><Check size={12} /> Asistencia confirmada</p>}
@@ -219,7 +219,7 @@ function MiRegistroContenido() {
                     <button onClick={copiar} className="font-futura sticker flex-1 bg-ecopil-sun text-ink font-extrabold py-2.5 rounded-full text-sm flex items-center justify-center gap-1.5">
                         <Copy size={14} /> {copiado ? 'Copiado' : 'Copiar'}
                     </button>
-                    <a href={`https://wa.me/?text=${encodeURIComponent(`Mi registro al Encuentro de Nodos 2026: ${enlace}`)}`} target="_blank" rel="noreferrer"
+                    <a href={`https://wa.me/?text=${encodeURIComponent(`Mi registro al Encuentro Nacional de Innovación Social y Liderazgo Ambiental 2026: ${enlace}`)}`} target="_blank" rel="noreferrer"
                         className="flex-1 border-2 border-[var(--t-border)] rounded-full py-2.5 text-sm font-bold text-[var(--t-text-muted)] flex items-center justify-center gap-1.5">
                         <Share2 size={14} /> WhatsApp
                     </a>

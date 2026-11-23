@@ -68,7 +68,7 @@ export const ITINERARIO: BloqueDia[] = [
   },
   {
     dia: '20 DIC',
-    sede: 'Acaxochitlán → Tulancingo (Ajolotequio)  ·  Noche de campamento en Ajolotequio',
+    sede: 'Acaxochitlán → Ajolotequio, Los Romeros (Tulancingo)  ·  Noche de campamento en Ajolotequio',
     teaser: 'Foto oficial, manantiales, cierre con sorteo y una noche de temazcal.',
     actividades: [
       { hora: '07:00–08:00', titulo: 'Desayuno en 2 equipos', detalle: 'Grupo A 7:00–7:30 · Grupo B 7:30–8:00 · Hotel Tula' },
@@ -78,7 +78,7 @@ export const ITINERARIO: BloqueDia[] = [
       { hora: '10:50–12:00', titulo: 'Taller de análisis de calidad de agua', detalle: 'Manantial' },
       { hora: '12:00–12:20', titulo: 'Regreso', esTraslado: true },
       { hora: '12:30–14:30', titulo: 'Comida, clausura y sorteo', detalle: 'Con la comunidad de Cascadas Dos Mundos' },
-      { hora: '14:40–15:40', titulo: 'Traslado a Tulancingo', detalle: 'Parada en la terminal para quien se despide · Información de Ajolotequio: Wendy', esTraslado: true },
+      { hora: '14:40–15:40', titulo: 'Traslado a Ajolotequio, Los Romeros', detalle: 'Parada en la terminal para quien se despide · Información de Ajolotequio: Wendy', esTraslado: true },
       {
         hora: '16:00–18:00',
         titulo: 'Tequio en Ajolotequio',
@@ -89,7 +89,7 @@ export const ITINERARIO: BloqueDia[] = [
   },
   {
     dia: '21 DIC',
-    sede: 'Ajolotequio, Tulancingo  ·  Cierre de integración',
+    sede: 'Ajolotequio, Los Romeros (Tulancingo)  ·  Cierre de integración',
     teaser: 'Temazcal al amanecer y despedida antes de volver a casa.',
     actividades: [
       { hora: '08:00–09:30', titulo: 'Temazcal' },

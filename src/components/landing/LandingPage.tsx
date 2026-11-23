@@ -168,12 +168,31 @@ const ALIADOS = [
     { nombre: 'COESBIOH · Comisión Estatal de Biodiversidad de Hidalgo', logo: '/logos/coesbioh.png', h: 'h-10' },
     { nombre: 'Cascadas Dos Mundos', logo: '/logos/huetzitli.png', h: 'h-11' },
     { nombre: 'Invictus · Conciencia, ciencia y corazón', logo: '/logos/invictus.png', h: 'h-11' },
+    { nombre: 'CONANP · Comisión Nacional de Áreas Naturales Protegidas', logo: '/logos/conanp.webp', h: 'h-11' },
+    { nombre: 'CONABIO', logo: '/logos/conabio.webp', h: 'h-11' },
+    { nombre: 'UICN Comité Mexicano', logo: '/logos/uicn.webp', h: 'h-10' },
+    { nombre: 'CEC · Commission on Education and Communication (UICN)', logo: '/logos/cec-uicn.webp', h: 'h-9' },
+    { nombre: 'Servicio Forestal de EE. UU. (USDA Forest Service)', logo: '/logos/usfs.webp', h: 'h-11' },
+    { nombre: 'Objetivos de Desarrollo Sostenible', logo: '/logos/ods.webp', h: 'h-8' },
+    { nombre: '#NatureForAll', logo: '/logos/nature-for-all.webp', h: 'h-8' },
+    { nombre: 'Environment for the Americas', logo: '/logos/environment-americas.webp', h: 'h-9' },
+    { nombre: 'Parque Nacional Tula', logo: '/logos/pn-tula.webp', h: 'h-11' },
+    { nombre: 'Ajolotequio', logo: '/logos/ajolotequio.webp', h: 'h-11' },
+    { nombre: 'NaturaLista', logo: '/logos/naturalista.webp', h: 'h-9' },
+    { nombre: 'Plantas Altepetl', logo: '/logos/plantas-altepetl.webp', h: 'h-11' },
+    { nombre: 'Water Hackers', logo: '/logos/water-hackers.webp', h: 'h-10' },
+    { nombre: 'Watergram', logo: '/logos/watergram.webp', h: 'h-7' },
+    { nombre: 'Valia Energía', logo: '/logos/valia-energia.webp', h: 'h-8' },
+    { nombre: 'AC Expertos en Energía', logo: '/logos/ac-energia.webp', h: 'h-10' },
+    { nombre: 'ENOMEX · Enovaciones Mexicanas de Alambre', logo: '/logos/enomex.webp', h: 'h-9' },
+    { nombre: 'Norte 19 · Promotora de Hoteles', logo: '/logos/norte19.webp', h: 'h-8' },
+    { nombre: 'PAU', logo: '/logos/pau.webp', h: 'h-9' },
 ];
 
 const INFO_PRACTICA = [
     { titulo: 'Hospedaje y llegada', pose: 'asoma', color: 'bg-ecopil-sun', items: [
         'Llegada el 17 de diciembre. Bienvenida a las 19:30 en el Hotel City Express Tula.',
-        'Del 17 al 19 dormimos en el hotel; la noche del 20 acampamos en Ajolotequio (Tulancingo).',
+        'Del 17 al 19 dormimos en el hotel; la noche del 20 acampamos en Ajolotequio, Los Romeros (Tulancingo).',
         'El 21 a las 12:00 te llevamos a las terminales para tu regreso.',
     ] },
     { titulo: 'Qué traer', pose: 'pala', color: 'bg-ecopil-leaf', items: [
@@ -227,10 +246,10 @@ export default function LandingPage() {
             <section className="relative -mx-4 overflow-hidden px-5 pt-6">
                 <div className="relative z-10 space-y-3">
                     <span className="font-futura sticker inline-flex items-center gap-1.5 rounded-full bg-ecopil-sun px-3 py-1 text-[10px] font-extrabold uppercase tracking-wider text-ink">
-                        <Star size={10} fill="currentColor" /> Encuentro de Nodos 2026
+                        <Star size={10} fill="currentColor" /> Encuentro Nacional 2026
                     </span>
-                    <h1 className="font-display text-[34px] font-semibold leading-[1.05] tracking-tight text-[var(--t-text)]">
-                        7º Encuentro Nacional <span className="text-[var(--t-accent)]">de Nodos</span>
+                    <h1 className="font-display text-[28px] font-semibold leading-[1.08] tracking-tight text-[var(--t-text)]">
+                        Encuentro Nacional de <span className="text-[var(--t-accent)]">Innovación Social y Liderazgo Ambiental</span>
                     </h1>
                     <p className="flex items-center gap-1.5 text-sm font-bold text-[var(--t-text-secondary)]">
                         <MapPin size={15} className="text-ecopil-red" /> Hidalgo &middot; 17–21 dic 2026
@@ -248,11 +267,11 @@ export default function LandingPage() {
                 <div className="mt-5" aria-label="Aliados del Encuentro">
                     <p className="font-futura mb-1.5 text-[10px] font-extrabold uppercase tracking-[0.18em] text-[var(--t-text-faint)]">Con el apoyo de</p>
                     <div className="-mx-5 overflow-hidden [mask-image:linear-gradient(90deg,transparent,black_12%,black_88%,transparent)]">
-                        <div className="flex w-max animate-[aliados_28s_linear_infinite] items-center">
+                        <div className="flex w-max animate-[aliados_90s_linear_infinite] items-center">
                             {[...ALIADOS, ...ALIADOS].map((a, i) => (
                                 // eslint-disable-next-line @next/next/no-img-element
                                 <img key={i} src={a.logo} alt={i < ALIADOS.length ? a.nombre : ''} aria-hidden={i >= ALIADOS.length}
-                                    className={`mr-10 ${a.h} w-auto max-w-[130px] object-contain`} />
+                                    className={`mr-10 ${a.h} w-auto max-w-[150px] object-contain`} />
                             ))}
                         </div>
                     </div>
@@ -262,7 +281,7 @@ export default function LandingPage() {
                 <div className="relative mt-2">
                     <MixtliCorre>
                     <MixtliBubble className="absolute left-5 top-1 max-w-[170px]">
-                        ¡Bienvenidos al <b>7º Encuentro de Nodos</b>! Del 17 al 21 de diciembre, Hidalgo es su casa.
+                        ¡Bienvenidos al <b>Encuentro Nacional</b>! Del 17 al 21 de diciembre, Hidalgo es su casa.
                     </MixtliBubble>
                     </MixtliCorre>
                 </div>
@@ -439,7 +458,7 @@ export default function LandingPage() {
                             Asociación Civil mexicana que conecta comunidades, gobierno, academia y sector privado para restaurar ecosistemas y formar líderes ambientales a nivel nacional, desde 2012.
                         </p>
                         <div className="flex flex-wrap gap-2">
-                            {['Soluciones basadas en Naturaleza', 'STEAM', 'Acción Climática', 'ODS 2030'].map((tag) => (
+                            {['Soluciones basadas en el Ecosistema', 'STEAM', 'Acción Climática', 'ODS 2030'].map((tag) => (
                                 <span key={tag} className="text-xs rounded-full px-3 py-1 font-bold bg-[var(--t-accent-tint-bg)] text-[var(--t-accent)] border border-[var(--t-accent-tint-border)]">
                                     {tag}
                                 </span>
@@ -447,9 +466,9 @@ export default function LandingPage() {
                         </div>
                     </section>
 
-                    {/* El Encuentro Nacional de Nodos */}
+                    {/* El Encuentro Nacional */}
                     <section className="space-y-6">
-                        <h2 className="font-display text-2xl font-semibold">El Encuentro Nacional de Nodos</h2>
+                        <h2 className="font-display text-2xl font-semibold">Encuentro Nacional de Innovación Social y Liderazgo Ambiental</h2>
 
                         <div className="bg-[var(--t-surface)] border border-[var(--t-border)] rounded-2xl p-5">
                             <p className="text-sm text-[var(--t-text-secondary)] leading-relaxed">
@@ -460,9 +479,9 @@ export default function LandingPage() {
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                             {[
                                 { title: 'Encuentro', desc: 'Jóvenes de 22 ciudades comparten experiencias', img: '/impacto/optimized/hero-ecopil.webp' },
-                                { title: 'Capacitación', desc: 'Talleres STEAM, SbN y liderazgo ambiental', img: '/impacto/optimized/Arroyo Moreno-Ecopil-374.webp' },
+                                { title: 'Capacitación', desc: 'Talleres STEAM, soluciones basadas en el ecosistema y liderazgo ambiental', img: '/impacto/optimized/Arroyo Moreno-Ecopil-374.webp' },
                                 { title: 'Restauración', desc: 'Reforestación y monitoreo en campo', img: '/impacto/optimized/Jornada Alpura_AeroMexico-077.webp' },
-                                { title: 'Innovación', desc: 'Soluciones basadas en la naturaleza', img: '/impacto/optimized/Arroyo Moreno-Ecopil-416.webp' },
+                                { title: 'Innovación', desc: 'Soluciones basadas en el ecosistema', img: '/impacto/optimized/Arroyo Moreno-Ecopil-416.webp' },
                             ].map((pilar) => (
                                 <div key={pilar.title} className="relative rounded-xl overflow-hidden h-28">
                                     <Image src={pilar.img} alt={pilar.title} fill className="object-cover opacity-40" />
@@ -522,7 +541,7 @@ export default function LandingPage() {
                             <div className="space-y-3">
                                 {[
                                     { title: 'Modelo de Innovación Ecopil', desc: 'Línea base, Nodos, Restauración, Monitoreo' },
-                                    { title: 'Soluciones basadas en la Naturaleza', desc: 'Infraestructura verde, humedales, reforestación' },
+                                    { title: 'Soluciones basadas en el Ecosistema', desc: 'Infraestructura verde, humedales, reforestación' },
                                     { title: 'STEAM ambiental', desc: 'Ciencia y tecnología aplicada a ecosistemas locales' },
                                     { title: 'Acción para el Empoderamiento Climático', desc: 'Marco CMNUCC' },
                                     { title: 'Liderazgo y gestión de nodos', desc: 'Vinculación con sector privado y gobierno' },
