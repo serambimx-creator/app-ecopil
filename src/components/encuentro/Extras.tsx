@@ -7,9 +7,9 @@ import { Loader2, Tent } from 'lucide-react';
 import { ecopil } from '@/lib/ecopil';
 
 export const EXTRAS = [
-    { k: 'temazcal', t: 'Temazcal', d: '20 dic · cupo de 20 lugares' },
+    { k: 'temazcal', t: 'Temazcal', d: '21 dic, 8:00 · cupo de 20 lugares' },
     { k: 'acampada', t: 'Acampada en Ajolotequio', d: 'Noche del 20 dic' },
-    { k: 'pajareada', t: 'Pajareada', d: '21 dic, en la mañana' },
+    { k: 'pajareada', t: 'Pajareada', d: '21 dic, en la mañana (para quien acampa)' },
 ] as const;
 export type ClaveExtra = (typeof EXTRAS)[number]['k'];
 export type Extras = Record<ClaveExtra, boolean | null>;
