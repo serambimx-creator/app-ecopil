@@ -1,6 +1,6 @@
 -- Carta compromiso (aviso de privacidad, reglamento, riesgos, imagen opcional, menores) con aceptación electrónica
 -- (firma electrónica simple) y ficha médica.
--- ANTES DE CORRER: reemplaza {{CORREO_PRIVACIDAD}} (2 veces) por el correo de Ecopil para privacidad.
+-- Correo de privacidad: ecopilgo@gmail.com
 -- Base: Código de Comercio arts. 89–93 (mensaje de datos, firma electrónica, atribución) y
 -- Código Civil Federal arts. 1803 y 1834 bis (consentimiento y forma escrita por medios electrónicos).
 -- Evidencia: versión y hash de la carta mostrada, casillas explícitas, nombre escrito (+ firma dibujada opcional),
@@ -53,7 +53,7 @@ Finalidades necesarias: registrar y validar tu participación, organizar grupos,
 
 Tus datos de salud solo los consulta el staff del nodo anfitrión y, en una emergencia, el personal médico que te atienda. No vendemos tus datos ni los transferimos a terceros, salvo a servicios médicos o autoridades cuando sea necesario para protegerte o lo exija la ley.
 
-Conservamos los datos de logística y salud hasta 6 meses después del Encuentro y la evidencia de esta carta mientras pueda servir para aclarar cualquier controversia. Puedes ejercer tus derechos de acceso, rectificación, cancelación y oposición, o revocar tu consentimiento, escribiendo a {{CORREO_PRIVACIDAD}}.
+Conservamos los datos de logística y salud hasta 6 meses después del Encuentro y la evidencia de esta carta mientras pueda servir para aclarar cualquier controversia. Puedes ejercer tus derechos de acceso, rectificación, cancelación y oposición, o revocar tu consentimiento, escribiendo a ecopilgo@gmail.com.
 
 2. REGLAMENTO DE PARTICIPACIÓN
 
@@ -75,7 +75,7 @@ Respondo por mis actos y por los daños que cause por no seguir el reglamento o 
 
 {{IMAGEN}} a Ecopil MX a usar, sin pago, fotografías, videos y audio en los que aparezca, tomados durante el Encuentro, para difundir y documentar el Encuentro y el trabajo de Ecopil MX en sus redes sociales, sitio web, informes y materiales impresos, y para que los aliados y patrocinadores del Encuentro los publiquen en sus propios canales con la misma finalidad, siempre citando el Encuentro. No se usarán para anunciar productos o servicios de terceros.
 
-La autorización dura 5 años a partir de la fecha de aceptación. Puedo revocarla en cualquier momento escribiendo a {{CORREO_PRIVACIDAD}}; la revocación aplica a usos nuevos y no obliga a retirar materiales impresos o publicaciones anteriores a ella. Si no autorizo, el staff procurará no publicar imágenes en las que se me identifique.
+La autorización dura 5 años a partir de la fecha de aceptación. Puedo revocarla en cualquier momento escribiendo a ecopilgo@gmail.com; la revocación aplica a usos nuevos y no obliga a retirar materiales impresos o publicaciones anteriores a ella. Si no autorizo, el staff procurará no publicar imágenes en las que se me identifique.
 
 5. PERSONAS MENORES DE EDAD
 
