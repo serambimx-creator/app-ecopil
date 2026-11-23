@@ -246,10 +246,10 @@ export default function LandingPage() {
             <section className="relative -mx-4 overflow-hidden px-5 pt-6">
                 <div className="relative z-10 space-y-3">
                     <span className="font-futura sticker inline-flex items-center gap-1.5 rounded-full bg-ecopil-sun px-3 py-1 text-[10px] font-extrabold uppercase tracking-wider text-ink">
-                        <Star size={10} fill="currentColor" /> Encuentro Nacional 2026
+                        <Star size={10} fill="currentColor" /> 7º Encuentro Nacional 2026
                     </span>
                     <h1 className="font-display text-[28px] font-semibold leading-[1.08] tracking-tight text-[var(--t-text)]">
-                        Encuentro Nacional de <span className="text-[var(--t-accent)]">Innovación Social y Liderazgo Ambiental</span>
+                        7º Encuentro Nacional de <span className="text-[var(--t-accent)]">Innovación Social y Liderazgo Ambiental</span>
                     </h1>
                     <p className="flex items-center gap-1.5 text-sm font-bold text-[var(--t-text-secondary)]">
                         <MapPin size={15} className="text-ecopil-red" /> Hidalgo &middot; 17–21 dic 2026
@@ -281,7 +281,7 @@ export default function LandingPage() {
                 <div className="relative mt-2">
                     <MixtliCorre>
                     <MixtliBubble className="absolute left-5 top-1 max-w-[170px]">
-                        ¡Bienvenidos al <b>Encuentro Nacional</b>! Del 17 al 21 de diciembre, Hidalgo es su casa.
+                        ¡Bienvenidos al <b>7º Encuentro Nacional</b>! Del 17 al 21 de diciembre, Hidalgo es su casa.
                     </MixtliBubble>
                     </MixtliCorre>
                 </div>
@@ -470,7 +470,7 @@ export default function LandingPage() {
 
                     {/* El Encuentro Nacional */}
                     <section className="space-y-6">
-                        <h2 className="font-display text-2xl font-semibold">Encuentro Nacional de Innovación Social y Liderazgo Ambiental</h2>
+                        <h2 className="font-display text-2xl font-semibold">7º Encuentro Nacional de Innovación Social y Liderazgo Ambiental</h2>
 
                         <div className="bg-[var(--t-surface)] border border-[var(--t-border)] rounded-2xl p-5">
                             <p className="text-sm text-[var(--t-text-secondary)] leading-relaxed">

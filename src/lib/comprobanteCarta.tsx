@@ -51,7 +51,7 @@ function Doc({ c }: { c: Comprobante }) {
     return (
         <Document title={`Carta compromiso - folio ${c.folio}`} author="Ecopil MX">
             <Page size="LETTER" style={s.page}>
-                <Text style={s.h1}>Carta compromiso · Encuentro Nacional de Innovación Social y Liderazgo Ambiental 2026</Text>
+                <Text style={s.h1}>Carta compromiso · 7º Encuentro Nacional de Innovación Social y Liderazgo Ambiental 2026</Text>
                 <Text style={s.sub}>Comprobante de aceptación electrónica · Folio {c.folio} · Versión {c.version}</Text>
                 {c.texto.split('\n\n').map((p, i) => (
                     <Text key={i} style={/^\d\. /.test(p) ? [s.p, { fontFamily: 'Helvetica-Bold' }] : s.p}>{p}</Text>
