@@ -1,6 +1,6 @@
 'use client';
 
-// Apartar lugar en el temazcal del 21 dic (cupo limitado). Solo agentes con registro aprobado.
+// Apartar lugar en el temazcal del 20 dic (cupo limitado). Solo agentes con registro aprobado.
 import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Flame, Loader2 } from 'lucide-react';
@@ -28,7 +28,7 @@ export default function Temazcal({ token: tokenProp }: { token?: string | null }
 
     return (
         <div className="sticker space-y-2 rounded-3xl bg-ecopil-orange p-4 text-ink">
-            <p className="flex items-center gap-2 font-display text-xl font-semibold"><Flame size={20} /> Temazcal · 21 dic, 8:00</p>
+            <p className="flex items-center gap-2 font-display text-xl font-semibold"><Flame size={20} /> Temazcal · 20 dic, 18:00</p>
             <p className="text-sm">Solo hay 20 lugares. Si te interesa ir, apártalo aquí.</p>
             {!token ? (
                 <Link href="/registro" className="font-futura inline-block rounded-full bg-ink px-4 py-2 text-xs font-extrabold text-white">Regístrate para apartar lugar</Link>
