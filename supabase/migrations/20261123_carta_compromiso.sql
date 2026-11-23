@@ -65,7 +65,7 @@ Entiendo que, si incumplo este reglamento de forma grave, la organización puede
 
 Yo, {{NOMBRE}}, confirmo que participo de forma voluntaria y sin remuneración en el Encuentro Nacional de Innovación Social y Liderazgo Ambiental 2026, que Ecopil MX realiza en el estado de Hidalgo del 17 al 21 de diciembre de 2026.
 
-Conozco que el programa incluye actividades al aire libre, como caminatas en terreno irregular, visitas a cascadas y cuerpos de agua, actividades de restauración con herramientas, pernocta en campamento y traslados en vehículo, y que estas tienen riesgos propios: caídas, golpes, cortaduras, picaduras, exposición al sol, al frío o a la lluvia, y contacto con fauna y flora silvestre. Acepto esos riesgos inherentes y me comprometo a usar el equipo y la ropa recomendados.
+Conozco que el programa incluye actividades al aire libre, como caminatas en terreno irregular, visitas a cascadas y cuerpos de agua, actividades de restauración con herramientas y traslados en vehículo, además de actividades extra opcionales (acampada y observación de aves), y que estas tienen riesgos propios: caídas, golpes, cortaduras, picaduras, exposición al sol, al frío o a la lluvia, y contacto con fauna y flora silvestre. Acepto esos riesgos inherentes y me comprometo a usar el equipo y la ropa recomendados.
 
 Declaro que mi estado de salud me permite participar y que informé en la ficha médica cualquier condición relevante. En caso de emergencia, autorizo al staff a llamar a mi contacto de emergencia y a solicitar atención médica para mí. Los gastos médicos que no cubra un seguro corren por mi cuenta.
 
