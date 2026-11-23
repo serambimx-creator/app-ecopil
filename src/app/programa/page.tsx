@@ -1,5 +1,6 @@
 'use client';
 
+import SoloValidados from '@/components/layout/SoloValidados';
 import { useState } from 'react';
 import Link from 'next/link';
 import { clsx } from 'clsx';
@@ -49,7 +50,7 @@ function Ahora() {
     );
 }
 
-export default function ProgramaPage() {
+function ProgramaPageContenido() {
     const { datos, sinConexion } = usePublico();
     const hoy = ahoraHidalgo().dia;
     const [dia, setDia] = useState(DIAS.includes(hoy) ? hoy : DIAS[1]);
@@ -121,4 +122,8 @@ export default function ProgramaPage() {
             </section>
         </div>
     );
+}
+
+export default function ProgramaPage() {
+    return <SoloValidados><ProgramaPageContenido /></SoloValidados>;
 }

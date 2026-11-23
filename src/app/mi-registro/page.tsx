@@ -10,6 +10,7 @@ import { clsx } from 'clsx';
 import { Loader2, Check, Clock, XCircle, Copy, Share2, CalendarDays, Map, BookOpen, Star, ChevronDown } from 'lucide-react';
 import { ecopil, TOKEN_KEY, type MiRegistro } from '@/lib/ecopil';
 import { ahoraHidalgo, diaCorto } from '@/lib/encuentro';
+import { useAcceso } from '@/context/AccesoContext';
 import Mixtli, { MixtliBubble } from '@/components/brand/Mixtli';
 
 const ESTADO = {
@@ -68,6 +69,7 @@ function MiRegistroContenido() {
     const [qr, setQr] = useState('');
     const [verEncuesta, setVerEncuesta] = useState(false);
     const nuevo = params.get('nuevo') === '1';
+    const { recargar: recargarAcceso } = useAcceso();
 
     const cargar = async (t: string) => {
         const r3 = await ecopil.rpc('encuentro_mi_registro3', { p_token: t });
@@ -89,9 +91,10 @@ function MiRegistroContenido() {
             else t = localStorage.getItem(TOKEN_KEY);
         } catch { /* sin storage */ }
         setToken(t);
+        recargarAcceso();
         if (!t) { setRegistro(null); return; }
         cargar(t);
-    }, [params]);
+    }, [params, recargarAcceso]);
 
     const enlace = token ? `${typeof window !== 'undefined' ? window.location.origin : ''}/mi-registro?t=${token}` : '';
     const copiar = async () => { try { await navigator.clipboard.writeText(enlace); setCopiado(true); } catch { /* sin portapapeles */ } };

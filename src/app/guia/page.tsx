@@ -1,5 +1,6 @@
 'use client';
 
+import SoloValidados from '@/components/layout/SoloValidados';
 import { Fragment, useEffect, useMemo, useState } from 'react';
 import Image from 'next/image';
 import { clsx } from 'clsx';
@@ -143,7 +144,7 @@ function SedeCard({ s, llegar, checks, toggleCheck, vistas, verla, reiniciar, ma
     );
 }
 
-export default function GuiaPage() {
+function GuiaPageContenido() {
     const hoy = Number(ahoraHidalgo().dia.slice(8, 10));
     const enEvento = ahoraHidalgo().dia.startsWith('2026-12') && DIAS.includes(hoy);
     const [dia, setDia] = useState(enEvento ? hoy : 18);
@@ -210,4 +211,8 @@ export default function GuiaPage() {
             <p className="mt-6 flex items-start gap-2 text-xs text-[var(--t-text-faint)]"><Lightbulb size={14} className="shrink-0" /> Tu lista y tus retos se guardan en este celular.</p>
         </div>
     );
+}
+
+export default function GuiaPage() {
+    return <SoloValidados><GuiaPageContenido /></SoloValidados>;
 }

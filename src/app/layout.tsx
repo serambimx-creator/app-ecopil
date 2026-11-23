@@ -6,6 +6,7 @@ import Header from "@/components/layout/Header";
 
 import { AuthProvider } from "@/context/AuthContext";
 import { ThemeProvider } from "@/context/ThemeContext";
+import { AccesoProvider } from "@/context/AccesoContext";
 import RegistrarSW from "@/components/pwa/RegistrarSW";
 
 // Tipografía oficial de Ecopil: Androgyne (títulos), Futura y Helvetica.
@@ -40,12 +41,14 @@ export default function RootLayout({
       >
         <ThemeProvider>
           <AuthProvider>
+          <AccesoProvider>
             <Header />
             <main className="px-4">
               {children}
             </main>
             <BottomNav />
             <RegistrarSW />
+          </AccesoProvider>
           </AuthProvider>
         </ThemeProvider>
       </body>

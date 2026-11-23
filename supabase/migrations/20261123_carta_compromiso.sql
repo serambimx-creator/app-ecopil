@@ -300,3 +300,23 @@ grant execute on function public.encuentro_carta(), public.encuentro_mi_carta(te
   public.encuentro_firmar_carta(text, text, text, text, boolean, boolean, boolean, boolean, text, text, text),
   public.gestor_cartas(text), public.gestor_carta_comprobante(text, uuid),
   public.encuentro_guardar_ficha(text, boolean, text, text, text, text, text, text), public.encuentro_mi_ficha(text) to anon, authenticated;
+
+-- ---------- Acceso: solo agentes validados (o gestores) ven programa, guía y mapa ----------
+-- Estado de acceso para la app: 'gestor', 'aprobado', 'pendiente', 'rechazado' o null (sin registro).
+create or replace function public.encuentro_acceso(p_token text, p_gestor text)
+returns text language sql stable security definer set search_path = public as $$
+  select case
+    when p_gestor is not null and gestor_de_token(p_gestor) is not null then 'gestor'
+    else (select estado from encuentro_registros where token = p_token) end;
+$$;
+
+-- Programa y avisos: ya no son públicos. Mismo contenido que encuentro_publico(), solo con acceso.
+create or replace function public.encuentro_publico2(p_token text, p_gestor text)
+returns jsonb language plpgsql stable security definer set search_path = public as $$
+begin
+  if encuentro_acceso(p_token, p_gestor) not in ('gestor', 'aprobado') then return null; end if;
+  return encuentro_publico();
+end $$;
+
+revoke execute on function public.encuentro_publico() from public, anon, authenticated;
+grant execute on function public.encuentro_acceso(text, text), public.encuentro_publico2(text, text) to anon, authenticated;
